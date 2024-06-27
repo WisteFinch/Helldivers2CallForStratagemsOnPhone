@@ -9,8 +9,8 @@ Based on the idea: Strap the phone to the arm and simulate the call strategy to 
 PC (Rust):
 
 - TCP server ✅
-- Keyboard simulate ⌛
-- Synchronize configuration with client
+- Keyboard simulate ✅
+- Synchronize configuration with client ✅
 
 Phone (Android Kotlin):
 
@@ -27,8 +27,8 @@ Phone (Android Kotlin):
 电脑端 (Rust):
 
 - TCP服务器 ✅
-- 模拟输入 ⌛
-- 和手机端同步配置
+- 模拟输入 ✅
+- 和手机端同步配置 ✅
 
 手机端 (Android Kotlin):
 
