@@ -3,16 +3,18 @@ use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::{sleep, Duration};
-use rdev::{simulate, EventType, Key, SimulateError};
+use rdev::{simulate, EventType, Key};
 use config::*;
 
 pub mod config;
 
+const CONF_PATH: &str = "./config.json";
+
 pub async fn run() -> Result<()> {
-    // load configuration
+    // Load configuration
     let conf: Config = load_config().await?;
 
-    // listen port
+    // Listen port
     let listener = TcpListener::bind(format!("127.0.0.1:{}", conf.port)).await?;
     println!("Listening port: {}", conf.port);
     loop {
@@ -31,52 +33,101 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             return Ok(());
         }
 
-        // parsing json
+        // Parsing json
         let json = json!(std::str::from_utf8(&buffer[..size]).unwrap());
         let opt: Operation = Operation::from_u64(json["operation"].as_u64().unwrap());
         match opt {
-            Operation::Status => client.write_all("ready".as_bytes()).await.unwrap(),
-            Operation::Request => todo!(),
-            Operation::Sync => todo!(),
-            Operation::Simulate => execute(json["stratagem"].clone(), &conf).await.unwrap(),
+            Operation::Status => client.write_all("ready".as_bytes()).await?,
+            Operation::Request => {client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; println!("Sending configuration to: {}", client.peer_addr()?)},
+            Operation::Sync => save_config(json["configuration"].as_str().unwrap()).await,
+            Operation::Combined => macros(json["macro"].clone(), &conf).await?,
+            Operation::Independent => independent(json["input"].clone(), &conf).await?
         }
     }
 }
 
 async fn load_config() -> Result<Config> {
-    let conf: Config = match fs::read_to_string("config.json") {
+    let conf: Config = match fs::read_to_string(CONF_PATH) {
         Ok(ok) => serde_json::from_str(&ok).unwrap(),
         Err(_) => {println!("Error loading configuration, loading default configuration!"); Config::default()}
     };
+
     Ok(conf)
 }
 
-async fn save_config() -> Result<()> {
-    todo!();
+async fn save_config(str: &str) {
+    fs::write(CONF_PATH, str).unwrap();
+    println!("Configuration synchronize, need to restart.");
+    std::process::exit(0);
+}
+
+async fn macros(value: Value, conf: &Config) -> Result<()>{
+    // Press ctrl
+    print!("{}: ", value["name"].as_str().unwrap());
+    execute(Step::Ctrl, InputType::Press, conf).await.unwrap();
+    
+    // Click steps
+    let list = value["steps"].as_array().unwrap();
+    for i in list {
+        execute(Step::from_u64(i.as_u64().unwrap()), InputType::Click, conf).await.unwrap();
+    }
+
+    // Release ctrl
+    print!("\n");
+    execute(Step::Ctrl, InputType::Release, conf).await.unwrap();
+
     Ok(())
 }
 
-async fn execute(value: Value, conf: &Config) -> Result<()>{
-    print!("{}: ", value["name"].as_str().unwrap());
-    let list = value["steps"].as_array().unwrap();
-    for i in list {
-        simulate(&EventType::KeyPress(Key::Alt)).unwrap();
-        match Step::from_u64(i.as_u64().unwrap()) {
-            Step::Ctrl => simulate(&EventType::KeyPress(str_to_key(conf.open.as_str()))).unwrap(),
-            Step::Up => simulate(&EventType::KeyPress(str_to_key(conf.up.as_str()))).unwrap(),
-            Step::Down => simulate(&EventType::KeyPress(str_to_key(conf.down.as_str()))).unwrap(),
-            Step::Left => simulate(&EventType::KeyPress(str_to_key(conf.left.as_str()))).unwrap(),
-            Step::Right => simulate(&EventType::KeyPress(str_to_key(conf.right.as_str()))).unwrap()
+async fn independent(value: Value, conf: &Config) -> Result<()>{
+    let step = Step::from_u64(value["step"].as_u64().unwrap());
+    let t = InputType::from_u64(value["type"].as_u64().unwrap());
+    execute(step, t, conf).await.unwrap();
+
+    Ok(())
+}
+
+async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()>{
+    match t {
+        InputType::Click => {
+            match step {
+                Step::Ctrl => {simulate(&EventType::KeyPress(str_to_key(conf.open.as_str()))).unwrap(); print!("{}", step)},
+                Step::Up => {simulate(&EventType::KeyPress(str_to_key(conf.up.as_str()))).unwrap(); print!("{}", step)},
+                Step::Down => {simulate(&EventType::KeyPress(str_to_key(conf.down.as_str()))).unwrap(); print!("{}", step)},
+                Step::Left => {simulate(&EventType::KeyPress(str_to_key(conf.left.as_str()))).unwrap(); print!("{}", step)},
+                Step::Right => {simulate(&EventType::KeyPress(str_to_key(conf.right.as_str()))).unwrap(); print!("{}", step)}
+            }
+            sleep(Duration::from_millis(conf.delay)).await;
+            match step {
+                Step::Ctrl => simulate(&EventType::KeyRelease(str_to_key(conf.open.as_str()))).unwrap(),
+                Step::Up => simulate(&EventType::KeyRelease(str_to_key(conf.up.as_str()))).unwrap(),
+                Step::Down => simulate(&EventType::KeyRelease(str_to_key(conf.down.as_str()))).unwrap(),
+                Step::Left => simulate(&EventType::KeyRelease(str_to_key(conf.left.as_str()))).unwrap(),
+                Step::Right => simulate(&EventType::KeyRelease(str_to_key(conf.right.as_str()))).unwrap()
+            }
         }
-        sleep(Duration::from_millis(conf.delay)).await;
-        match Step::from_u64(i.as_u64().unwrap()) {
-            Step::Ctrl => simulate(&EventType::KeyRelease(str_to_key(conf.open.as_str()))).unwrap(),
-            Step::Up => simulate(&EventType::KeyRelease(str_to_key(conf.up.as_str()))).unwrap(),
-            Step::Down => simulate(&EventType::KeyRelease(str_to_key(conf.down.as_str()))).unwrap(),
-            Step::Left => simulate(&EventType::KeyRelease(str_to_key(conf.left.as_str()))).unwrap(),
-            Step::Right => simulate(&EventType::KeyRelease(str_to_key(conf.right.as_str()))).unwrap()
+        InputType::Press => {
+            match step {
+                Step::Ctrl => simulate(&EventType::KeyPress(str_to_key(conf.open.as_str()))).unwrap(),
+                Step::Up => simulate(&EventType::KeyPress(str_to_key(conf.up.as_str()))).unwrap(),
+                Step::Down => simulate(&EventType::KeyPress(str_to_key(conf.down.as_str()))).unwrap(),
+                Step::Left => simulate(&EventType::KeyPress(str_to_key(conf.left.as_str()))).unwrap(),
+                Step::Right => simulate(&EventType::KeyPress(str_to_key(conf.right.as_str()))).unwrap()
+            }
+        }
+        InputType::Release => {
+            match step {
+                Step::Ctrl => simulate(&EventType::KeyRelease(str_to_key(conf.open.as_str()))).unwrap(),
+                Step::Up => simulate(&EventType::KeyRelease(str_to_key(conf.up.as_str()))).unwrap(),
+                Step::Down => simulate(&EventType::KeyRelease(str_to_key(conf.down.as_str()))).unwrap(),
+                Step::Left => simulate(&EventType::KeyRelease(str_to_key(conf.left.as_str()))).unwrap(),
+                Step::Right => simulate(&EventType::KeyRelease(str_to_key(conf.right.as_str()))).unwrap()
+            }
+            print!("\n");
         }
     }
+    sleep(Duration::from_millis(conf.delay)).await;
+
     Ok(())
 }
 

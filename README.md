@@ -9,7 +9,7 @@ Based on the idea: Strap the phone to the arm and simulate the call strategy to 
 PC (Rust):
 
 - TCP server ✅
-- Keyboard simulate ✅
+- Keyboard simulate ⌛
 - Synchronize configuration with client
 
 Phone (Android Kotlin):
@@ -22,12 +22,12 @@ Phone (Android Kotlin):
 - Invert input(reserve for illuminates)
 - Macro
 
-# 任务清单
+## 任务清单
 
 电脑端 (Rust):
 
 - TCP服务器 ✅
-- 模拟输入 ✅
+- 模拟输入 ⌛
 - 和手机端同步配置
 
 手机端 (Android Kotlin):

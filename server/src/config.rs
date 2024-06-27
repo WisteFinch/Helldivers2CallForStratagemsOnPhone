@@ -1,4 +1,25 @@
+use std::fmt;
 use serde::{Deserialize, Serialize};
+
+pub enum InputType {
+    Click,
+    Press,
+    Release
+}
+
+impl InputType {
+    pub fn from_u64(v: u64) -> Self {
+        if v == 1 {
+            Self::Press
+        }
+        else if v == 2 {
+            Self::Release
+        }
+        else {
+            Self::Click
+        }
+    }
+}
 
 pub enum Step {
     Ctrl,
@@ -28,9 +49,22 @@ impl Step {
     }
 }
 
+impl fmt::Display for Step {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Ctrl => write!(f, "ctrl"),
+            Self::Up => write!(f, "↑"),
+            Self::Down => write!(f, "↓"),
+            Self::Left => write!(f, "←"),
+            Self::Right => write!(f, "→"),
+        }
+    }
+}
+
 pub enum Operation {
     Status,
-    Simulate,
+    Combined,
+    Independent,
     Request,
     Sync,
 }
@@ -38,12 +72,15 @@ pub enum Operation {
 impl Operation {
     pub fn from_u64(v: u64) -> Self {
         if v == 1 {
-            Self::Simulate
+            Self::Combined
         }
         else if v == 2 {
-            Self::Request
+            Self::Independent
         }
         else if v == 3 {
+            Self::Request
+        }
+        else if v == 4 {
             Self::Sync
         }
         else {
