@@ -104,8 +104,8 @@ impl Config {
     pub fn default() -> Self {
         Self {
             port: 2333,
-            delay: 50,
-            open: "ctrl".to_string(),
+            delay: 25,
+            open: "ctrl_left".to_string(),
             up: "w".to_string(),
             down: "s".to_string(),
             left: "a".to_string(),

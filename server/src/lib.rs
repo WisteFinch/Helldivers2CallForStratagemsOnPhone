@@ -1,5 +1,5 @@
 use std::fs;
-use serde_json::{json, Value};
+use serde_json::Value;
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::{sleep, Duration};
@@ -12,7 +12,14 @@ const CONF_PATH: &str = "./config.json";
 
 pub async fn run() -> Result<()> {
     // Load configuration
-    let conf: Config = load_config().await?;
+    let conf: Config = match load_config().await{
+        Some(s) => {println!("Configuration loaded."); s},
+        None => {
+            println!("File error: Failed to load configuration, loading default configuration!");
+            save_config(serde_json::to_string(&Config::default()).unwrap().as_str(), false).await;
+            Config::default()
+        },
+    };
 
     // Listen port
     let listener = TcpListener::bind(format!("127.0.0.1:{}", conf.port)).await?;
@@ -34,40 +41,85 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         }
 
         // Parsing json
-        let json = json!(std::str::from_utf8(&buffer[..size]).unwrap());
-        let opt: Operation = Operation::from_u64(json["operation"].as_u64().unwrap());
+        let json: Value = match serde_json::from_str(std::str::from_utf8(&buffer[..size]).unwrap()) {
+            Ok(ok) => ok,
+            Err(_) => {
+                println!("Request error: Failed to parse request data!"); 
+                continue
+            },
+        };
+        let opt: Operation = match json["operation"].as_u64() {
+            Some(s) => Operation::from_u64(s),
+            None => {
+                println!("Request error: Failed to parse operation!"); 
+                continue
+            },
+        };
+
+        // Operation
         match opt {
-            Operation::Status => client.write_all("ready".as_bytes()).await?,
-            Operation::Request => {client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; println!("Sending configuration to: {}", client.peer_addr()?)},
-            Operation::Sync => save_config(json["configuration"].as_str().unwrap()).await,
+            Operation::Status => {
+                client.write_all("ready".as_bytes()).await?; 
+                println!("Sended status to: {}", client.peer_addr()?)
+            },
+            Operation::Request => {
+                client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; 
+                println!("Sended configuration to: {}", client.peer_addr()?)
+            },
+            Operation::Sync => save_config(json["configuration"].as_str().unwrap(), true).await,
             Operation::Combined => macros(json["macro"].clone(), &conf).await?,
             Operation::Independent => independent(json["input"].clone(), &conf).await?
         }
     }
 }
 
-async fn load_config() -> Result<Config> {
+async fn load_config() -> Option<Config> {
     let conf: Config = match fs::read_to_string(CONF_PATH) {
         Ok(ok) => serde_json::from_str(&ok).unwrap(),
-        Err(_) => {println!("Error loading configuration, loading default configuration!"); Config::default()}
+        Err(_) => return None,
     };
 
-    Ok(conf)
+    Some(conf)
 }
 
-async fn save_config(str: &str) {
-    fs::write(CONF_PATH, str).unwrap();
-    println!("Configuration synchronize, need to restart.");
-    std::process::exit(0);
+async fn save_config(str: &str, sync: bool) {
+    match fs::write(CONF_PATH, str) {
+        Ok(_) => {
+            match sync {
+                true => {
+                    println!("Configuration synchronized, need to restart.");
+                    std::process::exit(0);
+                },
+                false => println!("Configuration saved."),
+            }
+        },
+        Err(_) => match sync {
+            true => {
+                println!("File error: Failed to synchronize configuration!");
+                std::process::exit(0);
+            },
+            false => println!("File error: Failed to save configuration!"),
+        },
+    }
 }
 
 async fn macros(value: Value, conf: &Config) -> Result<()>{
     // Press ctrl
-    print!("{}: ", value["name"].as_str().unwrap());
+    let name = match value["name"].as_str() {
+        Some(s) => s,
+        None => "",
+    };
+    print!("{}: ", name);
     execute(Step::Ctrl, InputType::Press, conf).await.unwrap();
     
     // Click steps
-    let list = value["steps"].as_array().unwrap();
+    let list = match value["steps"].as_array() {
+        Some(s) => s,
+        None => {
+            println!("Request error: Failed to parse steps!"); 
+            return Ok(())
+        },
+    };
     for i in list {
         execute(Step::from_u64(i.as_u64().unwrap()), InputType::Click, conf).await.unwrap();
     }
@@ -80,8 +132,20 @@ async fn macros(value: Value, conf: &Config) -> Result<()>{
 }
 
 async fn independent(value: Value, conf: &Config) -> Result<()>{
-    let step = Step::from_u64(value["step"].as_u64().unwrap());
-    let t = InputType::from_u64(value["type"].as_u64().unwrap());
+    let step = match value["step"].as_u64() {
+        Some(s) => Step::from_u64(s),
+        None => {
+            println!("Request error: Failed to parse step!"); 
+            return Ok(())
+        },
+    };
+    let t = match value["type"].as_u64() {
+        Some(s) => InputType::from_u64(s),
+        None => {
+            println!("Request error: Failed to parse input type!"); 
+            return Ok(())
+        },
+    };
     execute(step, t, conf).await.unwrap();
 
     Ok(())
@@ -91,12 +155,13 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()>{
     match t {
         InputType::Click => {
             match step {
-                Step::Ctrl => {simulate(&EventType::KeyPress(str_to_key(conf.open.as_str()))).unwrap(); print!("{}", step)},
-                Step::Up => {simulate(&EventType::KeyPress(str_to_key(conf.up.as_str()))).unwrap(); print!("{}", step)},
-                Step::Down => {simulate(&EventType::KeyPress(str_to_key(conf.down.as_str()))).unwrap(); print!("{}", step)},
-                Step::Left => {simulate(&EventType::KeyPress(str_to_key(conf.left.as_str()))).unwrap(); print!("{}", step)},
-                Step::Right => {simulate(&EventType::KeyPress(str_to_key(conf.right.as_str()))).unwrap(); print!("{}", step)}
+                Step::Ctrl => simulate(&EventType::KeyPress(str_to_key(conf.open.as_str()))).unwrap(),
+                Step::Up => simulate(&EventType::KeyPress(str_to_key(conf.up.as_str()))).unwrap(),
+                Step::Down => simulate(&EventType::KeyPress(str_to_key(conf.down.as_str()))).unwrap(),
+                Step::Left => simulate(&EventType::KeyPress(str_to_key(conf.left.as_str()))).unwrap(),
+                Step::Right => simulate(&EventType::KeyPress(str_to_key(conf.right.as_str()))).unwrap()
             }
+            print!("{}", step);
             sleep(Duration::from_millis(conf.delay)).await;
             match step {
                 Step::Ctrl => simulate(&EventType::KeyRelease(str_to_key(conf.open.as_str()))).unwrap(),
