@@ -12,7 +12,7 @@ PC (Rust):
 - Keyboard simulate ✅
 - Synchronize configuration with client ✅
 
-Phone (Android Kotlin):
+Phone (Android Kotlin): ⏳
 
 - TCP client
 - Synchronize configuration with PC
@@ -30,7 +30,7 @@ Phone (Android Kotlin):
 - 模拟输入 ✅
 - 和手机端同步配置 ✅
 
-手机端 (Android Kotlin):
+手机端 (Android Kotlin): ⏳
 
 - TCP客户端
 - 和电脑同步配置
