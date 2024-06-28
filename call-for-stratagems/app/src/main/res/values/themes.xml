@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.CallForStratagems" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+    </style>
 
-    <style name="Theme.CallForStratagems" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.CallForStratagems" parent="Base.Theme.CallForStratagems" />
 </resources>

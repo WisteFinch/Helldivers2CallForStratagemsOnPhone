@@ -1,3 +1,47 @@
 <resources>
     <string name="app_name">CallForStratagems</string>
+    <string name="fragment_root">Stratagems groups</string>
+    <string name="fragment_editGroup">Edit stratagems group</string>
+    <string name="fragment_settings">Settings</string>
+    <string name="fragment_viewGroup">Stratagems group</string>
+
+    <!-- Fragment Root -->
+    <string name="new_group_desc">New stratagems group</string>
+    <string name="no_group">The Galactic War awaits</string>
+    <string name="no_stratagems_group_img">No stratagems group</string>
+
+    <!-- Fragment Add Group -->
+    <string name="edit_group_title">Title</string>
+    <string name="edit_group_pickup_icon">Pickup an icon</string>
+
+    <!-- Preference Titles -->
+    <string name="connection_header">Connection</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Connection Preferences -->
+    <string name="tcp_add_title">Server address</string>
+    <string name="tcp_add_default">127.0.0.1</string>
+    <string name="tcp_port_title">Server port</string>
+    <string name="tcp_port_default">2333</string>
+
+    <!-- Sync Preferences -->
+    <string name="server_port_title">Port</string>
+    <string name="server_port_default">2333</string>
+    <string name="input_open_title">Input: Open Stratagems List</string>
+    <string name="input_up_title">Input: Up</string>
+    <string name="input_down_title">Input: Down</string>
+    <string name="input_left_title">Input: Left</string>
+    <string name="input_right_title">Input: Right</string>
+    <string name="sync_config_title">Apply configuration</string>
+    <string name="sync_config_summary">Synchronize configuration with the PC server. Then you need to restart the server to apply it.</string>
+
+    <!-- Root Menu -->
+    <string name="root_menu_preferences_title">Preferences</string>
+
+    <!-- Edit Group Menu -->
+    <string name="edit_group_menu_save_title">Preferences</string>
+
+    <!-- View Group Menu -->
+    <string name="view_group_menu_edit_title">Edit</string>
+    <string name="view_group_menu_delete_title">Delete</string>
 </resources>

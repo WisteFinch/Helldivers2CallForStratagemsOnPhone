@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_nav"
+    app:startDestination="@id/rootFragment">
+
+    <fragment
+        android:id="@+id/rootFragment"
+        android:name="indi.wistefinch.callforstratagems.fragments.root.RootFragment"
+        android:label="@string/fragment_root"
+        tools:layout="@layout/fragment_root" >
+        <action
+            android:id="@+id/action_rootFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_rootFragment_to_editGroupFragment"
+            app:destination="@id/editGroupFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_rootFragment_to_viewGroupFragment"
+            app:destination="@id/viewGroupFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/editGroupFragment"
+        android:name="indi.wistefinch.callforstratagems.fragments.editgroup.EditGroupFragment"
+        android:label="@string/fragment_editGroup"
+        tools:layout="@layout/fragment_edit_group" >
+        <action
+            android:id="@+id/action_editGroupFragment_to_rootFragment"
+            app:destination="@id/rootFragment"
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="indi.wistefinch.callforstratagems.fragments.settings.SettingsFragment"
+        android:label="@string/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_rootFragment"
+            app:destination="@id/rootFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewGroupFragment"
+        android:name="indi.wistefinch.callforstratagems.fragments.viewgroup.ViewGroupFragment"
+        android:label="@string/fragment_viewGroup"
+        tools:layout="@layout/fragment_view_group" >
+        <action
+            android:id="@+id/action_viewGroupFragment_to_rootFragment"
+            app:destination="@id/rootFragment" />
+    </fragment>
+</navigation>

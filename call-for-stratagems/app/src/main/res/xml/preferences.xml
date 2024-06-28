@@ -1,0 +1,84 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/connection_header">
+
+        <EditTextPreference
+            app:key="tcp_add"
+            app:title="@string/tcp_add_title"
+            app:defaultValue="@string/tcp_add_default"
+            app:icon="@drawable/ic_cable"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="tcp_port"
+            app:title="@string/tcp_port_title"
+            app:defaultValue="@string/tcp_port_default"
+            app:icon="@drawable/ic_cable"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <EditTextPreference
+            app:key="server_port"
+            app:title="@string/server_port_title"
+            app:defaultValue="@string/server_port_default"
+            app:icon="@drawable/ic_cable"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="ctrl_left"
+            app:entries="@array/input_entries"
+            app:entryValues="@array/input_values"
+            app:key="input_open"
+            app:title="@string/input_open_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="w"
+            app:entries="@array/input_entries"
+            app:entryValues="@array/input_values"
+            app:key="input_up"
+            app:title="@string/input_up_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="s"
+            app:entries="@array/input_entries"
+            app:entryValues="@array/input_values"
+            app:key="input_down"
+            app:title="@string/input_down_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="a"
+            app:entries="@array/input_entries"
+            app:entryValues="@array/input_values"
+            app:key="input_left"
+            app:title="@string/input_left_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="d"
+            app:entries="@array/input_entries"
+            app:entryValues="@array/input_values"
+            app:key="input_right"
+            app:title="@string/input_right_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:key="sync_config"
+            app:title="@string/sync_config_title"
+            app:summary="@string/sync_config_summary"
+            app:icon="@drawable/ic_check"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

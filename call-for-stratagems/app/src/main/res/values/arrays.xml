@@ -1,0 +1,209 @@
+<resources>
+    <!-- Input Preference -->
+    <string-array name="input_entries">
+        <item>Alt</item>
+        <item>Alt Gr</item>
+        <item>Left Ctrl</item>
+        <item>Right Ctrl</item>
+        <item>Left Shift</item>
+        <item>Right Shift</item>
+        <item>Up Arrow</item>
+        <item>Down Arrow</item>
+        <item>Left Arrow</item>
+        <item>Right Arrow</item>
+        <item>Num1</item>
+        <item>Num2</item>
+        <item>Num3</item>
+        <item>Num4</item>
+        <item>Num5</item>
+        <item>Num6</item>
+        <item>Num7</item>
+        <item>Num8</item>
+        <item>Num9</item>
+        <item>Num0</item>
+        <item>a</item>
+        <item>b</item>
+        <item>c</item>
+        <item>d</item>
+        <item>e</item>
+        <item>f</item>
+        <item>g</item>
+        <item>h</item>
+        <item>i</item>
+        <item>j</item>
+        <item>k</item>
+        <item>l</item>
+        <item>m</item>
+        <item>n</item>
+        <item>o</item>
+        <item>p</item>
+        <item>q</item>
+        <item>r</item>
+        <item>s</item>
+        <item>t</item>
+        <item>u</item>
+        <item>v</item>
+        <item>w</item>
+        <item>x</item>
+        <item>y</item>
+        <item>z</item>
+        <item>`</item>
+        <item>-</item>
+        <item>=</item>
+        <item>;</item>
+        <item>\'</item>
+        <item>\\</item>
+        <item>,</item>
+        <item>.</item>
+        <item>/</item>
+        <item>F1</item>
+        <item>F2</item>
+        <item>F3</item>
+        <item>F4</item>
+        <item>F5</item>
+        <item>F6</item>
+        <item>F7</item>
+        <item>F8</item>
+        <item>F9</item>
+        <item>F10</item>
+        <item>F11</item>
+        <item>F12</item>
+        <item>Backspace</item>
+        <item>Enter</item>
+        <item>Delete</item>
+        <item>Caps Lock</item>
+        <item>Space</item>
+        <item>Tab</item>
+        <item>Fn</item>
+        <item>Insert</item>
+        <item>Home</item>
+        <item>End</item>
+        <item>Esc</item>
+        <item>Page Down</item>
+        <item>Page Up</item>
+        <item>Print Screen</item>
+        <item>Scroll Lock</item>
+        <item>Num Lock</item>
+        <item>Pause</item>
+        <item>kp Enter</item>
+        <item>kp -</item>
+        <item>kp +</item>
+        <item>kp *</item>
+        <item>kp /</item>
+        <item>kp Num0</item>
+        <item>kp Num1</item>
+        <item>kp Num2</item>
+        <item>kp Num3</item>
+        <item>kp Num4</item>
+        <item>kp Num5</item>
+        <item>kp Num6</item>
+        <item>kp Num7</item>
+        <item>kp Num8</item>
+        <item>kp Num9</item>
+        <item>kp Delete</item>
+    </string-array>
+
+    <string-array name="input_values">
+        <item>alt</item>
+        <item>alt_gr</item>
+        <item>ctrl_left</item>
+        <item>ctrl_right</item>
+        <item>shift_left</item>
+        <item>shift_right</item>
+        <item>up</item>
+        <item>down</item>
+        <item>left</item>
+        <item>right</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>0</item>
+        <item>a</item>
+        <item>b</item>
+        <item>c</item>
+        <item>d</item>
+        <item>e</item>
+        <item>f</item>
+        <item>g</item>
+        <item>h</item>
+        <item>i</item>
+        <item>j</item>
+        <item>k</item>
+        <item>l</item>
+        <item>m</item>
+        <item>n</item>
+        <item>o</item>
+        <item>p</item>
+        <item>q</item>
+        <item>r</item>
+        <item>s</item>
+        <item>t</item>
+        <item>u</item>
+        <item>v</item>
+        <item>w</item>
+        <item>x</item>
+        <item>y</item>
+        <item>z</item>
+        <item>`</item>
+        <item>-</item>
+        <item>=</item>
+        <item>;</item>
+        <item>\'</item>
+        <item>\\</item>
+        <item>,</item>
+        <item>.</item>
+        <item>/</item>
+        <item>f1</item>
+        <item>f2</item>
+        <item>f3</item>
+        <item>f4</item>
+        <item>f5</item>
+        <item>f6</item>
+        <item>f7</item>
+        <item>f8</item>
+        <item>f9</item>
+        <item>f10</item>
+        <item>f11</item>
+        <item>f12</item>
+        <item>backspace</item>
+        <item>enter</item>
+        <item>delete</item>
+        <item>caps_lock</item>
+        <item>space</item>
+        <item>tab</item>
+        <item>fn</item>
+        <item>insert</item>
+        <item>home</item>
+        <item>end</item>
+        <item>esc</item>
+        <item>page_down</item>
+        <item>page_up</item>
+        <item>print_screen</item>
+        <item>scroll_lock</item>
+        <item>num_lock</item>
+        <item>pause</item>
+        <item>kp_enter</item>
+        <item>kp-</item>
+        <item>kp+</item>
+        <item>kp*</item>
+        <item>kp/</item>
+        <item>kp0</item>
+        <item>kp1</item>
+        <item>kp2</item>
+        <item>kp3</item>
+        <item>kp4</item>
+        <item>kp5</item>
+        <item>kp6</item>
+        <item>kp7</item>
+        <item>kp8</item>
+        <item>kp9</item>
+        <item>kp_delete</item>
+    </string-array>
+
+</resources>

@@ -4,6 +4,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::{sleep, Duration};
 use rdev::{simulate, EventType, Key};
+use local_ipaddress;
 use config::*;
 
 pub mod config;
@@ -22,8 +23,8 @@ pub async fn run() -> Result<()> {
     };
 
     // Listen port
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", conf.port)).await?;
-    println!("Listening port: {}", conf.port);
+    let listener = TcpListener::bind(format!("{}:{}", local_ipaddress::get().unwrap(), conf.port)).await?;
+    println!("Listening: {}:{}", local_ipaddress::get().unwrap(), conf.port);
     loop {
         let (client, _address) = listener.accept().await?;
         tokio::spawn(handle_connection(client, conf.clone()));
@@ -104,15 +105,10 @@ async fn save_config(str: &str, sync: bool) {
 }
 
 async fn macros(value: Value, conf: &Config) -> Result<()>{
-    // Press ctrl
     let name = match value["name"].as_str() {
         Some(s) => s,
         None => "",
     };
-    print!("{}: ", name);
-    execute(Step::Ctrl, InputType::Press, conf).await.unwrap();
-    
-    // Click steps
     let list = match value["steps"].as_array() {
         Some(s) => s,
         None => {
@@ -120,6 +116,12 @@ async fn macros(value: Value, conf: &Config) -> Result<()>{
             return Ok(())
         },
     };
+
+    // Press ctrl
+    print!("{}: ", name);
+    execute(Step::Ctrl, InputType::Press, conf).await.unwrap();
+    
+    // Click steps
     for i in list {
         execute(Step::from_u64(i.as_u64().unwrap()), InputType::Click, conf).await.unwrap();
     }
