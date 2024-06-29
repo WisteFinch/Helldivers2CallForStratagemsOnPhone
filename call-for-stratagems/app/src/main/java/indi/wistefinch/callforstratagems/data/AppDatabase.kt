@@ -4,32 +4,33 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import indi.wistefinch.callforstratagems.data.models.GroupData
+import indi.wistefinch.callforstratagems.data.dao.GroupDao
+import indi.wistefinch.callforstratagems.data.models.StratagemData
 
-@Database(entities = [GroupData::class], version = 1, exportSchema = false)
+@Database(entities = [GroupData::class, StratagemData::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun groupDao(): GroupDao
 
     companion object {
         @Volatile
-        private  var INSTANCE: AppDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-            val instance = INSTANCE
-            if (instance != null) {
-                return instance
-            }
-            synchronized(this) {
-                val newInstacne = Room.databaseBuilder(
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "group_table"
-                ).build()
-                INSTANCE = newInstacne
-                return newInstacne
+                    "app_database"
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                INSTANCE = instance
+                instance
             }
         }
     }
-
 }

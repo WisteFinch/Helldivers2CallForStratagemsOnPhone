@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/add_group_menu_save"
-        android:title="@string/edit_group_menu_save_title"
+        android:id="@+id/editGroup_menu_save"
+        android:title="@string/editGroup_menu_save_title"
         android:icon="@drawable/ic_save"
         app:showAsAction="ifRoom"/>
 

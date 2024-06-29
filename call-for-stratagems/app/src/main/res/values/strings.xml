@@ -48,9 +48,9 @@
     <string name="root_menu_preferences_title">Preferences</string>
 
     <!-- Edit Group Menu -->
-    <string name="edit_group_menu_save_title">Preferences</string>
+    <string name="editGroup_menu_save_title">Preferences</string>
 
     <!-- View Group Menu -->
-    <string name="view_group_menu_edit_title">Edit</string>
-    <string name="view_group_menu_delete_title">Delete</string>
+    <string name="viewGroup_menu_edit_title">Edit</string>
+    <string name="viewGroup_menu_delete_title">Delete</string>
 </resources>

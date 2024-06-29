@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/view_group_menu_edit"
-        android:title="@string/view_group_menu_edit_title"
+        android:id="@+id/viewGroup_menu_edit"
+        android:title="@string/viewGroup_menu_edit_title"
         android:icon="@drawable/ic_edit"
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/view_group_menu_delete"
-        android:title="@string/view_group_menu_delete_title"
+        android:id="@+id/viewGroup_menu_delete"
+        android:title="@string/viewGroup_menu_delete_title"
         android:icon="@drawable/ic_delete"
         app:showAsAction="never"/>
 

@@ -5,18 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import indi.wistefinch.callforstratagems.data.dao.GroupDao
-import indi.wistefinch.callforstratagems.data.models.GroupData
+import indi.wistefinch.callforstratagems.data.dao.StratagemDao
+import indi.wistefinch.callforstratagems.data.models.StratagemData
 import kotlinx.coroutines.launch
 
 /**
  * View Model to keep a reference to the Inventory repository and an up-to-date list of all items.
  *
  */
-class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
+class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
 
     // Cache all items form the database using LiveData.
-    val allItems: LiveData<List<GroupData>> = groupDao.getItems().asLiveData()
+    val allItems: LiveData<List<StratagemData>> = stratagemDao.getItems().asLiveData()
 
     fun updateItem(
         id: Int,
@@ -27,9 +27,9 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
         updateItem(updatedItem)
     }
 
-    private fun updateItem(item: GroupData) {
+    private fun updateItem(item: StratagemData) {
         viewModelScope.launch {
-            groupDao.update(item)
+            stratagemDao.update(item)
         }
     }
 
@@ -42,20 +42,20 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
         insertItem(newItem)
     }
 
-    private fun insertItem(item: GroupData) {
+    private fun insertItem(item: StratagemData) {
         viewModelScope.launch {
-            groupDao.insert(item)
+            stratagemDao.insert(item)
         }
     }
 
-    fun deleteItem(item: GroupData) {
+    fun deleteItem(item: StratagemData) {
         viewModelScope.launch {
-            groupDao.delete(item)
+            stratagemDao.delete(item)
         }
     }
 
-    fun retrieveItem(id: Int): LiveData<GroupData> {
-        return groupDao.getItem(id).asLiveData()
+    fun retrieveItem(id: Int): LiveData<StratagemData> {
+        return stratagemDao.getItem(id).asLiveData()
     }
 
     fun isEntryValid(title: String): Boolean {
@@ -63,33 +63,34 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
     }
 
     private fun getNewItemEntry(
-        title: String,
+        name: String,
         list: List<Int>
-    ): GroupData {
-        return GroupData(
-            title = title,
-            list = list
+    ): StratagemData {
+        return StratagemData(
+            0,
+            name = name,
+            steps = list
         )
     }
 
     private fun getUpdatedItemEntry(
         id: Int,
-        title: String,
+        name: String,
         list: List<Int>
-    ): GroupData {
-        return GroupData(
+    ): StratagemData {
+        return StratagemData(
             id = id,
-            title = title,
-            list = list
+            name = name,
+            steps = list
         )
     }
 }
 
-class GroupViewModelFactory(private val groupDao: GroupDao) : ViewModelProvider.Factory {
+class StratagemViewModelFactory(private val stratagemDao: StratagemDao) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GroupViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(StratagemViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return GroupViewModel(groupDao) as T
+            return StratagemViewModel(stratagemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

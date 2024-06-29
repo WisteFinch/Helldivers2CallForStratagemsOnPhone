@@ -1,12 +1,13 @@
 package indi.wistefinch.callforstratagems.data.models
 
+import android.graphics.drawable.Drawable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "group_table")
-data class GroupData(
+@Entity(tableName = "stratagem_table")
+data class StratagemData(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    var title: String,
-    var list: List<Int>
+    var name: String,
+    var steps: List<Int>
 )

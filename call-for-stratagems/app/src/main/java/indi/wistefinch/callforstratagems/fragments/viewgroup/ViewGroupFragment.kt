@@ -34,7 +34,11 @@ class ViewGroupFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
-                    R.id.add_group_menu_save -> {
+                    R.id.viewGroup_menu_edit-> {
+                        // clearCompletedTasks()
+                        true
+                    }
+                    R.id.viewGroup_menu_delete-> {
                         // clearCompletedTasks()
                         true
                     }
