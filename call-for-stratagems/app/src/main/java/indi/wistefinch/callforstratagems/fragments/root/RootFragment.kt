@@ -24,7 +24,7 @@ class RootFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_root, container, false)
 
         // Add FAB
-        view.findViewById<FloatingActionButton>(R.id.add_group_FAB).setOnClickListener {
+        view.findViewById<FloatingActionButton>(R.id.root_new_group_FAB).setOnClickListener {
             findNavController().navigate(R.id.action_rootFragment_to_editGroupFragment)
         }
 

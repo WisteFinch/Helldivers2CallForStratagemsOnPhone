@@ -9,4 +9,36 @@
     </style>
 
     <style name="Theme.CallForStratagems" parent="Base.Theme.CallForStratagems" />
+
+    <style name="AppCardView" parent="CardView">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="cardBackgroundColor">@color/darkBlue</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="AppEditText">
+        <item name="android:background">@drawable/custom_input</item>
+    </style>
+
+    <style name="AppFAB" parent="Widget.Design.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/FABRoundedStyle</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint">@color/colorAccent</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:elevation">8dp</item>
+        <item name="tint">@color/white</item>
+    </style>
+
+    <style name="FABRoundedStyle" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

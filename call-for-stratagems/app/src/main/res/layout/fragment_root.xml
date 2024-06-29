@@ -18,26 +18,21 @@
         app:layout_constraintVertical_bias="0.5" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_group_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/root_new_group_FAB"
+        style="@style/AppFAB"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:clickable="true"
-        android:contentDescription="@string/new_group_desc"
-        android:focusable="true"
+        android:contentDescription="@string/root_new_group_FAB"
         android:src="@drawable/ic_add"
-        android:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/white"
-        tools:ignore="ImageContrastCheck" />
+        android:elevation="8dp" />
 
     <ImageView
         android:id="@+id/no_group_imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:contentDescription="@string/no_stratagems_group_img"
+        android:contentDescription="@string/root_no_group_img"
         android:src="@drawable/super_earth"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -52,7 +47,7 @@
         android:id="@+id/no_group_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_group"
+        android:text="@string/root_no_group"
         android:visibility="invisible"
         android:textColor="@color/grey"
         android:textSize="16sp"

@@ -11,14 +11,16 @@
     <color name="orange">#FDC363</color>
     <color name="pink">#F7438C</color>
     <color name="lightPink">#FCB8D9</color>
+    <color name="darkBlue">#171A27</color>
     <color name="blue">#269DCE</color>
     <color name="lightBlue">#A3DEF8</color>
     <color name="grey">#ABAAB2</color>
     <color name="lightGrey">#F1F1F3</color>
+    <color name="veryDarkCornflowerBlue">#061015</color>
 
     <color name="colorPrimary">@color/purple</color>
     <color name="colorPrimaryDark">@color/darkPurple</color>
     <color name="colorAccent">@color/lightPurple</color>
-    <color name="windowBackground">@color/black</color>
+    <color name="windowBackground">@color/veryDarkCornflowerBlue</color>
     <color name="textColorPrimary">@color/white</color>
 </resources>

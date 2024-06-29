@@ -6,13 +6,16 @@
     <string name="fragment_viewGroup">Stratagems group</string>
 
     <!-- Fragment Root -->
-    <string name="new_group_desc">New stratagems group</string>
-    <string name="no_group">The Galactic War awaits</string>
-    <string name="no_stratagems_group_img">No stratagems group</string>
+    <string name="root_new_group_FAB">New stratagems group</string>
+    <string name="root_no_group">The Galactic War awaits</string>
+    <string name="root_no_group_img">No stratagems group</string>
 
-    <!-- Fragment Add Group -->
-    <string name="edit_group_title">Title</string>
-    <string name="edit_group_pickup_icon">Pickup an icon</string>
+    <!-- Fragment Edit Group -->
+    <string name="editGroup_title">Title</string>
+
+    <!-- Fragment View Group -->
+    <string name="viewGroup_title">Title</string>
+    <string name="viewGroup_play_FAB">Play</string>
 
     <!-- Preference Titles -->
     <string name="connection_header">Connection</string>
@@ -23,6 +26,12 @@
     <string name="tcp_add_default">127.0.0.1</string>
     <string name="tcp_port_title">Server port</string>
     <string name="tcp_port_default">2333</string>
+    <string name="tcp_test_title">Test connection</string>
+    <string name="tcp_test_default">Test the connection to the PC server</string>
+    <string name="tcp_test_connecting">Connecting…</string>
+    <string name="tcp_test_success">Success</string>
+    <string name="tcp_test_failed">Connection failed, please check the network settings</string>
+    <string name="tcp_test_no_response">Server did not respond, please check whether the server is running properly</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
@@ -33,7 +42,7 @@
     <string name="input_left_title">Input: Left</string>
     <string name="input_right_title">Input: Right</string>
     <string name="sync_config_title">Apply configuration</string>
-    <string name="sync_config_summary">Synchronize configuration with the PC server. Then you need to restart the server to apply it.</string>
+    <string name="sync_config_summary">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
 
     <!-- Root Menu -->
     <string name="root_menu_preferences_title">Preferences</string>

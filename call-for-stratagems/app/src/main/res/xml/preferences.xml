@@ -16,6 +16,12 @@
             app:icon="@drawable/ic_cable"
             app:useSimpleSummaryProvider="true" />
 
+        <Preference
+            app:key="tcp_test"
+            app:title="@string/tcp_test_title"
+            app:summary="@string/tcp_test_default"
+            app:icon="@drawable/ic_sync" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/sync_header">
