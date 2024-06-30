@@ -7,7 +7,7 @@
     tools:context=".fragments.root.RootFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/group_recyclerView"
+        android:id="@+id/root_recyclerView"
         android:layout_width="409dp"
         android:layout_height="729dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -15,7 +15,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        android:padding="32dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/root_new_group_FAB"
@@ -23,10 +24,10 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/root_new_group_FAB"
+        android:elevation="8dp"
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="8dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/no_group_imageView"
@@ -54,4 +55,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/no_group_imageView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import indi.wistefinch.callforstratagems.data.models.GroupData
 import indi.wistefinch.callforstratagems.data.dao.GroupDao
+import indi.wistefinch.callforstratagems.data.dao.StratagemDao
 import indi.wistefinch.callforstratagems.data.models.StratagemData
 
 @Database(entities = [GroupData::class, StratagemData::class], version = 1, exportSchema = false)
@@ -14,6 +15,7 @@ import indi.wistefinch.callforstratagems.data.models.StratagemData
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun groupDao(): GroupDao
+    abstract fun stratagemDao(): StratagemDao
 
     companion object {
         @Volatile

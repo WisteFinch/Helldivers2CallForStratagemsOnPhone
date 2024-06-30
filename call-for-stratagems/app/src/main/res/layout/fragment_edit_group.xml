@@ -4,40 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     tools:context=".fragments.editgroup.EditGroupFragment">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/edit_group_title_cardView"
+        android:id="@+id/editGroup_title_cardView"
         style="@style/AppCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintVertical_bias="0.5"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp">
 
-        <TextView
-            android:id="@+id/edit_group_title"
+        <EditText
+            android:id="@+id/editGroup_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_margin="16dp"
+            android:autofillHints="@string/editGroup_title"
+            android:inputType="text"
             android:text="@string/editGroup_title"
-            android:textColor="@color/textColorPrimary"
+            android:hint="@string/editGroup_title_hint"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            style="@style/AppTextTitle" />
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         style="@style/AppCardView"
-        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_group_title_cardView" >
+        app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp" >
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/editGroup_recyclerView"
             android:layout_margin="16dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

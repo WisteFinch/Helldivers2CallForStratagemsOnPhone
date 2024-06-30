@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     tools:context=".fragments.viewgroup.ViewGroupFragment">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -13,21 +12,24 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/viewGroup_play_FAB"
-        android:src="@drawable/ic_add"
+        android:elevation="8dp"
+        android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="8dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/edit_group_title_cardView"
+        android:id="@+id/viewGroup_title_cardView"
         style="@style/AppCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintVertical_bias="0.5"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp">
 
         <TextView
+            android:id="@+id/viewGroup_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
@@ -41,11 +43,12 @@
 
     <androidx.cardview.widget.CardView
         style="@style/AppCardView"
-        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_group_title_cardView" >
+        app:layout_constraintTop_toBottomOf="@+id/viewGroup_title_cardView"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp" >
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_margin="16dp"

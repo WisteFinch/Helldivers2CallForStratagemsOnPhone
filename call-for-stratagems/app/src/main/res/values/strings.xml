@@ -4,6 +4,7 @@
     <string name="fragment_editGroup">Edit stratagems group</string>
     <string name="fragment_settings">Settings</string>
     <string name="fragment_viewGroup">Stratagems group</string>
+    <string name="default_string">Default</string>
 
     <!-- Fragment Root -->
     <string name="root_new_group_FAB">New stratagems group</string>
@@ -11,7 +12,8 @@
     <string name="root_no_group_img">No stratagems group</string>
 
     <!-- Fragment Edit Group -->
-    <string name="editGroup_title">Title</string>
+    <string name="editGroup_title">New stratagems group</string>
+    <string name="editGroup_title_hint">Stratagems group Name</string>
 
     <!-- Fragment View Group -->
     <string name="viewGroup_title">Title</string>
@@ -53,4 +55,5 @@
     <!-- View Group Menu -->
     <string name="viewGroup_menu_edit_title">Edit</string>
     <string name="viewGroup_menu_delete_title">Delete</string>
+
 </resources>

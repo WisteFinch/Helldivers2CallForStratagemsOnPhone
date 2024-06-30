@@ -9,5 +9,6 @@ data class StratagemData(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     var name: String,
+    var icon: String,
     var steps: List<Int>
 )

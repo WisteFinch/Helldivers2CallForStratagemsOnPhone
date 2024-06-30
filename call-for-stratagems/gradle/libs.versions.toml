@@ -17,6 +17,10 @@ lifecycleViewmodelKtx = "2.6.1"
 lifecycleLivedataKtx = "2.6.1"
 roomKtx = "2.6.0-alpha01"
 gson = "2.11.0"
+androidxNavigationSafeargsGradlePlugin = "2.6.0-alpha08"
+navigationSafeArgsGradlePlugin = "2.6.0"
+navigationSafeArgsGradlePluginVersion = "1.0.0"
+androidxNavigationSafeArgsGradlePluginVersion = "2.7.0-beta02"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +40,10 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+androidx-androidx-navigation-safeargs-gradle-plugin = { group = "androidx.navigation.safeargs", name = "androidx.navigation.safeargs.gradle.plugin", version.ref = "androidxNavigationSafeargsGradlePlugin" }
+androidx-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
+navigation-safe-args-gradle-plugin = { group = "android.arch.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePluginVersion" }
+androidx-navigation-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "androidxNavigationSafeArgsGradlePluginVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -59,5 +59,8 @@
         <action
             android:id="@+id/action_viewGroupFragment_to_rootFragment"
             app:destination="@id/rootFragment" />
+        <action
+            android:id="@+id/action_viewGroupFragment_to_editGroupFragment"
+            app:destination="@id/editGroupFragment" />
     </fragment>
 </navigation>

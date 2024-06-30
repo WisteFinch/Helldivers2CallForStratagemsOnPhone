@@ -21,9 +21,10 @@ class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
     fun updateItem(
         id: Int,
         title: String,
+        icon: String,
         list: List<Int>
     ) {
-        val updatedItem = getUpdatedItemEntry(id, title, list)
+        val updatedItem = getUpdatedItemEntry(id, title, icon, list)
         updateItem(updatedItem)
     }
 
@@ -36,9 +37,10 @@ class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
     fun addItem(
         id: Int,
         title: String,
+        icon: String,
         list: List<Int>
     ) {
-        val newItem = getNewItemEntry(title, list)
+        val newItem = getNewItemEntry(title, icon, list)
         insertItem(newItem)
     }
 
@@ -64,24 +66,28 @@ class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
 
     private fun getNewItemEntry(
         name: String,
-        list: List<Int>
+        icon: String,
+        steps: List<Int>
     ): StratagemData {
         return StratagemData(
             0,
             name = name,
-            steps = list
+            icon = icon,
+            steps = steps
         )
     }
 
     private fun getUpdatedItemEntry(
         id: Int,
         name: String,
-        list: List<Int>
+        icon: String,
+        steps: List<Int>
     ): StratagemData {
         return StratagemData(
             id = id,
             name = name,
-            steps = list
+            icon = icon,
+            steps = steps
         )
     }
 }

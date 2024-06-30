@@ -15,8 +15,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import indi.wistefinch.callforstratagems.R
 import indi.wistefinch.callforstratagems.CFSApplication
+import indi.wistefinch.callforstratagems.data.models.GroupData
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
+import indi.wistefinch.callforstratagems.databinding.FragmentEditGroupBinding
 
 
 class EditGroupFragment : Fragment() {
@@ -27,12 +29,28 @@ class EditGroupFragment : Fragment() {
         )
     }
 
+    private var _binding: FragmentEditGroupBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var currentItem: GroupData
+    private var isEdit: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_edit_group, container, false)
+        _binding = FragmentEditGroupBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        // Setup view with arguments
+        isEdit = arguments?.getBoolean("isEdit")!!
+        if (isEdit) {
+            currentItem = arguments?.getParcelable("currentItem")!!
+            binding.editGroupTitle.setText(currentItem.title)
+        } else {
+            binding.editGroupTitle.text = null
+        }
 
         return view
     }
@@ -50,7 +68,12 @@ class EditGroupFragment : Fragment() {
                 return when (menuItem.itemId) {
                     R.id.editGroup_menu_save -> {
                         // Save data to database
-                        insertDataToDb()
+                        if (isEdit) {
+                            updateDataToDb()
+                        }
+                        else {
+                            insertDataToDb()
+                        }
                         findNavController().navigate(R.id.action_editGroupFragment_to_rootFragment)
                         true
                     }
@@ -60,11 +83,29 @@ class EditGroupFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    fun updateDataToDb() {
+        viewModel.updateItem(
+            currentItem.id,
+            when (binding.editGroupTitle.text.toString()) {
+                "" -> {
+                    binding.editGroupTitle.autofillHints!![0]
+                }
+                else -> binding.editGroupTitle.text.toString()
+            },
+            listOf(0)
+        )
+    }
+
     fun insertDataToDb() {
         viewModel.addItem(
             0,
-            "233",
-            listOf(1, 3, 4, 6)
+            when (binding.editGroupTitle.text.toString()) {
+                "" -> {
+                    binding.editGroupTitle.autofillHints!![0]
+                }
+                else -> binding.editGroupTitle.text.toString()
+            },
+            listOf(0)
         )
     }
 
