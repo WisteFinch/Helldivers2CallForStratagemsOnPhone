@@ -12,26 +12,28 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import indi.wistefinch.callforstratagems.R
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import indi.wistefinch.callforstratagems.CFSApplication
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
+import indi.wistefinch.callforstratagems.data.viewmodel.SharedViewModel
 import indi.wistefinch.callforstratagems.databinding.FragmentRootBinding
 
 class RootFragment : Fragment() {
 
-    // Init the group view model
-    private val viewModel: GroupViewModel by activityViewModels {
+    // Init the view model
+    private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
             (activity?.application as CFSApplication).database.groupDao()
         )
     }
+
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     // Init the group recycler view adapter
     private val adapter: GroupListAdapter by lazy { GroupListAdapter() }
@@ -50,7 +52,7 @@ class RootFragment : Fragment() {
 
         // Add FAB
         binding.rootNewGroupFAB.setOnClickListener {
-            val bundle = bundleOf(Pair("currentId", -1))
+            val bundle = bundleOf(Pair("isEdit", false))
             findNavController().navigate(R.id.action_rootFragment_to_editGroupFragment, bundle)
         }
 
@@ -58,9 +60,15 @@ class RootFragment : Fragment() {
         val recyclerView = binding.rootRecyclerView
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        viewModel.allItems.observe(viewLifecycleOwner, Observer { data->
+        groupViewModel.allItems.observe(viewLifecycleOwner, Observer { data->
+            sharedViewModel.checkIfDbIsEmpty(data)
             adapter.setData(data)
         })
+
+        // Check whether to show the no data image
+        sharedViewModel.emptyDatabase.observe(viewLifecycleOwner) {
+            showEmptyDbViews(it)
+        }
 
         return view
     }
@@ -84,5 +92,16 @@ class RootFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun showEmptyDbViews(empty: Boolean) {
+        if(empty) {
+            binding.noGroupTextView.visibility = View.VISIBLE
+            binding.noGroupImageView.visibility = View.VISIBLE
+        }
+        else {
+            binding.noGroupTextView.visibility = View.INVISIBLE
+            binding.noGroupImageView.visibility = View.INVISIBLE
+        }
     }
 }
