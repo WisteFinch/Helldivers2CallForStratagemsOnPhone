@@ -22,6 +22,8 @@ import indi.wistefinch.callforstratagems.CFSApplication
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indi.wistefinch.callforstratagems.data.viewmodel.SharedViewModel
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indi.wistefinch.callforstratagems.databinding.FragmentRootBinding
 
 class RootFragment : Fragment() {
@@ -29,7 +31,13 @@ class RootFragment : Fragment() {
     // Init the view model
     private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
-            (activity?.application as CFSApplication).database.groupDao()
+            (activity?.application as CFSApplication).groupDb.groupDao()
+        )
+    }
+
+    private val stratagemViewModel: StratagemViewModel by activityViewModels {
+        StratagemViewModelFactory(
+            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
         )
     }
 
@@ -56,14 +64,7 @@ class RootFragment : Fragment() {
             findNavController().navigate(R.id.action_rootFragment_to_editGroupFragment, bundle)
         }
 
-        // Setup group recycler view
-        val recyclerView = binding.rootRecyclerView
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        groupViewModel.allItems.observe(viewLifecycleOwner, Observer { data->
-            sharedViewModel.checkIfDbIsEmpty(data)
-            adapter.setData(data)
-        })
+        setupRecyclerView()
 
         // Check whether to show the no data image
         sharedViewModel.emptyDatabase.observe(viewLifecycleOwner) {
@@ -103,5 +104,19 @@ class RootFragment : Fragment() {
             binding.noGroupTextView.visibility = View.INVISIBLE
             binding.noGroupImageView.visibility = View.INVISIBLE
         }
+    }
+
+    /**
+     * Setup the group recycler view
+     */
+    private fun setupRecyclerView() {
+        val recyclerView = binding.rootRecyclerView
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        adapter.setStratagemViewModel(stratagemViewModel)
+        groupViewModel.allItems.observe(viewLifecycleOwner, Observer { data->
+            sharedViewModel.checkIfDbIsEmpty(data)
+            adapter.setData(data)
+        })
     }
 }

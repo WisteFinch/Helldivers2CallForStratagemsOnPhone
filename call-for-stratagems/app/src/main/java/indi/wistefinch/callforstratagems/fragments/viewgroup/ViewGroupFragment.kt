@@ -8,29 +8,41 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import indi.wistefinch.callforstratagems.CFSApplication
 import indi.wistefinch.callforstratagems.R
 import indi.wistefinch.callforstratagems.data.models.GroupData
+import indi.wistefinch.callforstratagems.data.models.StratagemData
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
-import indi.wistefinch.callforstratagems.databinding.FragmentEditGroupBinding
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indi.wistefinch.callforstratagems.databinding.FragmentViewGroupBinding
+import indi.wistefinch.callforstratagems.layout.AppGridLayoutManager
+import java.util.Vector
 
 class ViewGroupFragment : Fragment() {
 
-    private val viewModel: GroupViewModel by activityViewModels {
+    private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
-            (activity?.application as CFSApplication).database.groupDao()
+            (activity?.application as CFSApplication).groupDb.groupDao()
         )
     }
+
+    private val stratagemViewModel: StratagemViewModel by activityViewModels {
+        StratagemViewModelFactory(
+            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+
+    // Init the stratagem recycler view adapter
+    private val adapter: StratagemViewAdapter by lazy { StratagemViewAdapter() }
 
     private var _binding: FragmentViewGroupBinding? = null
     private val binding get() = _binding!!
@@ -47,6 +59,8 @@ class ViewGroupFragment : Fragment() {
 
         currentItem = arguments?.getParcelable("currentItem")!!
         binding.viewGroupTitle.text = currentItem.title
+
+        setupRecyclerView()
 
         return view
     }
@@ -69,13 +83,30 @@ class ViewGroupFragment : Fragment() {
                         true
                     }
                     R.id.viewGroup_menu_delete-> {
-                        viewModel.deleteItem(currentItem)
-                        findNavController().navigate(R.id.action_viewGroupFragment_to_rootFragment)
+                        groupViewModel.deleteItem(currentItem)
+                        findNavController().popBackStack(R.id.rootFragment, false)
                         true
                     }
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    /**
+     * Setup the stratagem recycler view
+     */
+    private fun setupRecyclerView() {
+        val recyclerView = binding.viewGroupRecyclerView
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = AppGridLayoutManager(context, 3)
+        val list: Vector<StratagemData> = Vector()
+        for (i in currentItem.list) {
+            if (stratagemViewModel.isIdValid(i)) {
+                list.add(stratagemViewModel.retrieveItem(i))
+            }
+        }
+        adapter.setData(list.toList())
+        binding.viewGroupRecyclerView.suppressLayout(true)
     }
 }

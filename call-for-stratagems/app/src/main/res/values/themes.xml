@@ -31,6 +31,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="AppText">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
     <style name="AppFAB" parent="Widget.Design.FloatingActionButton">
         <item name="shapeAppearanceOverlay">@style/FABRoundedStyle</item>
         <item name="android:layout_width">wrap_content</item>

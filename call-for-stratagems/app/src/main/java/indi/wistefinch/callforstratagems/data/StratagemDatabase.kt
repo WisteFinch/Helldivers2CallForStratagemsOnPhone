@@ -5,30 +5,28 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import indi.wistefinch.callforstratagems.data.models.GroupData
-import indi.wistefinch.callforstratagems.data.dao.GroupDao
 import indi.wistefinch.callforstratagems.data.dao.StratagemDao
 import indi.wistefinch.callforstratagems.data.models.StratagemData
 
-@Database(entities = [GroupData::class, StratagemData::class], version = 1, exportSchema = false)
+@Database(entities = [StratagemData::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class AppDatabase: RoomDatabase() {
+abstract class StratagemDatabase: RoomDatabase() {
 
-    abstract fun groupDao(): GroupDao
     abstract fun stratagemDao(): StratagemDao
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var INSTANCE: StratagemDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
+        fun getDatabase(context: Context): StratagemDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    AppDatabase::class.java,
-                    "app_database"
+                    StratagemDatabase::class.java,
+                    "stratagem_database"
                 )
-                    .createFromAsset("database/initial_db.db")
+                    .allowMainThreadQueries()
+                    .createFromAsset("database/stratagem_initial_db.db")
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

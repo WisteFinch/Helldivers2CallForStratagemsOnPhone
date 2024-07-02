@@ -13,10 +13,13 @@ import kotlinx.coroutines.flow.Flow
 interface StratagemDao {
 
     @Query("SELECT * FROM stratagem_table ORDER BY id ASC")
-    fun getItems(): Flow<List<StratagemData>>
+    fun getItems(): List<StratagemData>
 
     @Query("SELECT * from stratagem_table WHERE id = :id")
-    fun getItem(id: Int): Flow<StratagemData>
+    fun getItem(id: Int): StratagemData
+
+    @Query("SELECT EXISTS(SELECT 1 FROM stratagem_table WHERE id = :id)")
+    fun valid(id: Int): Boolean
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: StratagemData)

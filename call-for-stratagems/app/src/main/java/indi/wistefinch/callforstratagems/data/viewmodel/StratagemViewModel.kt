@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
 
     // Cache all items form the database using LiveData.
-    val allItems: LiveData<List<StratagemData>> = stratagemDao.getItems().asLiveData()
+    val allItems: List<StratagemData> = stratagemDao.getItems()
 
     fun updateItem(
         id: Int,
@@ -56,8 +56,12 @@ class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
         }
     }
 
-    fun retrieveItem(id: Int): LiveData<StratagemData> {
-        return stratagemDao.getItem(id).asLiveData()
+    fun retrieveItem(id: Int): StratagemData {
+        return stratagemDao.getItem(id)
+    }
+
+    fun isIdValid(id: Int): Boolean {
+        return stratagemDao.valid(id)
     }
 
     fun isEntryValid(title: String): Boolean {

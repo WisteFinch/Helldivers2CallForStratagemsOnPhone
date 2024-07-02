@@ -25,7 +25,7 @@ class EditGroupFragment : Fragment() {
 
     private val viewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
-            (activity?.application as CFSApplication).database.groupDao()
+            (activity?.application as CFSApplication).groupDb.groupDao()
         )
     }
 
@@ -74,7 +74,7 @@ class EditGroupFragment : Fragment() {
                         else {
                             insertDataToDb()
                         }
-                        findNavController().navigate(R.id.action_editGroupFragment_to_rootFragment)
+                        findNavController().popBackStack(R.id.rootFragment, false)
                         true
                     }
                     else -> false
@@ -92,7 +92,7 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            listOf(0)
+            listOf(1, 2, 3, 4)
         )
     }
 
@@ -105,7 +105,7 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            listOf(0)
+            listOf(1, 2, 3, 4)
         )
     }
 
