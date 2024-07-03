@@ -12,8 +12,6 @@
     <style name="Theme.CallForStratagems" parent="Base.Theme.CallForStratagems" />
 
     <style name="AppCardView" parent="CardView">
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardCornerRadius">16dp</item>

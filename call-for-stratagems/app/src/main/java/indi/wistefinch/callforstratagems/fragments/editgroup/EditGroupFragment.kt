@@ -16,18 +16,33 @@ import androidx.navigation.fragment.findNavController
 import indi.wistefinch.callforstratagems.R
 import indi.wistefinch.callforstratagems.CFSApplication
 import indi.wistefinch.callforstratagems.data.models.GroupData
+import indi.wistefinch.callforstratagems.data.models.StratagemData
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indi.wistefinch.callforstratagems.databinding.FragmentEditGroupBinding
+import indi.wistefinch.callforstratagems.fragments.viewgroup.StratagemViewAdapter
+import indi.wistefinch.callforstratagems.layout.AppGridLayoutManager
+import java.util.Vector
 
 
 class EditGroupFragment : Fragment() {
 
-    private val viewModel: GroupViewModel by activityViewModels {
+    private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
             (activity?.application as CFSApplication).groupDb.groupDao()
         )
     }
+
+    private val stratagemViewModel: StratagemViewModel by activityViewModels {
+        StratagemViewModelFactory(
+            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    // Init the stratagem recycler view adapter
+    private val adapter: StratagemEditAdapter by lazy { StratagemEditAdapter() }
 
     private var _binding: FragmentEditGroupBinding? = null
     private val binding get() = _binding!!
@@ -49,8 +64,16 @@ class EditGroupFragment : Fragment() {
             currentItem = arguments?.getParcelable("currentItem")!!
             binding.editGroupTitle.setText(currentItem.title)
         } else {
+
             binding.editGroupTitle.text = null
+            currentItem = GroupData(
+                0,
+                "",
+                listOf(1, 2, 3)
+            )
         }
+
+        setupRecyclerView()
 
         return view
     }
@@ -84,7 +107,7 @@ class EditGroupFragment : Fragment() {
     }
 
     fun updateDataToDb() {
-        viewModel.updateItem(
+        groupViewModel.updateItem(
             currentItem.id,
             when (binding.editGroupTitle.text.toString()) {
                 "" -> {
@@ -92,12 +115,12 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            listOf(1, 2, 3, 4)
+            adapter.set.sorted().toList()
         )
     }
 
     fun insertDataToDb() {
-        viewModel.addItem(
+        groupViewModel.addItem(
             0,
             when (binding.editGroupTitle.text.toString()) {
                 "" -> {
@@ -105,8 +128,19 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            listOf(1, 2, 3, 4)
+            adapter.set.sorted().toList()
         )
+    }
+
+    /**
+     * Setup the stratagem recycler view
+     */
+    private fun setupRecyclerView() {
+        val recyclerView = binding.editGroupRecyclerView
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = AppGridLayoutManager(context, 3)
+        val list = stratagemViewModel.allItems
+        adapter.setData(list, currentItem.list.toMutableSet())
     }
 
 }

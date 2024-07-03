@@ -40,7 +40,6 @@ class ViewGroupFragment : Fragment() {
         )
     }
 
-
     // Init the stratagem recycler view adapter
     private val adapter: StratagemViewAdapter by lazy { StratagemViewAdapter() }
 

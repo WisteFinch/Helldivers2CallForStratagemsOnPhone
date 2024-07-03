@@ -2,18 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
+    android:layout_margin="4dp"
+    tools:context=".fragments.editgroup.EditGroupFragment">
 
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/group_cardView"
+        android:id="@+id/stratagem_edit_cardView"
         style="@style/AppCardView"
-        android:clickable="true"
-        android:focusable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -24,28 +26,28 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="8dp">
 
-
-            <TextView
-                android:id="@+id/group_title"
-                style="@style/AppTextTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/default_string"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textSize="16sp"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/group_recyclerView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+            <ImageView
+                android:id="@+id/stratagem_edit_imageView"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="@string/default_string"
+                android:src="@drawable/reinforce"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/group_title" />
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/stratagem_edit_title"
+                style="@style/AppText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/default_string"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/stratagem_edit_imageView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

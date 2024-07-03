@@ -11,7 +11,8 @@
     <color name="orange">#FDC363</color>
     <color name="pink">#F7438C</color>
     <color name="lightPink">#FCB8D9</color>
-    <color name="darkBlue">#171A27</color>
+    <color name="veryDarkBlue">#171A27</color>
+    <color name="darkBlue">#373A77</color>
     <color name="blue">#269DCE</color>
     <color name="lightBlue">#A3DEF8</color>
     <color name="grey">#ABAAB2</color>
@@ -23,5 +24,5 @@
     <color name="colorAccent">@color/lightPurple</color>
     <color name="windowBackground">@color/veryDarkCornflowerBlue</color>
     <color name="textColorPrimary">@color/white</color>
-    <color name="colorBackground">@color/darkBlue</color>
+    <color name="colorBackground">@color/veryDarkBlue</color>
 </resources>
