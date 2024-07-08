@@ -23,8 +23,15 @@ pub async fn run() -> Result<()> {
     };
 
     // Listen port
-    let listener = TcpListener::bind(format!("{}:{}", local_ipaddress::get().unwrap(), conf.port)).await?;
-    println!("Listening: {}:{}", local_ipaddress::get().unwrap(), conf.port);
+    let listener = match TcpListener::bind(format!("{}:{}", local_ipaddress::get().unwrap(), conf.port)).await {
+        Ok(ok) => ok,
+        Err(err) => {
+            println!("Error: {}", err); 
+            println!("Using temporary network configuration"); 
+            TcpListener::bind(format!("{}:{}", local_ipaddress::get().unwrap(), Config::default().port)).await?
+        }
+    };
+    println!("Listening: {}", listener.local_addr().unwrap().to_string());
     loop {
         let (client, _address) = listener.accept().await?;
         tokio::spawn(handle_connection(client, conf.clone()));

@@ -103,7 +103,7 @@ pub struct Config {
 impl Config {
     pub fn default() -> Self {
         Self {
-            port: 2333,
+            port: 23333,
             delay: 25,
             open: "ctrl_left".to_string(),
             up: "w".to_string(),
