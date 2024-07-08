@@ -62,11 +62,11 @@ impl fmt::Display for Step {
 }
 
 pub enum Operation {
-    Status,
-    Combined,
-    Independent,
-    Request,
-    Sync,
+    Status = 0,
+    Combined = 1,
+    Independent = 2,
+    Request = 3,
+    Sync = 4,
 }
 
 impl Operation {

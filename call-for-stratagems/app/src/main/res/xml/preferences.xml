@@ -33,6 +33,13 @@
             app:icon="@drawable/ic_cable"
             app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+            app:key="input_delay"
+            app:title="@string/input_delay_title"
+            app:defaultValue="@string/input_delay_default"
+            app:icon="@drawable/ic_time"
+            app:useSimpleSummaryProvider="true" />
+
         <ListPreference
             app:defaultValue="ctrl_left"
             app:entries="@array/input_entries"
@@ -41,6 +48,7 @@
             app:title="@string/input_open_title"
             app:icon="@drawable/ic_keyboard"
             app:useSimpleSummaryProvider="true" />
+
 
         <ListPreference
             app:defaultValue="w"
@@ -81,7 +89,7 @@
         <Preference
             app:key="sync_config"
             app:title="@string/sync_config_title"
-            app:summary="@string/sync_config_summary"
+            app:summary="@string/sync_config_default"
             app:icon="@drawable/ic_check"
             />
 

@@ -27,24 +27,27 @@
     <string name="tcp_add_title">Server address</string>
     <string name="tcp_add_default">127.0.0.1</string>
     <string name="tcp_port_title">Server port</string>
-    <string name="tcp_port_default">2333</string>
+    <string name="tcp_port_default">23333</string>
     <string name="tcp_test_title">Test connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
     <string name="tcp_test_success">Success</string>
     <string name="tcp_test_failed">Connection failed, please check the network settings</string>
-    <string name="tcp_test_no_response">Server did not respond, please check whether the server is running properly</string>
+    <string name="tcp_test_response_error">Server response error, please check whether the server is running properly</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
     <string name="server_port_default">2333</string>
+    <string name="input_delay_title">Input interval time(ms)</string>
+    <string name="input_delay_default">25</string>
     <string name="input_open_title">Input: Open Stratagems List</string>
     <string name="input_up_title">Input: Up</string>
     <string name="input_down_title">Input: Down</string>
     <string name="input_left_title">Input: Left</string>
     <string name="input_right_title">Input: Right</string>
     <string name="sync_config_title">Apply configuration</string>
-    <string name="sync_config_summary">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
+    <string name="sync_config_default">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
+    <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
 
     <!-- Root Menu -->
     <string name="root_menu_preferences_title">Preferences</string>

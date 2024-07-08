@@ -67,14 +67,14 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         // Operation
         match opt {
             Operation::Status => {
-                client.write_all("ready".as_bytes()).await?; 
+                client.write_all("ready\n".as_bytes()).await?; 
                 println!("Sended status to: {}", client.peer_addr()?)
             },
             Operation::Request => {
                 client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; 
                 println!("Sended configuration to: {}", client.peer_addr()?)
             },
-            Operation::Sync => save_config(json["configuration"].as_str().unwrap(), true).await,
+            Operation::Sync => save_config(json["configuration"].to_string().as_str(), true).await,
             Operation::Combined => macros(json["macro"].clone(), &conf).await?,
             Operation::Independent => independent(json["input"].clone(), &conf).await?
         }

@@ -22,7 +22,7 @@ class Client {
         }
         socket = Socket()
         try {
-            socket.connect(InetSocketAddress(address, port))
+            socket.connect(InetSocketAddress(address, port), 5000)
             reader = Scanner(InputStreamReader(socket.getInputStream()))
             writer = PrintWriter(socket.getOutputStream(), true)
         } catch (_: IOException) {
