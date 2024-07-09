@@ -92,6 +92,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         syncConfig.setOnPreferenceClickListener {
+            syncConfig.summary = resources.getText(R.string.tcp_test_connecting)
             val config = ServerConfig(
                 port = serverPort.text?.toInt()!!,
                 delay = inputDelay.text?.toInt()!!,

@@ -32,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_margin="16dp"
-                    android:text="@string/viewGroup_title"
+                    android:text="@string/default_string"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="24sp"
                     android:textStyle="bold" />

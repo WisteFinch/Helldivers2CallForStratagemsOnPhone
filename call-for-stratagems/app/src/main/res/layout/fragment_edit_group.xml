@@ -34,7 +34,7 @@
                 <EditText
                     android:id="@+id/editGroup_title"
                     style="@style/AppTextTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_margin="16dp"
@@ -42,6 +42,7 @@
                     android:hint="@string/editGroup_title_hint"
                     android:inputType="text"
                     android:text="@string/editGroup_title"
+                    android:gravity="center_horizontal"
                     android:textSize="24sp" />
 
             </androidx.cardview.widget.CardView>

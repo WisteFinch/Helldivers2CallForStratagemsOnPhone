@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">呼叫战略配备</string>
+    <string name="fragment_root">呼叫战略配备</string>
+    <string name="fragment_editGroup">编辑组合</string>
+    <string name="fragment_settings">设置</string>
+    <string name="fragment_viewGroup">浏览组合</string>
+    <string name="default_string">默认</string>
+
+    <!-- Fragment Root -->
+    <string name="root_new_group_FAB">新组合</string>
+    <string name="root_no_group">The Galactic War awaits</string>
+    <string name="root_no_group_img">没有组合</string>
+
+    <!-- Fragment Edit Group -->
+    <string name="editGroup_title">新的组合</string>
+    <string name="editGroup_title_hint">组合名称</string>
+
+    <!-- Fragment View Group -->
+    <string name="viewGroup_play_FAB">开始</string>
+
+    <!-- Preference Titles -->
+    <string name="connection_header">连接</string>
+    <string name="sync_header">同步</string>
+
+    <!-- Connection Preferences -->
+    <string name="tcp_add_title">服务器地址</string>
+    <string name="tcp_port_title">服务器端口</string>
+    <string name="tcp_test_title">测试连接</string>
+    <string name="tcp_test_default">测试与电脑端的连接</string>
+    <string name="tcp_test_connecting">请民主地等待…</string>
+    <string name="tcp_test_success">成功</string>
+    <string name="tcp_test_failed">连接失败，请检查网络设置</string>
+    <string name="tcp_test_response_error">服务器响应错误，请检查服务器是否正常运行</string>
+
+    <!-- Sync Preferences -->
+    <string name="server_port_title">端口</string>
+    <string name="input_delay_title">输入延迟（毫秒）</string>
+    <string name="input_open_title">输入：打开战略配备</string>
+    <string name="input_up_title">输入：上</string>
+    <string name="input_down_title">输入：下</string>
+    <string name="input_left_title">输入：左</string>
+    <string name="input_right_title">输入：右</string>
+    <string name="sync_config_title">应用配置</string>
+    <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
+    <string name="sync_config_finished">同步完成，您需要重启服务器来应用配置</string>
+
+    <!-- Root Menu -->
+    <string name="root_menu_preferences_title">首选项</string>
+
+    <!-- Edit Group Menu -->
+    <string name="editGroup_menu_save_title">保存</string>
+
+    <!-- View Group Menu -->
+    <string name="viewGroup_menu_edit_title">编辑</string>
+    <string name="viewGroup_menu_delete_title">删除</string>
+</resources>

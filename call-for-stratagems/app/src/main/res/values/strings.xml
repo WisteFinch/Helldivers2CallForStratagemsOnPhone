@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">CallForStratagems</string>
-    <string name="fragment_root">Stratagems groups</string>
+    <string name="fragment_root">CallForStratagems</string>
     <string name="fragment_editGroup">Edit stratagems group</string>
     <string name="fragment_settings">Settings</string>
     <string name="fragment_viewGroup">Stratagems group</string>
@@ -16,7 +16,6 @@
     <string name="editGroup_title_hint">Stratagems group Name</string>
 
     <!-- Fragment View Group -->
-    <string name="viewGroup_title">Title</string>
     <string name="viewGroup_play_FAB">Play</string>
 
     <!-- Preference Titles -->
@@ -25,9 +24,9 @@
 
     <!-- Connection Preferences -->
     <string name="tcp_add_title">Server address</string>
-    <string name="tcp_add_default">127.0.0.1</string>
+    <string name="tcp_add_default" translatable="false">127.0.0.1</string>
     <string name="tcp_port_title">Server port</string>
-    <string name="tcp_port_default">23333</string>
+    <string name="tcp_port_default" translatable="false">23333</string>
     <string name="tcp_test_title">Test connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
@@ -37,9 +36,9 @@
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
-    <string name="server_port_default">2333</string>
+    <string name="server_port_default" translatable="false">23333</string>
     <string name="input_delay_title">Input interval time(ms)</string>
-    <string name="input_delay_default">25</string>
+    <string name="input_delay_default" translatable="false">25</string>
     <string name="input_open_title">Input: Open Stratagems List</string>
     <string name="input_up_title">Input: Up</string>
     <string name="input_down_title">Input: Down</string>
@@ -53,7 +52,7 @@
     <string name="root_menu_preferences_title">Preferences</string>
 
     <!-- Edit Group Menu -->
-    <string name="editGroup_menu_save_title">Preferences</string>
+    <string name="editGroup_menu_save_title">Save</string>
 
     <!-- View Group Menu -->
     <string name="viewGroup_menu_edit_title">Edit</string>
