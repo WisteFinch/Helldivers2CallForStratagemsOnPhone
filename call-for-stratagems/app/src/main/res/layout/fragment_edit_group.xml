@@ -8,13 +8,19 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp" >
+            android:padding="16dp">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/editGroup_title_cardView"
@@ -27,32 +33,32 @@
 
                 <EditText
                     android:id="@+id/editGroup_title"
+                    style="@style/AppTextTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_margin="16dp"
                     android:autofillHints="@string/editGroup_title"
+                    android:hint="@string/editGroup_title_hint"
                     android:inputType="text"
                     android:text="@string/editGroup_title"
-                    android:hint="@string/editGroup_title_hint"
-                    android:textSize="24sp"
-                    style="@style/AppTextTitle" />
+                    android:textSize="24sp" />
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 style="@style/AppCardView"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView"
-                android:layout_marginTop="8dp">
+                app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/editGroup_recyclerView"
-                    android:layout_margin="16dp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:layout_margin="16dp" />
 
             </androidx.cardview.widget.CardView>
 
