@@ -21,7 +21,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stratagem_edit_layout, parent, false))
+        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_edit, parent, false))
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {

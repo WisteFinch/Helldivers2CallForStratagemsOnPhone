@@ -10,9 +10,10 @@
     <ImageView
         android:id="@+id/play_banner"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="60dp"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:layout_marginBottom="4dp"
         android:contentDescription="@string/play_banner_desc"
         android:scaleType="fitCenter"
         android:src="@drawable/hd2_banner"
@@ -32,8 +33,9 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/play_stratagem_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
     </androidx.core.widget.NestedScrollView>
 
@@ -55,11 +57,13 @@
         android:id="@+id/play_exit"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@color/colorBackground"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/play_exit"
         android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_exit"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -67,7 +71,7 @@
         android:id="@+id/play_mode"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@color/colorBackground"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/play_mode"
         android:padding="8dp"
         android:scaleType="fitCenter"
@@ -136,7 +140,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title"
+        app:layout_constraintTop_toBottomOf="@+id/play_freeInput"
         app:layout_constraintVertical_bias="0.5">
 
 

@@ -41,7 +41,7 @@ class EditGroupFragment : Fragment() {
         )
     }
 
-    // Init the stratagem recycler view adapter
+    // stratagem recycler view adapter
     private val adapter: StratagemEditAdapter by lazy { StratagemEditAdapter() }
 
     private var _binding: FragmentEditGroupBinding? = null
