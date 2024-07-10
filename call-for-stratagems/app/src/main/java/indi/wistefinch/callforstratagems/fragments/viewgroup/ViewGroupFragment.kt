@@ -59,6 +59,12 @@ class ViewGroupFragment : Fragment() {
         currentItem = arguments?.getParcelable("currentItem")!!
         binding.viewGroupTitle.text = currentItem.title
 
+        // Add FAB
+        binding.viewGroupPlayFAB.setOnClickListener {
+            val bundle = bundleOf(Pair("currentItem", currentItem))
+            findNavController().navigate(R.id.action_viewGroupFragment_to_playFragment, bundle)
+        }
+
         setupRecyclerView()
 
         return view

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">呼叫战略配备</string>
+
+    <!-- Fragment Root -->
     <string name="fragment_root">呼叫战略配备</string>
     <string name="fragment_editGroup">编辑组合</string>
     <string name="fragment_settings">设置</string>
     <string name="fragment_viewGroup">浏览组合</string>
-    <string name="default_string">默认</string>
+    <string name="fragment_play">游玩</string>
 
     <!-- Fragment Root -->
     <string name="root_new_group_FAB">新组合</string>
@@ -45,6 +47,11 @@
     <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
     <string name="sync_config_finished">同步完成，您需要重启服务器来应用配置</string>
 
+    <!-- Info Preferences -->
+    <string name="info_version">版本</string>
+    <string name="info_repo">项目仓库</string>
+    <string name="info_repo_desc">在Github上查看源码</string>
+
     <!-- Root Menu -->
     <string name="root_menu_preferences_title">首选项</string>
 
@@ -54,4 +61,14 @@
     <!-- View Group Menu -->
     <string name="viewGroup_menu_edit_title">编辑</string>
     <string name="viewGroup_menu_delete_title">删除</string>
+
+    <!-- Fragment Play -->
+    <string name="play_banner_desc">横幅</string>
+    <string name="play_exit">退出</string>
+    <string name="play_mode">输入模式</string>
+    <string name="play_freeInput">自由输入</string>
+    <string name="play_upward">上</string>
+    <string name="play_downward">下</string>
+    <string name="play_backward">左</string>
+    <string name="play_forward">右</string>
 </resources>

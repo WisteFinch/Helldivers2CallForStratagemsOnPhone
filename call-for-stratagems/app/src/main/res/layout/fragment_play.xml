@@ -1,6 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.play.PlayFragment"/>
+    android:background="@color/colorBackground"
+    tools:context=".fragments.play.PlayFragment">
+
+    <ImageView
+        android:id="@+id/play_banner"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:contentDescription="@string/play_banner_desc"
+        android:scaleType="fitCenter"
+        android:src="@drawable/hd2_banner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/play_stratagem_scrollView"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_banner">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/play_stratagem_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/play_blank"
+        style="@style/AppPlayText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/play_blank"
+        android:textColor="@color/textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_scrollView"
+        tools:ignore="VisualLintOverlap" />
+
+    <ImageButton
+        android:id="@+id/play_exit"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@color/colorBackground"
+        android:contentDescription="@string/play_exit"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_exit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/play_mode"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@color/colorBackground"
+        android:contentDescription="@string/play_mode"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/play_gesture"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_banner" />
+
+    <TextView
+        android:id="@+id/play_freeInput"
+        style="@style/AppPlayText"
+        android:layout_width="wrap_content"
+        android:layout_height="64sp"
+        android:gravity="center"
+        android:text="@string/play_freeInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_banner"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/play_stratagem_title"
+        style="@style/AppPlayText"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:text="@string/default_string"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_scrollView"
+        android:visibility="invisible" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/play_steps_scrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title"
+        android:visibility="invisible">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/play_steps_recyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/play_freeInput_image"
+        android:layout_width="192dp"
+        android:layout_height="192dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title"
+        app:layout_constraintVertical_bias="0.5">
+
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="128dp"
+            android:contentDescription="@string/play_upward"
+            android:src="@drawable/ic_arrow_upward"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="128dp"
+            android:contentDescription="@string/play_downward"
+            android:src="@drawable/ic_arrow_downward"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="128dp"
+            android:contentDescription="@string/play_backward"
+            android:src="@drawable/ic_arrow_backward"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="128dp"
+            android:contentDescription="@string/play_forward"
+            android:src="@drawable/ic_arrow_forward"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

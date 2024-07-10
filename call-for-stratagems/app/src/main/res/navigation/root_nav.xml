@@ -69,7 +69,7 @@
     <fragment
         android:id="@+id/playFragment"
         android:name="indi.wistefinch.callforstratagems.fragments.play.PlayFragment"
-        android:label="fragment_play"
+        android:label="@string/fragment_play"
         tools:layout="@layout/fragment_play" >
         <action
             android:id="@+id/action_playFragment_to_viewGroupFragment"

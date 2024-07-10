@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">CallForStratagems</string>
+    <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
+    <string name="default_string" translatable="false">NULL</string>
+
+    <!-- Fragment Title -->
     <string name="fragment_root">CallForStratagems</string>
     <string name="fragment_editGroup">Edit stratagems group</string>
     <string name="fragment_settings">Settings</string>
     <string name="fragment_viewGroup">Stratagems group</string>
-    <string name="default_string">Default</string>
+    <string name="fragment_play">Play</string>
 
     <!-- Fragment Root -->
     <string name="root_new_group_FAB">New stratagems group</string>
@@ -48,6 +52,11 @@
     <string name="sync_config_default">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
     <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
 
+    <!-- Info Preferences -->
+    <string name="info_version">Version</string>
+    <string name="info_repo">Project repository</string>
+    <string name="info_repo_desc">View the source code on github</string>
+
     <!-- Root Menu -->
     <string name="root_menu_preferences_title">Preferences</string>
 
@@ -57,5 +66,16 @@
     <!-- View Group Menu -->
     <string name="viewGroup_menu_edit_title">Edit</string>
     <string name="viewGroup_menu_delete_title">Delete</string>
+
+    <!-- Fragment Play -->
+    <string name="play_blank" translatable="false">PERSONAL HELLPAD\nSYSTEM</string>
+    <string name="play_banner_desc">Banner</string>
+    <string name="play_exit">Exit</string>
+    <string name="play_mode">Input mode</string>
+    <string name="play_freeInput">FREE INPUT</string>
+    <string name="play_upward">Upward</string>
+    <string name="play_downward">Downward</string>
+    <string name="play_backward">Backward</string>
+    <string name="play_forward">Forward</string>
 
 </resources>

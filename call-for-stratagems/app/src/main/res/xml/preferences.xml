@@ -95,4 +95,22 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Info">
+
+        <Preference
+            app:key="info_version"
+            app:title="@string/info_version"
+            app:summary="@string/default_string"
+            app:icon="@drawable/ic_info"
+            />
+
+        <Preference
+            app:key="info_repo"
+            app:title="@string/info_repo"
+            app:summary="@string/info_repo_desc"
+            app:icon="@drawable/ic_info"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

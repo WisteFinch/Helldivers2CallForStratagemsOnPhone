@@ -1,5 +1,7 @@
 package indi.wistefinch.callforstratagems.fragments.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import androidx.preference.EditTextPreference
@@ -30,6 +32,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var inputRight: ListPreference
     private lateinit var syncConfig: Preference
 
+    // Info preference
+    private lateinit var infoVersion: Preference
+    private lateinit var infoRepo: Preference
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
@@ -46,7 +52,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputRight = preferenceManager.findPreference("input_right")!!
         syncConfig = preferenceManager.findPreference("sync_config")!!
 
-        // Only numeric value for port
+        infoVersion = preferenceManager.findPreference("info_version")!!
+        infoRepo = preferenceManager.findPreference("info_repo")!!
+
+        setupFormat()
+        setupEventListener()
+        setupContent()
+
+    }
+
+    private fun setupFormat() {
+        // Only numeric value
         tcpPort.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
@@ -56,8 +72,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputDelay.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
+    }
 
-        // Set click listener
+    private fun setupEventListener() {
+        // Test connection
         tcpTest.setOnPreferenceClickListener {
             tcpTest.summary = resources.getText(R.string.tcp_test_connecting)
             val add = tcpAddress.text!!
@@ -91,6 +109,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }.start()
             true
         }
+        // Sync config
         syncConfig.setOnPreferenceClickListener {
             syncConfig.summary = resources.getText(R.string.tcp_test_connecting)
             val config = ServerConfig(
@@ -128,11 +147,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }.start()
             true
         }
+        // Open repository
+        infoRepo.setOnPreferenceClickListener {
+            val uri = Uri.parse(resources.getString(R.string.repo_url))
+            val internet = Intent(Intent.ACTION_VIEW, uri)
+            internet.addCategory(Intent.CATEGORY_BROWSABLE)
+            startActivity(internet)
+            true
+        }
+    }
 
+    private fun setupContent() {
+        val pkgName = context?.packageName!!
+        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        infoVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ")"
     }
 
     override fun onDestroy() {
         client.disconnect()
         super.onDestroy()
     }
+
+
 }
