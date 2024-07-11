@@ -95,6 +95,24 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Control">
+
+        <EditTextPreference
+            app:key="scroll_distance_threshold"
+            app:title="@string/scroll_distance_threshold_title"
+            app:defaultValue="100"
+            app:icon="@drawable/ic_height"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="scroll_velocity_threshold"
+            app:title="@string/scroll_velocity_threshold_title"
+            app:defaultValue="50"
+            app:icon="@drawable/ic_speed"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="Info">
 
         <Preference

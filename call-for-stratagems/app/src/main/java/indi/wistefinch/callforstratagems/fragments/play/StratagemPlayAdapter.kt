@@ -1,5 +1,6 @@
 package indi.wistefinch.callforstratagems.fragments.play
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -24,12 +25,13 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
+        // For compatibility with lower SDKs, ignore the warning
         val res = context.resources.getIdentifier(
             dataList[pos].icon,
             "drawable",
             context.packageName
         )
-        if(res != 0) {
+        if (res != 0) {
             holder.itemView.findViewById<ImageView>(R.id.stratagem_play_button).setImageResource(res)
             holder.itemView.findViewById<ImageView>(R.id.stratagem_play_button).setOnClickListener {
                 onItemClick?.invoke(dataList[pos])
@@ -41,6 +43,11 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
         return dataList.size
     }
 
+    /**
+     * Set the adapter data
+     * Because the data won't change, there is no need to compare the difference
+     */
+    @SuppressLint("NotifyDataSetChanged")
     fun setData(list: List<StratagemData>) {
         this.dataList = list
         notifyDataSetChanged()

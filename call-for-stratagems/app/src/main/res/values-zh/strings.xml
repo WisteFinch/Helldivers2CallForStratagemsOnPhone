@@ -47,6 +47,10 @@
     <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
     <string name="sync_config_finished">同步完成，您需要重启服务器来应用配置</string>
 
+    <!-- Control Preferences -->
+    <string name="scroll_distance_threshold_title">手势距离阈值（像素）</string>
+    <string name="scroll_velocity_threshold_title">手势速度阈值（像素/秒）</string>
+
     <!-- Info Preferences -->
     <string name="info_version">版本</string>
     <string name="info_repo">项目仓库</string>
@@ -71,4 +75,5 @@
     <string name="play_downward">下</string>
     <string name="play_backward">左</string>
     <string name="play_forward">右</string>
+
 </resources>

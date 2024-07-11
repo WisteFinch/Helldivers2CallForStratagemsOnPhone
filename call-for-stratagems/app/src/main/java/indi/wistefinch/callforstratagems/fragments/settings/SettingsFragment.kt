@@ -32,6 +32,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var inputRight: ListPreference
     private lateinit var syncConfig: Preference
 
+    // Control preference
+    private lateinit var scrollDistance: EditTextPreference
+    private lateinit var scrollVelocity: EditTextPreference
+
     // Info preference
     private lateinit var infoVersion: Preference
     private lateinit var infoRepo: Preference
@@ -51,6 +55,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputLeft = preferenceManager.findPreference("input_left")!!
         inputRight = preferenceManager.findPreference("input_right")!!
         syncConfig = preferenceManager.findPreference("sync_config")!!
+
+        scrollDistance = preferenceManager.findPreference("scroll_distance_threshold")!!
+        scrollVelocity = preferenceManager.findPreference("scroll_velocity_threshold")!!
 
         infoVersion = preferenceManager.findPreference("info_version")!!
         infoRepo = preferenceManager.findPreference("info_repo")!!
@@ -72,6 +79,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputDelay.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
+        scrollDistance.setOnBindEditTextListener { editText ->
+            editText.inputType = InputType.TYPE_CLASS_NUMBER
+        }
+        scrollVelocity.setOnBindEditTextListener { editText ->
+            editText.inputType = InputType.TYPE_CLASS_NUMBER
+        }
     }
 
     private fun setupEventListener() {
@@ -85,11 +98,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     tcpTest.isEnabled = false
                 }
                 val connected = client.connect(add, port)
-                if(connected) {
+                if (connected) {
                     client.send("{\"operation\":0}")
                     val res = client.receive()
                     activity?.runOnUiThread {
-                        if(res == "ready") {
+                        if (res == "ready") {
                             tcpTest.summary = resources.getText(R.string.tcp_test_success)
                         }
                         else {
@@ -128,7 +141,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     syncConfig.isEnabled = false
                 }
                 val connected = client.connect(add, port)
-                if(connected) {
+                if (connected) {
                     client.send("{\"operation\":4,\"configuration\":" + Gson().toJson(config).toString() + "}")
                     activity?.runOnUiThread {
                         tcpPort.text = config.port.toString()
@@ -167,6 +180,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
         client.disconnect()
         super.onDestroy()
     }
-
 
 }

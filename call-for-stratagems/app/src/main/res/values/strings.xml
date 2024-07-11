@@ -52,6 +52,10 @@
     <string name="sync_config_default">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
     <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
 
+    <!-- Control Preferences -->
+    <string name="scroll_distance_threshold_title">Gesture scroll distance threshold(pixel)</string>
+    <string name="scroll_velocity_threshold_title">Gesture scroll velocity threshold(pixel/s)</string>
+
     <!-- Info Preferences -->
     <string name="info_version">Version</string>
     <string name="info_repo">Project repository</string>
