@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -12,10 +14,15 @@ import com.google.gson.Gson
 import indi.wistefinch.callforstratagems.R
 import indi.wistefinch.callforstratagems.socket.Client
 import indi.wistefinch.callforstratagems.socket.ServerConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private val client: Client = Client()
+    private val client = Client()
 
     // Connection preference
     private lateinit var tcpAddress: EditTextPreference
@@ -33,8 +40,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var syncConfig: Preference
 
     // Control preference
-    private lateinit var scrollDistance: EditTextPreference
-    private lateinit var scrollVelocity: EditTextPreference
+    private lateinit var swipeDistance: EditTextPreference
+    private lateinit var swipeVelocity: EditTextPreference
 
     // Info preference
     private lateinit var infoVersion: Preference
@@ -56,8 +63,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputRight = preferenceManager.findPreference("input_right")!!
         syncConfig = preferenceManager.findPreference("sync_config")!!
 
-        scrollDistance = preferenceManager.findPreference("scroll_distance_threshold")!!
-        scrollVelocity = preferenceManager.findPreference("scroll_velocity_threshold")!!
+        swipeDistance = preferenceManager.findPreference("swipe_distance_threshold")!!
+        swipeVelocity = preferenceManager.findPreference("swipe_velocity_threshold")!!
 
         infoVersion = preferenceManager.findPreference("info_version")!!
         infoRepo = preferenceManager.findPreference("info_repo")!!
@@ -79,10 +86,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         inputDelay.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
-        scrollDistance.setOnBindEditTextListener { editText ->
+        swipeDistance.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
-        scrollVelocity.setOnBindEditTextListener { editText ->
+        swipeVelocity.setOnBindEditTextListener { editText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER
         }
     }
@@ -91,40 +98,42 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Test connection
         tcpTest.setOnPreferenceClickListener {
             tcpTest.summary = resources.getText(R.string.tcp_test_connecting)
+            tcpTest.isEnabled = false
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
-            Thread {
-                activity?.runOnUiThread {
-                    tcpTest.isEnabled = false
-                }
-                val connected = client.connect(add, port)
-                if (connected) {
-                    client.send("{\"operation\":0}")
-                    val res = client.receive()
-                    activity?.runOnUiThread {
-                        if (res == "ready") {
-                            tcpTest.summary = resources.getText(R.string.tcp_test_success)
-                        }
-                        else {
-                            tcpTest.summary = resources.getText(R.string.tcp_test_response_error)
+            // launch coroutine
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    val connected = client.connect(add, port)
+                    if (connected) {
+                        client.send("{\"operation\":0}")
+                        val res = client.receive()
+                        withContext(Dispatchers.Main) {
+                            if (res == "ready") {
+                                tcpTest.summary = resources.getText(R.string.tcp_test_success)
+                            }
+                            else {
+                                tcpTest.summary = resources.getText(R.string.tcp_test_response_error)
+                            }
                         }
                     }
-                }
-                else {
-                    activity?.runOnUiThread {
-                        tcpTest.summary = resources.getText(R.string.tcp_test_failed)
+                    else {
+                        withContext(Dispatchers.Main) {
+                            tcpTest.summary = resources.getText(R.string.tcp_test_failed)
+                        }
+                    }
+                    client.disconnect()
+                    withContext(Dispatchers.Main) {
+                        tcpTest.isEnabled = true
                     }
                 }
-                client.disconnect()
-                activity?.runOnUiThread {
-                    tcpTest.isEnabled = true
-                }
-            }.start()
+            }
             true
         }
         // Sync config
         syncConfig.setOnPreferenceClickListener {
             syncConfig.summary = resources.getText(R.string.tcp_test_connecting)
+            syncConfig.isEnabled = false
             val config = ServerConfig(
                 port = serverPort.text?.toInt()!!,
                 delay = inputDelay.text?.toInt()!!,
@@ -136,28 +145,28 @@ class SettingsFragment : PreferenceFragmentCompat() {
             )
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
-            Thread {
-                activity?.runOnUiThread {
-                    syncConfig.isEnabled = false
-                }
-                val connected = client.connect(add, port)
-                if (connected) {
-                    client.send("{\"operation\":4,\"configuration\":" + Gson().toJson(config).toString() + "}")
-                    activity?.runOnUiThread {
-                        tcpPort.text = config.port.toString()
-                        syncConfig.summary = resources.getText(R.string.sync_config_finished)
+            // Launch coroutine
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    val connected = client.connect(add, port)
+                    if (connected) {
+                        client.send("{\"operation\":4,\"configuration\":" + Gson().toJson(config).toString() + "}")
+                        withContext(Dispatchers.Main) {
+                            tcpPort.text = config.port.toString()
+                            syncConfig.summary = resources.getText(R.string.sync_config_finished)
+                        }
+                    }
+                    else {
+                        withContext(Dispatchers.Main) {
+                            syncConfig.summary = resources.getText(R.string.tcp_test_failed)
+                        }
+                    }
+                    client.disconnect()
+                    withContext(Dispatchers.Main) {
+                        syncConfig.isEnabled = true
                     }
                 }
-                else {
-                    activity?.runOnUiThread {
-                        syncConfig.summary = resources.getText(R.string.tcp_test_failed)
-                    }
-                }
-                client.disconnect()
-                activity?.runOnUiThread {
-                    syncConfig.isEnabled = true
-                }
-            }.start()
+            }
             true
         }
         // Open repository

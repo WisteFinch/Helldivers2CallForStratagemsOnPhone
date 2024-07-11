@@ -14,7 +14,7 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
 
     var onItemClick: ((StratagemData) -> Unit)? = null
 
-    private var dataList = emptyList<StratagemData>()
+    var dataList = emptyList<StratagemData>()
     private lateinit var context: Context
 
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {}

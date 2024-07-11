@@ -5,14 +5,21 @@
         <EditTextPreference
             app:key="tcp_add"
             app:title="@string/tcp_add_title"
-            app:defaultValue="@string/tcp_add_default"
+            app:defaultValue="127.0.0.1"
             app:icon="@drawable/ic_cable"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
             app:key="tcp_port"
             app:title="@string/tcp_port_title"
-            app:defaultValue="@string/tcp_port_default"
+            app:defaultValue="23333"
+            app:icon="@drawable/ic_cable"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="tcp_retry"
+            app:title="@string/tcp_retry_title"
+            app:defaultValue="5"
             app:icon="@drawable/ic_cable"
             app:useSimpleSummaryProvider="true" />
 
@@ -29,14 +36,14 @@
         <EditTextPreference
             app:key="server_port"
             app:title="@string/server_port_title"
-            app:defaultValue="@string/server_port_default"
+            app:defaultValue="23333"
             app:icon="@drawable/ic_cable"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
             app:key="input_delay"
             app:title="@string/input_delay_title"
-            app:defaultValue="@string/input_delay_default"
+            app:defaultValue="25"
             app:icon="@drawable/ic_time"
             app:useSimpleSummaryProvider="true" />
 
@@ -98,15 +105,15 @@
     <PreferenceCategory app:title="Control">
 
         <EditTextPreference
-            app:key="scroll_distance_threshold"
-            app:title="@string/scroll_distance_threshold_title"
+            app:key="swipe_distance_threshold"
+            app:title="@string/swipe_distance_threshold_title"
             app:defaultValue="100"
             app:icon="@drawable/ic_height"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:key="scroll_velocity_threshold"
-            app:title="@string/scroll_velocity_threshold_title"
+            app:key="swipe_velocity_threshold"
+            app:title="@string/swipe_velocity_threshold_title"
             app:defaultValue="50"
             app:icon="@drawable/ic_speed"
             app:useSimpleSummaryProvider="true" />

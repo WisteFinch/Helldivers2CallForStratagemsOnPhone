@@ -48,6 +48,8 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             return Ok(());
         }
 
+        // println!("{}",std::str::from_utf8(&buffer[..size]).unwrap());
+
         // Parsing json
         let json: Value = match serde_json::from_str(std::str::from_utf8(&buffer[..size]).unwrap()) {
             Ok(ok) => ok,
@@ -68,7 +70,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         match opt {
             Operation::Status => {
                 client.write_all("ready\n".as_bytes()).await?; 
-                println!("Sended status to: {}", client.peer_addr()?)
+                // println!("Sended status to: {}", client.peer_addr()?)
             },
             Operation::Request => {
                 client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; 
@@ -197,7 +199,6 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()>{
                 Step::Left => simulate(&EventType::KeyRelease(str_to_key(conf.left.as_str()))).unwrap(),
                 Step::Right => simulate(&EventType::KeyRelease(str_to_key(conf.right.as_str()))).unwrap()
             }
-            print!("\n");
         }
     }
     sleep(Duration::from_millis(conf.delay)).await;

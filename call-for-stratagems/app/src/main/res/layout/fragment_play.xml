@@ -8,6 +8,25 @@
     tools:context=".fragments.play.PlayFragment">
 
     <ImageView
+        android:id="@+id/play_connect_status"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:contentDescription="@string/network_status"
+        android:src="@drawable/ic_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/play_connect_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="1dp"
+        android:text="@string/default_string"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/play_connect_status" />
+
+    <ImageView
         android:id="@+id/play_banner"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -64,11 +83,11 @@
         android:id="@+id/play_steps_scrollView"
         android:layout_width="wrap_content"
         android:layout_height="64dp"
-        android:layout_marginTop="32dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title"
-        android:visibility="invisible">
+        app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title">
 
 
         <androidx.recyclerview.widget.RecyclerView

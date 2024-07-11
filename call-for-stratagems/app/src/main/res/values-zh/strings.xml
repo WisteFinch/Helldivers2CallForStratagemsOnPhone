@@ -28,6 +28,7 @@
     <!-- Connection Preferences -->
     <string name="tcp_add_title">服务器地址</string>
     <string name="tcp_port_title">服务器端口</string>
+    <string name="tcp_retry_title">重试次数</string>
     <string name="tcp_test_title">测试连接</string>
     <string name="tcp_test_default">测试与电脑端的连接</string>
     <string name="tcp_test_connecting">请民主地等待…</string>
@@ -48,8 +49,8 @@
     <string name="sync_config_finished">同步完成，您需要重启服务器来应用配置</string>
 
     <!-- Control Preferences -->
-    <string name="scroll_distance_threshold_title">手势距离阈值（像素）</string>
-    <string name="scroll_velocity_threshold_title">手势速度阈值（像素/秒）</string>
+    <string name="swipe_distance_threshold_title">手势距离阈值（像素）</string>
+    <string name="swipe_velocity_threshold_title">手势速度阈值（像素/秒）</string>
 
     <!-- Info Preferences -->
     <string name="info_version">版本</string>
@@ -75,5 +76,10 @@
     <string name="play_downward">下</string>
     <string name="play_backward">左</string>
     <string name="play_forward">右</string>
+    <string name="network_connecting">连接中… %1$s:%2$d</string>
+    <string name="network_retry">连接中… %1$s:%2$d (重试 %3$d/%4$d)</string>
+    <string name="network_connected">已连接 %1$s:%2$d</string>
+    <string name="network_failed">连接失败 %1$s:%2$d</string>
+    <string name="network_status">连接状态</string>
 
 </resources>

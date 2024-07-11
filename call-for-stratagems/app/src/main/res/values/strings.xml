@@ -28,9 +28,8 @@
 
     <!-- Connection Preferences -->
     <string name="tcp_add_title">Server address</string>
-    <string name="tcp_add_default" translatable="false">127.0.0.1</string>
     <string name="tcp_port_title">Server port</string>
-    <string name="tcp_port_default" translatable="false">23333</string>
+    <string name="tcp_retry_title">Retry times</string>
     <string name="tcp_test_title">Test connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
@@ -40,9 +39,7 @@
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
-    <string name="server_port_default" translatable="false">23333</string>
     <string name="input_delay_title">Input interval time(ms)</string>
-    <string name="input_delay_default" translatable="false">25</string>
     <string name="input_open_title">Input: Open Stratagems List</string>
     <string name="input_up_title">Input: Up</string>
     <string name="input_down_title">Input: Down</string>
@@ -53,8 +50,8 @@
     <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
 
     <!-- Control Preferences -->
-    <string name="scroll_distance_threshold_title">Gesture scroll distance threshold(pixel)</string>
-    <string name="scroll_velocity_threshold_title">Gesture scroll velocity threshold(pixel/s)</string>
+    <string name="swipe_distance_threshold_title">Gesture swipe distance threshold(pixel)</string>
+    <string name="swipe_velocity_threshold_title">Gesture swipe velocity threshold(pixel/s)</string>
 
     <!-- Info Preferences -->
     <string name="info_version">Version</string>
@@ -81,5 +78,10 @@
     <string name="play_downward">Downward</string>
     <string name="play_backward">Backward</string>
     <string name="play_forward">Forward</string>
+    <string name="network_connecting">Connecting… %1$s:%2$d</string>
+    <string name="network_retry">Connecting… %1$s:%2$d (retry %3$d/%4$d)</string>
+    <string name="network_connected">Connected %1$s:%2$d</string>
+    <string name="network_failed">Connect failed %1$s:%2$d</string>
+    <string name="network_status">Connect status</string>
 
 </resources>

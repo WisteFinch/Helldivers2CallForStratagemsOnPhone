@@ -18,6 +18,8 @@
     <color name="grey">#ABAAB2</color>
     <color name="lightGrey">#F1F1F3</color>
     <color name="veryDarkCornflowerBlue">#061015</color>
+    <color name="green">#67CA50</color>
+    <color name="red">#DB2D43</color>
 
     <color name="colorPrimary">@color/purple</color>
     <color name="colorPrimaryDark">@color/darkPurple</color>

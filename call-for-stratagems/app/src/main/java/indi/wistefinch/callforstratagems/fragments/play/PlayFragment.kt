@@ -8,19 +8,31 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import indi.wistefinch.callforstratagems.CFSApplication
 import indi.wistefinch.callforstratagems.MainActivity
+import indi.wistefinch.callforstratagems.R
 import indi.wistefinch.callforstratagems.data.models.GroupData
 import indi.wistefinch.callforstratagems.data.models.StratagemData
 import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indi.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indi.wistefinch.callforstratagems.databinding.FragmentPlayBinding
+import indi.wistefinch.callforstratagems.socket.Client
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import java.util.Vector
 import kotlin.math.abs
 
@@ -55,6 +67,15 @@ class PlayFragment : Fragment() {
     private var distanceThreshold = 100.0
     private var velocityThreshold = 50.0
 
+    // Socket
+    private val client = Client()
+    private var isConnected: Boolean = false
+    private var networkLock = Mutex()
+    private var connectingLock = Mutex()
+    private var address: String = "127.0.0.1"
+    private var port: Int = 23333
+    private var retryLimit: Int = 5
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,11 +102,24 @@ class PlayFragment : Fragment() {
 
         // Get preference
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        distanceThreshold = preferences.getString("scroll_distance_threshold", "100")?.toDouble()!!
-        velocityThreshold = preferences.getString("scroll_velocity_threshold", "50")?.toDouble()!!
+        distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
+        velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
+        address = preferences.getString("tcp_add", "127.0.0.1")!!
+        port = preferences.getString("tcp_port", "23333")?.toInt()!!
+        retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
 
         setupRecyclerView()
         setupEventListener()
+
+        // Setup client
+        lifecycleScope.launch {
+            setupClient()
+            this.launch {
+                clientKeepAlive()
+            }
+        }
+
+
 
         return view
     }
@@ -105,6 +139,8 @@ class PlayFragment : Fragment() {
             onStratagemClicked(data)
         }
         stratagemAdapter.setData(list.toList())
+        swipeToActivate(stratagemView)
+
 
         // Setup step recycler view
         val stepView = binding.playStepsRecyclerView
@@ -146,11 +182,11 @@ class PlayFragment : Fragment() {
                         if (abs(diffX) > distanceThreshold && abs(velocityX) > velocityThreshold) {
                             if (diffX >= 0) {
                                 // right
-                                onScrolling(4)
+                                onSwiping(4)
                             }
                             else {
                                 // left
-                                onScrolling(3)
+                                onSwiping(3)
                             }
                             return true
                         }
@@ -163,11 +199,11 @@ class PlayFragment : Fragment() {
                         if (abs(diffY) > distanceThreshold && abs(velocityY) > velocityThreshold) {
                             if (diffY >= 0) {
                                 // bottom
-                                onScrolling(2)
+                                onSwiping(2)
                             }
                             else {
                                 // top
-                                onScrolling(1)
+                                onSwiping(1)
                             }
                             return true
                         }
@@ -235,9 +271,9 @@ class PlayFragment : Fragment() {
     }
 
     /**
-     * Analyse scroll input
+     * Analyse swipe input
      */
-    fun onScrolling(dir: Int) {
+    fun onSwiping(dir: Int) {
         if (isFreeInput) {
             // TODO: Free input
         }
@@ -257,7 +293,10 @@ class PlayFragment : Fragment() {
      * Called when stratagem inputs is complete
      */
     private fun finishInput() {
-        // TODO: tcp
+        // Activate stratagem
+        lifecycleScope.launch {
+            activateStratagem(currentItem)
+        }
         // Reset Uis and flags
         itemSelected = false
         currentStepPos = 0
@@ -265,6 +304,162 @@ class PlayFragment : Fragment() {
         binding.playBlank.visibility = View.VISIBLE
         binding.playStratagemTitle.visibility = View.INVISIBLE
         binding.playStepsScrollView.visibility = View.INVISIBLE
+    }
+
+    /**
+     * Called when swiping a stratagem item, activate it immediately (like macro)
+     */
+    private fun swipeToActivate(recyclerView: RecyclerView) {
+        val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Restore recycle view
+                recyclerView.adapter?.notifyItemChanged(viewHolder.adapterPosition)
+                // Activate stratagem
+                val item = stratagemAdapter.dataList[viewHolder.adapterPosition]
+                lifecycleScope.launch {
+                    activateStratagem(item)
+                }
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    /**
+     * Setup the tcp client
+     */
+    private suspend fun setupClient() {
+        connectingLock.lock()
+        var tryTimes = 0
+        withContext(Dispatchers.IO) {
+            // Initial connect
+            withContext(Dispatchers.Main) {
+                binding.playConnectTitle.text = String.format(
+                    getString(R.string.network_connecting),
+                    address,
+                    port
+                )
+                binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.orange, context?.theme))
+            }
+            networkLock.lock()
+            isConnected = client.connect(address, port)
+            networkLock.unlock()
+            isConnected = checkClient()
+            // Retry
+            while (!isConnected && tryTimes < 5) {
+                tryTimes++
+                delay(2000)
+                withContext(Dispatchers.Main) {
+                    binding.playConnectTitle.text = String.format(
+                        getString(R.string.network_retry),
+                        address,
+                        port,
+                        tryTimes,
+                        retryLimit
+                    )
+                }
+                networkLock.lock()
+                isConnected = client.connect(address, port)
+                networkLock.unlock()
+                isConnected = checkClient()
+            }
+            // Set status
+            withContext(Dispatchers.Main) {
+                if (isConnected) {
+                    binding.playConnectTitle.text = String.format(
+                        getString(R.string.network_connected),
+                        address,
+                        port
+                    )
+                    binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.green, context?.theme))
+                }
+                else {
+                    binding.playConnectTitle.text = String.format(
+                        getString(R.string.network_failed),
+                        address,
+                        port
+                    )
+                    binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.red, context?.theme))
+                }
+            }
+        }
+        connectingLock.unlock()
+    }
+
+    /**
+     * Check if the client is valid by sending heartbeat package
+     */
+    private suspend fun checkClient(): Boolean {
+        if(!isConnected) {
+            return false
+        }
+        lateinit var res: String
+        withContext(Dispatchers.IO) {
+            networkLock.lock()
+            try {
+                client.send("{\"operation\":0}")
+                res = client.receive()
+
+            }
+            catch (_: Exception) {
+                res = String()
+            }
+            networkLock.unlock()
+        }
+        return res == "ready"
+    }
+
+    /**
+     * Check if the client is valid every 10s, if not, restart it
+     */
+    private suspend fun clientKeepAlive() {
+        while (true) {
+            delay(10000)
+            if (isConnected && !connectingLock.isLocked) {
+                val tmp = checkClient()
+                if (!tmp && !connectingLock.isLocked) {
+                    setupClient()
+                }
+            }
+        }
+    }
+
+    /**
+     * Activate stratagem, send stratagem data to the server
+     */
+    private suspend fun activateStratagem(stratagemData: StratagemData) {
+        // Check and restart the client
+        if (!isConnected) {
+            if (connectingLock.isLocked) {
+                return
+            }
+            setupClient()
+            if (!isConnected) {
+                return
+            }
+        }
+        // send stratagem data
+        withContext(Dispatchers.IO) {
+            networkLock.lock()
+            try {
+                client.send(String.format("{\"operation\":1,\"macro\":{\"name\":\"%s\",\"steps\":%s}}",
+                    stratagemData.name,
+                    Gson().toJson(stratagemData.steps).toString()
+                ))
+            }
+            catch (e: Exception) {
+                Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+            }
+            networkLock.unlock()
+        }
     }
 
     override fun onDestroy() {
@@ -276,6 +471,9 @@ class PlayFragment : Fragment() {
 
         // Show toolbar
         (activity as MainActivity).supportActionBar?.show()
+
+        // Close client
+        client.disconnect()
 
         super.onDestroy()
     }
