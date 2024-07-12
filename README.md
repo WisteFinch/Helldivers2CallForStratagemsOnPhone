@@ -11,6 +11,8 @@ Tie your phone to your arm so that you can call for stratagems like a real helld
 
 </div>
 
+You can check the usage [here](./usage.md)
+
 ## Feature
 
 - Combine stratagems freely ✅

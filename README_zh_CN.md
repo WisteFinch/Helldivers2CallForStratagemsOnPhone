@@ -26,8 +26,8 @@
 ### 服务器
 
 1. 需要安装Rust，可以在这里下载 <https://www.rust-lang.org/tools/install>
-2. 进入`./server`文件夹
-3. 使用下面的命令来编译运行
+2. 进入`./server`文件夹。
+3. 使用下面的命令来编译运行。
 
 ``` shell
 cargo run
@@ -35,6 +35,6 @@ cargo run
 
 ### 客户端
 
-1. 需要安装Android Studio
-2. 将`./call-for-stratagems`导入Android Studio
-3. 点击`Run`按钮开始编译
+1. 需要安装Android Studio。
+2. 将`./call-for-stratagems`导入Android Studio。
+3. 点击`Run`按钮开始编译。
