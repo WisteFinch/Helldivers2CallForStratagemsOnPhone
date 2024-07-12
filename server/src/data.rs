@@ -2,9 +2,9 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 
 pub enum InputType {
-    Click,
-    Press,
-    Release
+    Click = 0,
+    Press = 1,
+    Release = 2
 }
 
 impl InputType {
@@ -22,11 +22,11 @@ impl InputType {
 }
 
 pub enum Step {
-    Ctrl,
-    Up,
-    Down,
-    Left,
-    Right
+    Open = 0,
+    Up = 1,
+    Down = 2,
+    Left = 3,
+    Right = 4
 }
 
 impl Step {
@@ -44,7 +44,7 @@ impl Step {
             Self::Right
         }
         else {
-            Self::Ctrl
+            Self::Open
         }
     }
 }
@@ -52,7 +52,7 @@ impl Step {
 impl fmt::Display for Step {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Ctrl => write!(f, "ctrl"),
+            Self::Open => write!(f, "open"),
             Self::Up => write!(f, "↑"),
             Self::Down => write!(f, "↓"),
             Self::Left => write!(f, "←"),

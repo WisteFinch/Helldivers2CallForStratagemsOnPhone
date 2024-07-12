@@ -80,7 +80,7 @@ class PlayFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Set full screen
+        // Set screen
         // For compatibility with lower SDKs, ignore the warning
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -88,6 +88,7 @@ class PlayFragment : Fragment() {
         activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        view?.keepScreenOn = true
 
         // Hide toolbar
         (activity as MainActivity).supportActionBar?.hide()
@@ -118,8 +119,6 @@ class PlayFragment : Fragment() {
                 clientKeepAlive()
             }
         }
-
-
 
         return view
     }
@@ -258,6 +257,9 @@ class PlayFragment : Fragment() {
             binding.playStepsScrollView.visibility = View.INVISIBLE
             binding.playFreeInput.visibility = View.VISIBLE
             binding.playFreeInputImage.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                activateStep(0, 1)
+            }
         }
         else {
             binding.playStratagemScrollView.visibility = View.VISIBLE
@@ -266,6 +268,9 @@ class PlayFragment : Fragment() {
             binding.playStepsScrollView.visibility = View.INVISIBLE
             binding.playFreeInput.visibility = View.INVISIBLE
             binding.playFreeInputImage.visibility = View.INVISIBLE
+            lifecycleScope.launch {
+                activateStep(0, 2)
+            }
         }
 
     }
@@ -275,7 +280,9 @@ class PlayFragment : Fragment() {
      */
     fun onSwiping(dir: Int) {
         if (isFreeInput) {
-            // TODO: Free input
+            lifecycleScope.launch {
+                activateStep(dir, 0)
+            }
         }
         else if (itemSelected){
             if (dir == stepsList[currentStepPos]) {
@@ -462,12 +469,43 @@ class PlayFragment : Fragment() {
         }
     }
 
+    /**
+     * Activate step, send step data to the server
+     */
+    private suspend fun activateStep(step: Int, type: Int) {
+        // Check and restart the client
+        if (!isConnected) {
+            if (connectingLock.isLocked) {
+                return
+            }
+            setupClient()
+            if (!isConnected) {
+                return
+            }
+        }
+        // send step data
+        withContext(Dispatchers.IO) {
+            networkLock.lock()
+            try {
+                client.send(String.format("{\"operation\":2,\"input\":{\"step\":%s,\"type\":%s}}",
+                    step.toString(),
+                    type.toString()
+                ))
+            }
+            catch (e: Exception) {
+                Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+            }
+            networkLock.unlock()
+        }
+    }
+
     override fun onDestroy() {
         // Reset screen
         // For compatibility with lower SDKs, ignore the warning
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         activity?.window?.decorView?.systemUiVisibility = oriSystemUiVisibility
+        view?.keepScreenOn = false
 
         // Show toolbar
         (activity as MainActivity).supportActionBar?.show()

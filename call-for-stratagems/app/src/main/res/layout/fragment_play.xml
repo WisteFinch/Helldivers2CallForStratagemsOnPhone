@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".fragments.play.PlayFragment">
+    tools:context=".fragments.play.PlayFragment"
+    android:keepScreenOn="true" >
 
     <ImageView
         android:id="@+id/play_connect_status"
@@ -24,7 +25,8 @@
         android:layout_marginBottom="1dp"
         android:text="@string/default_string"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/play_connect_status" />
+        app:layout_constraintStart_toEndOf="@+id/play_connect_status"
+        tools:ignore="TextContrastCheck,VisualLintOverlap" />
 
     <ImageView
         android:id="@+id/play_banner"

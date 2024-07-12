@@ -12,15 +12,15 @@ PC (Rust):
 - Keyboard simulate ✅
 - Synchronize configuration with client ✅
 
-Phone (Android Kotlin): ⏳
+Phone (Android Kotlin): ✅
 
-- TCP client ⏳
+- TCP client ✅
 - Synchronize configuration with PC ✅
 - Allocate stratagems ✅
 - Input keys as prompted ✅
 - Input keys freely ✅
 - Invert input(reserve for illuminates)
-- Macro ⏳
+- Macro ✅
 
 ## 任务清单
 
@@ -30,12 +30,12 @@ Phone (Android Kotlin): ⏳
 - 模拟输入 ✅
 - 和手机端同步配置 ✅
 
-手机端 (Android Kotlin): ⏳
+手机端 (Android Kotlin): ✅
 
-- TCP客户端 ⏳
+- TCP客户端 ✅
 - 和电脑同步配置 ✅
 - 自由组合要带的配备 ✅
 - 根据配备的提示来输入 ✅
 - 自由输入(比如呼叫撤离) ✅
 - 反转输入(箭头你什么时候发光能族啊)
-- 一键输入(宏) ⏳
+- 一键输入(宏) ✅
