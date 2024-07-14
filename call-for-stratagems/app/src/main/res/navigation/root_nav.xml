@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/rootFragment"
-        android:name="indi.wistefinch.callforstratagems.fragments.root.RootFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.root.RootFragment"
         android:label="@string/fragment_root"
         tools:layout="@layout/fragment_root" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/editGroupFragment"
-        android:name="indi.wistefinch.callforstratagems.fragments.editgroup.EditGroupFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.editgroup.EditGroupFragment"
         android:label="@string/fragment_editGroup"
         tools:layout="@layout/fragment_edit_group" >
         <action
@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="indi.wistefinch.callforstratagems.fragments.settings.SettingsFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.settings.SettingsFragment"
         android:label="@string/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_rootFragment"
@@ -53,7 +53,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewGroupFragment"
-        android:name="indi.wistefinch.callforstratagems.fragments.viewgroup.ViewGroupFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.viewgroup.ViewGroupFragment"
         android:label="@string/fragment_viewGroup"
         tools:layout="@layout/fragment_view_group" >
         <action
@@ -68,7 +68,7 @@
     </fragment>
     <fragment
         android:id="@+id/playFragment"
-        android:name="indi.wistefinch.callforstratagems.fragments.play.PlayFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.play.PlayFragment"
         android:label="@string/fragment_play"
         tools:layout="@layout/fragment_play" >
         <action

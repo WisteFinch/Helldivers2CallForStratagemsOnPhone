@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "indi.wistefinch.callforstratagems"
+    namespace = "indie.wistefinch.callforstratagems"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "indi.wistefinch.callforstratagems"
+        applicationId = "indie.wistefinch.callforstratagems"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
