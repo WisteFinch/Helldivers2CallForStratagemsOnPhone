@@ -17,4 +17,4 @@
 
 ### 手机端
 
-- 下载并安装`call-for-stratagem-client.apk-x.x.x`，系统至少为安卓8.0。
+- 下载并安装`call-for-stratagem-client-x.x.x.apk`，系统至少为安卓8.0。
