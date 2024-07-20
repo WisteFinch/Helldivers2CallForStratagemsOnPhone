@@ -11,6 +11,7 @@ use data::*;
 pub mod data;
 
 const CONF_PATH: &str = "./config.json";
+const VERSION: &str = "0.1.1";
 
 pub async fn run() -> Result<()> {
     // Load configuration
@@ -56,28 +57,30 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             Ok(ok) => ok,
             Err(_) => {
                 println!("Request error: Failed to parse request data!"); 
-                continue
+                println!("Connection closed: {}", client.peer_addr()?);
+                return Ok(());
             },
         };
-        let opt: Operation = match json["operation"].as_u64() {
+        let opt: Operation = match json["opt"].as_u64() {
             Some(s) => Operation::from_u64(s),
             None => {
                 println!("Request error: Failed to parse operation!"); 
-                continue
+                println!("Connection closed: {}", client.peer_addr()?);
+                return Ok(());
             },
         };
 
         // Operation
         match opt {
             Operation::Status => {
-                client.write_all("ready\n".as_bytes()).await?; 
+                client.write_all(format!("{{\"status\":0,\"ver\":{}}}\n", VERSION).as_bytes()).await?; 
                 // println!("Sended status to: {}", client.peer_addr()?)
             },
             Operation::Request => {
                 client.write_all(serde_json::to_string(&conf).unwrap().as_bytes()).await?; 
                 println!("Sended configuration to: {}", client.peer_addr()?)
             },
-            Operation::Sync => save_config(json["configuration"].to_string().as_str(), true).await,
+            Operation::Sync => save_config(json["config"].to_string().as_str(), true).await,
             Operation::Combined => macros(json["macro"].clone(), &conf).await?,
             Operation::Independent => independent(json["input"].clone(), &conf).await?
         }

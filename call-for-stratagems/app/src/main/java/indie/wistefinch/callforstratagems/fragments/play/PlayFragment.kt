@@ -27,6 +27,12 @@ import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
 import indie.wistefinch.callforstratagems.socket.Client
+import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
+import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
+import indie.wistefinch.callforstratagems.socket.StratagemInputData
+import indie.wistefinch.callforstratagems.socket.StratagemInputPacket
+import indie.wistefinch.callforstratagems.socket.StratagemMacroData
+import indie.wistefinch.callforstratagems.socket.StratagemMacroPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -85,6 +91,11 @@ class PlayFragment : Fragment() {
      * Store the original screen settings, and restore it when closing the fragment.
      */
     private var oriSystemUiVisibility: Int = 0
+
+    /**
+     * Version of the app.
+     */
+    private lateinit var version: String
 
     // Recycler view adapters.
     /**
@@ -177,6 +188,11 @@ class PlayFragment : Fragment() {
         groupData = arguments?.getParcelable("currentItem")!!
         isFreeInput = false
 
+        // Get version.
+        val pkgName = context?.packageName!!
+        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        version = pkgInfo.versionName
+
         // Get preference.
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
@@ -192,7 +208,9 @@ class PlayFragment : Fragment() {
         lifecycleScope.launch {
             setupClient()
             this.launch {
-                clientKeepAlive()
+                withContext(Dispatchers.IO) {
+                    clientKeepAlive()
+                }
             }
         }
 
@@ -495,20 +513,20 @@ class PlayFragment : Fragment() {
         if (!isConnected) {
             return false
         }
-        lateinit var res: String
-        withContext(Dispatchers.IO) {
-            networkLock.lock()
-            try {
-                client.send("{\"operation\":0}")
-                res = client.receive()
-
-            }
-            catch (_: Exception) {
-                res = String()
-            }
-            networkLock.unlock()
+        var flag: Boolean
+        networkLock.lock()
+        try {
+            // Send status request.
+            client.send(Gson().toJson(RequestStatusPacket(version)).toString())
+            // Receive status.
+            val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+            // Check the server status.
+            flag =  res.status == 0 && res.ver == version
+        } catch (_: Exception) { // Json convert error & socket timeout.
+            flag = false
         }
-        return res == "ready"
+        networkLock.unlock()
+        return flag
     }
 
     /**
@@ -542,12 +560,15 @@ class PlayFragment : Fragment() {
         }
         // send stratagem data
         withContext(Dispatchers.IO) {
+            val packet = StratagemMacroPacket(
+                StratagemMacroData(
+                    stratagemData.name,
+                    stratagemData.steps
+                )
+            )
             networkLock.lock()
             try {
-                client.send(String.format("{\"operation\":1,\"macro\":{\"name\":\"%s\",\"steps\":%s}}",
-                    stratagemData.name,
-                    Gson().toJson(stratagemData.steps).toString()
-                ))
+                client.send(Gson().toJson(packet).toString())
             }
             catch (e: Exception) {
                 Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
@@ -572,12 +593,15 @@ class PlayFragment : Fragment() {
         }
         // send step data
         withContext(Dispatchers.IO) {
+            val packet = StratagemInputPacket(
+                StratagemInputData(
+                    step,
+                    type
+                )
+            )
             networkLock.lock()
             try {
-                client.send(String.format("{\"operation\":2,\"input\":{\"step\":%s,\"type\":%s}}",
-                    step.toString(),
-                    type.toString()
-                ))
+                client.send(Gson().toJson(packet).toString())
             }
             catch (e: Exception) {
                 Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

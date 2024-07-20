@@ -5,6 +5,7 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketException
 import java.util.Scanner
 
 /**
@@ -33,20 +34,27 @@ class Client {
     private var isConnected: Boolean = false
 
     /**
+     * Socket operation timeout.
+     */
+    private var soTimeout: Int = 5000
+
+    /**
      * Connect to the server.
      */
-    fun connect(address: String, port: Int):Boolean {
+     fun connect(address: String, port: Int, timeout: Int = 5000):Boolean {
+         soTimeout = timeout
         if (isConnected) {
           disconnect()
         }
         socket = Socket()
         try {
-            socket.connect(InetSocketAddress(address, port), 5000)
+            socket.connect(InetSocketAddress(address, port), soTimeout)
             reader = Scanner(InputStreamReader(socket.getInputStream()))
             writer = PrintWriter(socket.getOutputStream(), true)
         } catch (_: IOException) {
             return false
         }
+        socket.soTimeout = soTimeout
         isConnected = true
         return true
     }

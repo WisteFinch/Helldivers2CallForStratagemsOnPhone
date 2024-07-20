@@ -32,9 +32,12 @@
     <string name="tcp_test_title">测试连接</string>
     <string name="tcp_test_default">测试与电脑端的连接</string>
     <string name="tcp_test_connecting">请民主地等待…</string>
+    <string name="tcp_test_waiting">等待服务器响应…</string>
     <string name="tcp_test_success">成功</string>
     <string name="tcp_test_failed">连接失败，请检查网络设置</string>
     <string name="tcp_test_response_error">服务器响应错误，请检查服务器是否正常运行</string>
+    <string name="tcp_test_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
+    <string name="tcp_test_version_error">服务器版本错误，预期%1$s，实际%2$s</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">端口</string>

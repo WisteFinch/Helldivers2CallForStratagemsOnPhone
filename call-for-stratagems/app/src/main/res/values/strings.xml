@@ -33,9 +33,12 @@
     <string name="tcp_test_title">Test connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
+    <string name="tcp_test_waiting">Waiting for response…</string>
     <string name="tcp_test_success">Success</string>
     <string name="tcp_test_failed">Connection failed, please check the network settings</string>
     <string name="tcp_test_response_error">Server response error, please check whether the server is running properly</string>
+    <string name="tcp_test_status_error">Server status error [%1$d], please check whether the server is running properly</string>
+    <string name="tcp_test_version_error">Server version error, expecting %1$s, actually %2$s</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>

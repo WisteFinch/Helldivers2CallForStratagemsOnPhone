@@ -10,9 +10,13 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ServerConfig
+import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
+import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
+import indie.wistefinch.callforstratagems.socket.ServerConfigData
+import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -111,20 +115,44 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // Prepare socket and data.
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
+            val pkgName = context?.packageName!!
+            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+            val version = pkgInfo.versionName
+            infoVersion.summary = pkgInfo.versionName
             // Launch coroutine.
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     // Connect to the server.
                     val connected = client.connect(add, port)
                     if (connected) { // Connection successful, request server status.
-                        client.send("{\"operation\":0}")
-                        val res = client.receive()
                         withContext(Dispatchers.Main) {
+                            tcpTest.summary = resources.getText(R.string.tcp_test_waiting)
+                        }
+                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
+                        try {
+                            val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
                             // Check the server status.
-                            if (res == "ready") {
-                                tcpTest.summary = resources.getText(R.string.tcp_test_success)
+                            withContext(Dispatchers.Main) {
+                                if (res.status == 0) {
+                                    // Check server version.
+                                    if (res.ver == version) {
+                                        tcpTest.summary = resources.getText(R.string.tcp_test_success)
+                                    }
+                                    else {
+                                        tcpTest.summary = String.format(getString(R.string.tcp_test_version_error),
+                                            version,
+                                            res.ver
+                                        )
+                                    }
+                                }
+                                else {
+                                    tcpTest.summary = String.format(getString(R.string.tcp_test_status_error),
+                                        res.status
+                                    )
+                                }
                             }
-                            else {
+                        } catch (_: Exception) { // Json convert error & timeout.
+                            withContext(Dispatchers.Main) {
                                 tcpTest.summary = resources.getText(R.string.tcp_test_response_error)
                             }
                         }
@@ -153,7 +181,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             tcpTest.isEnabled = false
             syncConfig.isEnabled = false
             // Prepare socket and data.
-            val config = ServerConfig(
+            val config = ServerConfigData(
                 port = serverPort.text?.toInt()!!,
                 delay = inputDelay.text?.toInt()!!,
                 open = inputOpen.value!!,
@@ -162,6 +190,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 left = inputLeft.value!!,
                 right = inputRight.value!!,
             )
+            val packet = SyncConfigPacket(config)
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
             // Launch coroutine
@@ -170,7 +199,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     // Connect to the server.
                     val connected = client.connect(add, port)
                     if (connected) { // Connection successful.
-                        client.send("{\"operation\":4,\"configuration\":" + Gson().toJson(config).toString() + "}")
+                        client.send(Gson().toJson(packet).toString())
                         withContext(Dispatchers.Main) {
                             tcpPort.text = config.port.toString()
                             syncConfig.summary = resources.getText(R.string.sync_config_finished)

@@ -33,7 +33,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:contentDescription="@string/default_string"
-                android:src="@drawable/reinforce"
+                android:src="@drawable/ic_question"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
