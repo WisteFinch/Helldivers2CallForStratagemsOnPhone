@@ -26,5 +26,6 @@
     <color name="colorAccent">@color/lightPurple</color>
     <color name="windowBackground">@color/veryDarkCornflowerBlue</color>
     <color name="textColorPrimary">@color/white</color>
+    <color name="textColorSecondary">@color/grey</color>
     <color name="colorBackground">@color/veryDarkBlue</color>
 </resources>

@@ -32,7 +32,8 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/root_new_group_FAB"
-        style="@style/AppFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/root_new_group_FAB"

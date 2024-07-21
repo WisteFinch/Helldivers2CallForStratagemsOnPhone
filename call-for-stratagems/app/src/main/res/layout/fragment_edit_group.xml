@@ -40,6 +40,7 @@
                     android:layout_margin="16dp"
                     android:autofillHints="@string/editGroup_title"
                     android:hint="@string/editGroup_title_hint"
+                    android:textColorHint="@color/textColorSecondary"
                     android:inputType="text"
                     android:text="@string/editGroup_title"
                     android:gravity="center_horizontal"
