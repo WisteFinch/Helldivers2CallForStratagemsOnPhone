@@ -113,6 +113,7 @@
 
 
         <ImageView
+            android:id="@+id/play_freeInput_up"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginBottom="128dp"
@@ -124,6 +125,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/play_freeInput_down"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginTop="128dp"
@@ -135,6 +137,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/play_freeInput_left"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginEnd="128dp"
@@ -146,6 +149,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/play_freeInput_right"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginStart="128dp"

@@ -257,6 +257,20 @@ class PlayFragment : Fragment() {
         binding.playMode.setOnClickListener {
             setFreeInputMode(!isFreeInput)
         }
+        /*
+        binding.playFreeInputUp.setOnClickListener {
+            onInputting(1)
+        }
+        binding.playFreeInputDown.setOnClickListener {
+            onInputting(2)
+        }
+        binding.playFreeInputLeft.setOnClickListener {
+            onInputting(3)
+        }
+        binding.playFreeInputDown.setOnClickListener {
+            onInputting(4)
+        }
+        */
 
         // Setup gesture detector.
         // Override the detector.
@@ -282,11 +296,11 @@ class PlayFragment : Fragment() {
                         if (abs(diffX) > distanceThreshold && abs(velocityX) > velocityThreshold) {
                             if (diffX >= 0) {
                                 // right.
-                                onSwiping(4)
+                                onInputting(4)
                             }
                             else {
                                 // left.
-                                onSwiping(3)
+                                onInputting(3)
                             }
                             return true
                         }
@@ -299,11 +313,11 @@ class PlayFragment : Fragment() {
                         if (abs(diffY) > distanceThreshold && abs(velocityY) > velocityThreshold) {
                             if (diffY >= 0) {
                                 // bottom.
-                                onSwiping(2)
+                                onInputting(2)
                             }
                             else {
                                 // top.
-                                onSwiping(1)
+                                onInputting(1)
                             }
                             return true
                         }
@@ -351,7 +365,6 @@ class PlayFragment : Fragment() {
      * Setup the free input mode.
      */
     private fun setFreeInputMode(flag: Boolean) {
-        isFreeInput = flag
         if (flag) {
             binding.playStratagemScrollView.visibility = View.INVISIBLE
             binding.playBlank.visibility = View.INVISIBLE
@@ -359,8 +372,10 @@ class PlayFragment : Fragment() {
             binding.playStepsScrollView.visibility = View.INVISIBLE
             binding.playFreeInput.visibility = View.VISIBLE
             binding.playFreeInputImage.visibility = View.VISIBLE
-            lifecycleScope.launch {
-                activateStep(0, 1)
+            if (!isFreeInput) {
+                lifecycleScope.launch {
+                    activateStep(0, 3)
+                }
             }
         }
         else {
@@ -370,17 +385,20 @@ class PlayFragment : Fragment() {
             binding.playStepsScrollView.visibility = View.INVISIBLE
             binding.playFreeInput.visibility = View.INVISIBLE
             binding.playFreeInputImage.visibility = View.INVISIBLE
-            lifecycleScope.launch {
-                activateStep(0, 2)
+            if (isFreeInput) {
+                lifecycleScope.launch {
+                    activateStep(0, 4)
+                }
             }
-        }
 
+        }
+        isFreeInput = flag
     }
 
     /**
-     * Analyse swipe input.
+     * Analyse input.
      */
-    fun onSwiping(dir: Int) {
+    fun onInputting(dir: Int) {
         if (isFreeInput) { // In free input mode, activate step independently.
             lifecycleScope.launch {
                 activateStep(dir, 0)

@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 pub enum InputType {
     Click = 0,
     Press = 1,
-    Release = 2
+    Release = 2,
+    Begin = 3,
+    End = 4
 }
 
 impl InputType {
@@ -15,12 +17,19 @@ impl InputType {
         else if v == 2 {
             Self::Release
         }
+        else if v == 3 {
+            Self::Begin
+        }
+        else if v == 4 {
+            Self::End
+        }
         else {
             Self::Click
         }
     }
 }
 
+#[derive(Clone)]
 pub enum Step {
     Open = 0,
     Up = 1,
