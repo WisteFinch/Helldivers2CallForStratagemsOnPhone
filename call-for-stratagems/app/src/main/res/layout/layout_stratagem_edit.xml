@@ -10,7 +10,6 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/stratagem_edit_cardView"
-        style="@style/AppCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -41,7 +40,8 @@
             <TextView
                 android:id="@+id/stratagem_edit_title"
                 style="@style/AppText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:textAlignment="center"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/default_string"

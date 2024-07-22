@@ -14,6 +14,8 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
@@ -23,7 +25,6 @@ import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentViewGroupBinding
-import indie.wistefinch.callforstratagems.layout.AppGridLayoutManager
 import java.util.Vector
 
 class ViewGroupFragment : Fragment() {
@@ -118,7 +119,7 @@ class ViewGroupFragment : Fragment() {
     private fun setupRecyclerView() {
         val recyclerView = binding.viewGroupRecyclerView
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = AppGridLayoutManager(context, 3)
+        recyclerView.autoFitColumns(100)
         val list: Vector<StratagemData> = Vector()
         for (i in currentItem.list) {
             if (stratagemViewModel.isIdValid(i)) {
@@ -127,5 +128,13 @@ class ViewGroupFragment : Fragment() {
         }
         adapter.setData(list.toList())
         binding.viewGroupRecyclerView.suppressLayout(true)
+    }
+
+    companion object {
+        fun RecyclerView.autoFitColumns(columnWidth: Int) {
+            val displayMetrics = this.context.resources.displayMetrics
+            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            this.layoutManager = GridLayoutManager(this.context, noOfColumns)
+        }
     }
 }

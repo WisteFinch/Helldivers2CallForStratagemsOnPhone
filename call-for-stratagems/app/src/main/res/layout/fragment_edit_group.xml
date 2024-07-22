@@ -24,7 +24,8 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/editGroup_title_cardView"
-                style="@style/AppCardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +50,8 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                style="@style/AppCardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -60,7 +62,8 @@
                     android:id="@+id/editGroup_recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="16dp" />
+                    android:layout_margin="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
             </androidx.cardview.widget.CardView>
 
