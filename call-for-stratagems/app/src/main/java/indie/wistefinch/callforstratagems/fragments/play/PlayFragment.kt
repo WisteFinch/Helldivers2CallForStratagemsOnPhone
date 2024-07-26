@@ -1,6 +1,7 @@
 package indie.wistefinch.callforstratagems.fragments.play
 
 import android.content.pm.ActivityInfo
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -9,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +30,6 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
-import indie.wistefinch.callforstratagems.fragments.viewgroup.ViewGroupFragment.Companion.autoFitColumns
 import indie.wistefinch.callforstratagems.socket.Client
 import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
@@ -193,7 +195,7 @@ class PlayFragment : Fragment() {
             @Suppress("DEPRECATION")
             oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
             @Suppress("DEPRECATION")
-            activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+            activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -206,6 +208,14 @@ class PlayFragment : Fragment() {
         // Inflate the layout for this fragment.
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        // Disable back gesture on some devices.
+        if (!enableSimplifiedMode) {
+            binding.root.doOnNextLayout {
+                val exclusions = listOf(Rect(0, 0, it.width, it.height))
+                ViewCompat.setSystemGestureExclusionRects(binding.root, exclusions)
+            }
+        }
 
         // Check simplified mode
         if (enableSimplifiedMode) {
