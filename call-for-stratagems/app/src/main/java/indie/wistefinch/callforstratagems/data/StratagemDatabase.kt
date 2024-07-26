@@ -13,7 +13,10 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
  *
  * Is a read-only database, the contents are generated from the default file when the program is first run.
  */
-@Database(entities = [StratagemData::class], version = 2, exportSchema = false)
+@Database(entities = [StratagemData::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(Converters::class)
 abstract class StratagemDatabase: RoomDatabase() {
 
@@ -24,6 +27,7 @@ abstract class StratagemDatabase: RoomDatabase() {
         private var INSTANCE: StratagemDatabase? = null
 
         fun getDatabase(context: Context): StratagemDatabase {
+            context.deleteDatabase("stratagem_database")
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
