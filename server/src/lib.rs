@@ -13,7 +13,7 @@ pub mod data;
 pub mod tool;
 
 const CONF_PATH: &str = "./config.json";
-const VERSION: &str = "0.2.0";
+const VERSION: &str = "0.2.1";
 
 pub async fn run() -> Result<()> {
     println(format!("=== Call for stratagem server v{VERSION} ==="));
@@ -145,7 +145,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()>{
     };
 
     // Press open
-    print(name);
+    print(format!("{name}: "));
     execute(Step::Open, InputType::Press, conf).await.unwrap();
     
     // Click steps

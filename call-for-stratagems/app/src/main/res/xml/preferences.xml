@@ -102,7 +102,15 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Control">
+    <PreferenceCategory app:title="@string/control_header">
+
+        <SwitchPreference
+            app:key="enable_simplified_mode"
+            app:title="@string/enable_simplified_mode_title"
+            app:defaultValue="false"
+            app:icon="@drawable/ic_clear"
+            app:summary="@string/enable_simplified_mode_desc" />
+
 
         <EditTextPreference
             app:key="swipe_distance_threshold"
@@ -120,7 +128,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Info">
+    <PreferenceCategory app:title="@string/info_header">
 
         <Preference
             app:key="info_version"

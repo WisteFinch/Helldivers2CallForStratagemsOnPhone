@@ -222,6 +222,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        // Open release url preference.
+        infoVersion.setOnPreferenceClickListener {
+            val uri = Uri.parse(resources.getString(R.string.release_url))
+            val internet = Intent(Intent.ACTION_VIEW, uri)
+            internet.addCategory(Intent.CATEGORY_BROWSABLE)
+            startActivity(internet)
+            true
+        }
+
         // Open repository preference.
         infoRepo.setOnPreferenceClickListener {
             val uri = Uri.parse(resources.getString(R.string.repo_url))

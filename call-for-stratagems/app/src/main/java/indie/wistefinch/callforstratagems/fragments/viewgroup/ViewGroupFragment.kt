@@ -131,6 +131,9 @@ class ViewGroupFragment : Fragment() {
     }
 
     companion object {
+        /**
+         * Automatically adjust the number of columns
+         */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
             val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
