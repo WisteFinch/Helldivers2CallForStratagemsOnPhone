@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CallForStratagems</string>
     <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
+    <string name="release_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
     <string name="default_string" translatable="false">NULL</string>
 
     <!-- Fragment Title -->
@@ -25,6 +26,8 @@
     <!-- Preference Titles -->
     <string name="connection_header">Connection</string>
     <string name="sync_header">Sync</string>
+    <string name="control_header">Control</string>
+    <string name="info_header">Info</string>
 
     <!-- Connection Preferences -->
     <string name="tcp_add_title">Server address</string>
@@ -53,6 +56,8 @@
     <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
 
     <!-- Control Preferences -->
+    <string name="enable_simplified_mode_title">Enable simplified mode</string>
+    <string name="enable_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
     <string name="swipe_distance_threshold_title">Gesture swipe distance threshold(pixel)</string>
     <string name="swipe_velocity_threshold_title">Gesture swipe velocity threshold(pixel/s)</string>
 

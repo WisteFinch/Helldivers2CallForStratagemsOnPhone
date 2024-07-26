@@ -1,7 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.play
 
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -15,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +27,7 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
+import indie.wistefinch.callforstratagems.fragments.viewgroup.ViewGroupFragment.Companion.autoFitColumns
 import indie.wistefinch.callforstratagems.socket.Client
 import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
@@ -103,6 +104,12 @@ class PlayFragment : Fragment() {
      * The stratagem recycler view's adapter.
      */
     private val stratagemAdapter: StratagemPlayAdapter by lazy { StratagemPlayAdapter() }
+
+    /**
+     * The simplified stratagem recycler view's adapter.
+     */
+    private val stratagemSimplifiedAdapter: StratagemSimplifiedAdapter by lazy { StratagemSimplifiedAdapter() }
+
     /**
      * The step recycler view's adapter.
      */
@@ -118,6 +125,12 @@ class PlayFragment : Fragment() {
      * The minimum velocity for gesture detector to respond.
      */
     private var velocityThreshold = 50.0
+
+    // Other preferences
+    /**
+     * Keep only marcos.
+     */
+    private var enableSimplifiedMode = false
 
     // Runtime variables for socket.
     /**
@@ -163,17 +176,28 @@ class PlayFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Get preference.
+        val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
+        velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
+        enableSimplifiedMode = preferences.getBoolean("enable_simplified_mode", false)
+        address = preferences.getString("tcp_add", "127.0.0.1")!!
+        port = preferences.getString("tcp_port", "23333")?.toInt()!!
+        retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
+
         // Set screen.
-        // For compatibility with lower SDKs, ignore the deprecated warning.
-        @Suppress("DEPRECATION")
-        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        @Suppress("DEPRECATION")
-        oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
-        @Suppress("DEPRECATION")
-        activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        if (!enableSimplifiedMode) {
+            // For compatibility with lower SDKs, ignore the deprecated warning.
+            @Suppress("DEPRECATION")
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            @Suppress("DEPRECATION")
+            oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
+            @Suppress("DEPRECATION")
+            activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
         view?.keepScreenOn = true
 
         // Hide toolbar.
@@ -182,6 +206,17 @@ class PlayFragment : Fragment() {
         // Inflate the layout for this fragment.
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        // Check simplified mode
+        if (enableSimplifiedMode) {
+            binding.playBlank.visibility = View.INVISIBLE
+            binding.playBanner.visibility = View.INVISIBLE
+            binding.playMode.visibility = View.INVISIBLE
+            binding.playExit.visibility = View.INVISIBLE
+            binding.playStratagemScrollView.visibility = View.INVISIBLE
+            binding.playGesture.visibility = View.INVISIBLE
+            binding.playSimplifiedScrollView.visibility = View.VISIBLE
+        }
 
         // Init runtime.
         // For compatibility with lower SDKs, ignore the deprecated warning.
@@ -193,14 +228,6 @@ class PlayFragment : Fragment() {
         val pkgName = context?.packageName!!
         val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
         version = pkgInfo.versionName
-
-        // Get preference.
-        val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
-        velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
-        address = preferences.getString("tcp_add", "127.0.0.1")!!
-        port = preferences.getString("tcp_port", "23333")?.toInt()!!
-        retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
 
         setupRecyclerView()
         setupEventListener()
@@ -222,30 +249,53 @@ class PlayFragment : Fragment() {
      * Setup stratagem recycler view in this fragment.
      */
     private fun setupRecyclerView() {
-        // Setup stratagem recycler view.
-        val stratagemView = binding.playStratagemRecyclerView
-        stratagemView.adapter = stratagemAdapter
-        stratagemView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        // Retrieve stratagem entry from database and check the validation.
-        val list: Vector<StratagemData> = Vector()
-        for (i in groupData.list) {
-            if (stratagemViewModel.isIdValid(i)) {
-                list.add(stratagemViewModel.retrieveItem(i))
+        if (enableSimplifiedMode) {
+            // Setup simplified stratagem recycler view.
+            val stratagemView = binding.playSimplifiedRecyclerView
+            stratagemView.adapter = stratagemSimplifiedAdapter
+            stratagemView.autoFitColumns(100)
+            // Retrieve stratagem entry from database and check the validation.
+            val list: Vector<StratagemData> = Vector()
+            for (i in groupData.list) {
+                if (stratagemViewModel.isIdValid(i)) {
+                    list.add(stratagemViewModel.retrieveItem(i))
+                }
+            }
+            stratagemSimplifiedAdapter.setData(list.toList())
+            // Setup click listener.
+            stratagemSimplifiedAdapter.onItemClick = { data ->
+                // Activate stratagem
+                lifecycleScope.launch {
+                    activateStratagem(data)
+                }
             }
         }
-        stratagemAdapter.setData(list.toList())
-        // Setup click listener.
-        stratagemAdapter.onItemClick = { data ->
-            onStratagemClicked(data)
+        else {
+            // Setup stratagem recycler view.
+            val stratagemView = binding.playStratagemRecyclerView
+            stratagemView.adapter = stratagemAdapter
+            stratagemView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            // Retrieve stratagem entry from database and check the validation.
+            val list: Vector<StratagemData> = Vector()
+            for (i in groupData.list) {
+                if (stratagemViewModel.isIdValid(i)) {
+                    list.add(stratagemViewModel.retrieveItem(i))
+                }
+            }
+            stratagemAdapter.setData(list.toList())
+            // Setup click listener.
+            stratagemAdapter.onItemClick = { data ->
+                onStratagemClicked(data)
+            }
+            // Enable "swipe and activate stratagem"(macro).
+            swipeToActivate(stratagemView)
+
+
+            // Setup step recycler view, the data will be specified when selecting a stratagem entry.
+            val stepView = binding.playStepsRecyclerView
+            stepView.adapter = stepAdapter
+            stepView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         }
-        // Enable "swipe and activate stratagem"(macro).
-        swipeToActivate(stratagemView)
-
-
-        // Setup step recycler view, the data will be specified when selecting a stratagem entry.
-        val stepView = binding.playStepsRecyclerView
-        stepView.adapter = stepAdapter
-        stepView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
     }
 
     private fun setupEventListener() {
@@ -631,12 +681,14 @@ class PlayFragment : Fragment() {
 
     override fun onDestroy() {
         // Reset screen
-        // For compatibility with lower SDKs, ignore the deprecated warning.
-        @Suppress("DEPRECATION")
-        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        @Suppress("DEPRECATION")
-        activity?.window?.decorView?.systemUiVisibility = oriSystemUiVisibility
+        if (!enableSimplifiedMode) {
+            // For compatibility with lower SDKs, ignore the deprecated warning.
+            @Suppress("DEPRECATION")
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            @Suppress("DEPRECATION")
+            activity?.window?.decorView?.systemUiVisibility = oriSystemUiVisibility
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
         view?.keepScreenOn = false
 
         // Show toolbar
@@ -646,5 +698,16 @@ class PlayFragment : Fragment() {
         client.disconnect()
 
         super.onDestroy()
+    }
+
+    companion object {
+        /**
+         * Automatically adjust the number of columns
+         */
+        fun RecyclerView.autoFitColumns(columnWidth: Int) {
+            val displayMetrics = this.context.resources.displayMetrics
+            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            this.layoutManager = GridLayoutManager(this.context, noOfColumns)
+        }
     }
 }
