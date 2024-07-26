@@ -13,7 +13,7 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
  *
  * Is a read-only database, the contents are generated from the default file when the program is first run.
  */
-@Database(entities = [StratagemData::class], version = 1, exportSchema = false)
+@Database(entities = [StratagemData::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class StratagemDatabase: RoomDatabase() {
 
