@@ -44,7 +44,7 @@ pub async fn run() -> Result<()> {
                 TcpListener::bind(format!(
                     "{}:{}",
                     local_ipaddress::get().unwrap(),
-                    Config::default().port
+                    0
                 ))
                 .await?
             }
