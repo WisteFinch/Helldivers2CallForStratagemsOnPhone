@@ -1,29 +1,25 @@
-use std::fmt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 pub enum InputType {
     Click = 0,
     Press = 1,
     Release = 2,
     Begin = 3,
-    End = 4
+    End = 4,
 }
 
 impl InputType {
     pub fn from_u64(v: u64) -> Self {
         if v == 1 {
             Self::Press
-        }
-        else if v == 2 {
+        } else if v == 2 {
             Self::Release
-        }
-        else if v == 3 {
+        } else if v == 3 {
             Self::Begin
-        }
-        else if v == 4 {
+        } else if v == 4 {
             Self::End
-        }
-        else {
+        } else {
             Self::Click
         }
     }
@@ -35,24 +31,20 @@ pub enum Step {
     Up = 1,
     Down = 2,
     Left = 3,
-    Right = 4
+    Right = 4,
 }
 
 impl Step {
     pub fn from_u64(v: u64) -> Self {
         if v == 1 {
             Self::Up
-        }
-        else if v == 2 {
+        } else if v == 2 {
             Self::Down
-        }
-        else if v == 3 {
+        } else if v == 3 {
             Self::Left
-        }
-        else if v == 4{
+        } else if v == 4 {
             Self::Right
-        }
-        else {
+        } else {
             Self::Open
         }
     }
@@ -82,23 +74,19 @@ impl Operation {
     pub fn from_u64(v: u64) -> Self {
         if v == 1 {
             Self::Combined
-        }
-        else if v == 2 {
+        } else if v == 2 {
             Self::Independent
-        }
-        else if v == 3 {
+        } else if v == 3 {
             Self::Request
-        }
-        else if v == 4 {
+        } else if v == 4 {
             Self::Sync
-        }
-        else {
+        } else {
             Self::Status
         }
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Config {
     pub port: u64,
     pub delay: u64,
@@ -106,33 +94,19 @@ pub struct Config {
     pub up: String,
     pub down: String,
     pub left: String,
-    pub right: String
+    pub right: String,
 }
 
-impl Config {
-    pub fn default() -> Self {
+impl Default for Config {
+    fn default() -> Self {
         Self {
             port: 23333,
             delay: 25,
-            open: "ctrl_left".to_string(),
-            up: "w".to_string(),
-            down: "s".to_string(),
-            left: "a".to_string(),
-            right: "d".to_string()
-        }
-    }
-}
-
-impl Clone for Config {
-    fn clone(&self) -> Self {
-        Self { 
-            port: self.port,
-            delay: self.delay,
-            open: self.open.clone(),
-            up: self.up.clone(),
-            down: self.down.clone(),
-            left: self.left.clone(),
-            right: self.right.clone()
+            open: String::from("ctrl_left"),
+            up: String::from("w"),
+            down: String::from("s"),
+            left: String::from("a"),
+            right: String::from("d"),
         }
     }
 }
