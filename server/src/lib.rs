@@ -1,6 +1,7 @@
 use data::*;
 use rdev::{simulate, EventType};
 use serde_json::Value;
+use sys_locale::get_locale;
 use std::io::Write;
 use std::{fs, io};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
@@ -10,9 +11,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tool::*;
 use rand::{distributions::Alphanumeric, Rng};
 use fast_qr::qr::QRBuilder;
+use rust_i18n::{i18n, t};
 
 pub mod data;
 pub mod tool;
+
+i18n!("src/locales");
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
@@ -20,16 +24,23 @@ const VERSION: &str = "0.2.1";
 const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
-    println(format!("=== Call for stratagem server v{VERSION} ==="));
+    // Check locale.
+    if get_locale().unwrap().as_str() == "zh-CN" {
+        rust_i18n::set_locale("zh-CN");
+    } else {
+        rust_i18n::set_locale("zh-CN");
+    }
+
+    println(format!("{}{VERSION}{}", t!("title_1"), t!("title_2")));
     // Load configuration.
     let conf: Config = match load_config().await
     {
         Some(s) => {
-            info("Configuration loaded.");
+            info(t!("info_conf_loaded"));
             s
         }
         None => {
-            warning("Failed to load configuration, loading default configuration!");
+            warning(t!("warn_conf_load_failed"));
             save_config(
                 serde_json::to_string(&Config::default()).unwrap().as_str(),
                 false,
@@ -60,7 +71,7 @@ pub async fn run() -> Result<()> {
             Ok(ok) => ok,
             Err(err) => {
                 error(err);
-                warning("Using temporary network configuration");
+                warning(t!("warn_conf_network_temp"));
                 TcpListener::bind(format!(
                     "{}:{}",
                     local_ipaddress::get().unwrap(),
@@ -70,13 +81,14 @@ pub async fn run() -> Result<()> {
             }
         };
     info(format!(
-        "Listening: {}",
+        "{}{}",
+        t!("info_listening"),
         listener.local_addr().unwrap()
     ));
 
     // Print QR
     println!();
-    println("Scan this QR code to obtain the connection configuration.");
+    println(t!("n_scan_qr_code"));
     let qrcode = QRBuilder::new(format!("{{\"add\":\"{}\",\"port\":{}}}",
             local_ipaddress::get().unwrap(),
             conf.port
@@ -103,7 +115,8 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
 
     println!();
     info(format!(
-        "Established connection to: {}",
+        "{}{}",
+        t!("info_connect"),
         client.peer_addr()?
     ));
     let mut buffer = vec![0; 4096];
@@ -113,7 +126,8 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         let size = client.read(&mut buffer).await?;
         if size == 0 {
             info(format!(
-                "Connection closed by client: {}",
+                "{}{}",
+                t!("info_close"),
                 client.peer_addr()?
             ));
             return Ok(());
@@ -124,8 +138,8 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         {
             Ok(ok) => ok,
             Err(_) => {
-                error("Failed to parse request data!");
-                warning(format!("Connection closed: {}", client.peer_addr()?));
+                error(t!("err_parse_json_failed"));
+                warning(format!("{}{}", t!("warn_force_close"), client.peer_addr()?));
                 return Ok(());
             }
         };
@@ -133,8 +147,8 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         {
             Some(s) => Operation::from_u64(s),
             None => {
-                error("Failed to parse operation!");
-                warning(format!("Connection closed: {}", client.peer_addr()?));
+                error(t!("err_parse_opt_failed"));
+                warning(format!("{}{}", t!("warn_force_close"), client.peer_addr()?));
                 return Ok(());
             }
         };
@@ -157,7 +171,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
                         .await?;
                     }
                 } else {
-                    warning(format!("Client version is {ver}, may not work properly."));
+                    warning(format!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2")));
                     client
                     .write_all(format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::VersionMismatch).as_bytes())
                     .await?;
@@ -168,38 +182,38 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
                     client
                     .write_all(serde_json::to_string(&conf).unwrap().as_bytes())
                     .await?;
-                    info(format!("Sended configuration to: {}", client.peer_addr()?))
+                    info(format!("{}{}", t!("info_send_config"), client.peer_addr()?))
                 } else {
-                    warning("Authentication failed, reject request.")
+                    warning(t!("warn_reject_request"))
                 }
             }
             Operation::Sync => {
                 if is_authed && client_token == token {
-                    println(format!("Synchronization request from {}", client.peer_addr()?));
-                    print("Do you want to synchronize this configuration? (Y/N): ");
+                    println(format!("{}{}", t!("n_sync_conf"), client.peer_addr()?));
+                    print(t!("ask_sync"));
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
                     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
                         save_config(json["config"].to_string().as_str(), true).await
                     } else {
-                        warning(format!("Synchronization request rejected."));
+                        warning(t!("warn_reject_sync"));
                     }
                 } else {
-                    warning("Authentication failed, reject request.")
+                    warning(t!("warn_reject_request"))
                 }
             },
             Operation::Combined => {
                 if is_authed && client_token == token {
                     macros(json["macro"].clone(), &conf).await?
                 } else {
-                    warning("Authentication failed, reject request.")
+                    warning(t!("warn_reject_request"))
                 }
             }
             Operation::Independent => {
                 if is_authed && client_token == token {
                     independent(json["input"].clone(), &conf).await?
                 } else {
-                    warning("Authentication failed, reject request.")
+                    warning(t!("warn_reject_request"))
                 }
             }
             Operation::Auth => {
@@ -224,13 +238,13 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
 
                 // Ask user for authentication.
                 if !is_authed {
-                    println(format!("Authentication request from {}, sid: {}", client.peer_addr()?, sid));
-                    print("Do you want to authenticate this client? (Y/N): ");
+                    println(format!("{}{}{}{}", t!("n_auth_1"), client.peer_addr()?, t!("n_auth_2"), sid));
+                    print(t!("ask_auth"));
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
                     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
                         is_authed = true;
-                        info(format!("Client authenticated."));
+                        info(t!("info_auth"));
                         if is_exist {
                             for v in &mut auths {
                                 if v.sid == sid {
@@ -241,7 +255,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
                             auths.push(Auth{sid: sid.to_string(), time: current_time});
                         }
                     } else {
-                        warning(format!("Client authentication rejected."));
+                        warning(t!("warn_reject_auth"));
                     }
                 }
 
@@ -293,17 +307,17 @@ async fn save_config(str: &str, sync: bool) {
     match fs::write(CONF_PATH, str) {
         Ok(_) => match sync {
             true => {
-                info("Configuration synchronized, need to restart.");
+                info(t!("info_sync_complete"));
                 std::process::exit(0);
             }
-            false => info("Configuration saved."),
+            false => info(t!("info_conf_saved")),
         }
         Err(_) => match sync {
             true => {
-                error("Failed to synchronize configuration!");
+                error(t!("err_sync_failed"));
                 std::process::exit(0);
             }
-            false => error("Failed to save configuration!"),
+            false => error(t!("err_conf_save_failed")),
         }
     }
 }
@@ -311,7 +325,7 @@ async fn save_config(str: &str, sync: bool) {
 async fn save_auth(str: &str) {
     match fs::write(AUTH_PATH, str) {
         Ok(_) => {}
-        Err(_) => error("Failed to save authentication data!"),
+        Err(_) => error(t!("err_auth_save_failed")),
     }
 }
 
@@ -321,7 +335,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
     {
         Some(s) => s,
         None => {
-            error("Failed to parse steps!");
+            error(t!("err_parse_step_failed"));
             return Ok(());
         }
     };
@@ -349,7 +363,7 @@ async fn independent(value: Value, conf: &Config) -> Result<()> {
     {
         Some(s) => Step::from_u64(s),
         None => {
-            error("Failed to parse step!");
+            error(t!("err_parse_step_failed"));
             return Ok(());
         }
     };
@@ -357,7 +371,7 @@ async fn independent(value: Value, conf: &Config) -> Result<()> {
     {
         Some(s) => InputType::from_u64(s),
         None => {
-            error("Failed to parse input type!");
+            error(t!("err_parse_input_failed"));
             return Ok(());
         }
     };
@@ -397,7 +411,7 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
             simulate_key_event(step, EventType::KeyRelease, conf);
         }
         InputType::Begin => {
-            print("Free input: ");
+            print(t!("n_free_input"));
         }
         InputType::End => {
             println!();

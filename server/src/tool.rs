@@ -5,6 +5,9 @@ use std::{
 
 use colored::Colorize;
 use rdev::Key;
+use rust_i18n::{i18n, t};
+
+i18n!("src/locales");
 
 pub(crate) trait StringToKey {
     fn to_key(self) -> Key;
@@ -121,15 +124,15 @@ impl StringToKey for String {
 }
 
 pub fn error<T: Display>(str: T) {
-    println!("{}{}", "[ERROR] ".red(), str)
+    println!("{}{}", t!("n_err").red(), str)
 }
 
 pub fn warning<T: Display>(str: T) {
-    println!("{}{}", "[WARNING] ".yellow(), str)
+    println!("{}{}", t!("n_warn").yellow(), str)
 }
 
 pub fn info<T: Display>(str: T) {
-    println!("{}{}", "[INFO] ".blue(), str)
+    println!("{}{}", t!("n_info").blue(), str)
 }
 
 pub fn print<T: Display>(str: T) {
