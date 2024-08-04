@@ -9,6 +9,7 @@ use tokio::time::{sleep, Duration};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tool::*;
 use rand::{distributions::Alphanumeric, Rng};
+use fast_qr::qr::QRBuilder;
 
 pub mod data;
 pub mod tool;
@@ -72,6 +73,18 @@ pub async fn run() -> Result<()> {
         "Listening: {}",
         listener.local_addr().unwrap()
     ));
+
+    // Print QR
+    println!();
+    println("Scan this QR code to obtain the connection configuration.");
+    let qrcode = QRBuilder::new(format!("{{\"add\":\"{}\",\"port\":{}}}",
+            local_ipaddress::get().unwrap(),
+            conf.port
+        ))
+        .build()
+        .unwrap();
+    println(qrcode.to_str());
+    println!();
 
     // Handle connection.
     loop {

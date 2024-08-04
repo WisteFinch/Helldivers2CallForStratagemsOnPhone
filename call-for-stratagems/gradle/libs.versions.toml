@@ -21,6 +21,9 @@ androidxNavigationSafeargsGradlePlugin = "2.6.0-alpha08"
 navigationSafeArgsGradlePlugin = "2.6.0"
 navigationSafeArgsGradlePluginVersion = "1.0.0"
 androidxNavigationSafeArgsGradlePluginVersion = "2.7.0-beta02"
+playServicesCodeScanner = "16.0.0"
+playServicesBase = "18.2.0"
+playServicesTfliteJava = "16.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +47,9 @@ androidx-androidx-navigation-safeargs-gradle-plugin = { group = "androidx.naviga
 androidx-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
 navigation-safe-args-gradle-plugin = { group = "android.arch.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePluginVersion" }
 androidx-navigation-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "androidxNavigationSafeArgsGradlePluginVersion" }
+play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "playServicesCodeScanner" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
+play-services-tflite-java = { group = "com.google.android.gms", name = "play-services-tflite-java", version.ref = "playServicesTfliteJava" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

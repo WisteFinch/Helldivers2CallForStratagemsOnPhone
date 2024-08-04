@@ -31,8 +31,14 @@
     <string name="tcp_add_title">服务器地址</string>
     <string name="tcp_port_title">服务器端口</string>
     <string name="tcp_retry_title">重试次数</string>
+    <string name="tcp_scan">扫描二维码</string>
+    <string name="tcp_scan_desc">扫描服务端的二维码，快速获取连接配置</string>
+    <string name="tcp_scan_unavailable">不可用，点击下载谷歌服务依赖</string>
+    <string name="tcp_scan_downloading">已请求下载，稍后再试</string>
+    <string name="tcp_scan_success">扫描成功</string>
+    <string name="tcp_scan_failed">扫描失败</string>
     <string name="tcp_test_title">测试连接</string>
-    <string name="tcp_test_default">测试与电脑端的连接</string>
+    <string name="tcp_test_default">测试与服务端的连接</string>
     <string name="tcp_test_connecting">请民主地等待…</string>
     <string name="tcp_test_waiting">等待服务器响应…</string>
     <string name="tcp_test_success">成功</string>

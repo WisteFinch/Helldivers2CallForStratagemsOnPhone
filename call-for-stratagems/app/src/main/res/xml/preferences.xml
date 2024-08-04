@@ -24,6 +24,12 @@
             app:useSimpleSummaryProvider="true" />
 
         <Preference
+            app:key="tcp_scanner"
+            app:title="@string/tcp_scan"
+            app:summary="@string/tcp_scan_desc"
+            app:icon="@drawable/ic_qr_scanner" />
+
+        <Preference
             app:key="tcp_test"
             app:title="@string/tcp_test_title"
             app:summary="@string/tcp_test_default"
