@@ -4,14 +4,20 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.gson.Gson
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.socket.AddressData
 import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.Client
 import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
@@ -34,6 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     // Connection preference
     private lateinit var tcpAddress: EditTextPreference
     private lateinit var tcpPort: EditTextPreference
+    private lateinit var tcpScanner: Preference
     private lateinit var tcpTest: Preference
 
     // Sync preference
@@ -55,7 +62,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var infoRepo: Preference
 
     private lateinit var sid: String
-    private lateinit var token: String
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -63,6 +69,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Setup binding.
         tcpAddress = preferenceManager.findPreference("tcp_add")!!
         tcpPort = preferenceManager.findPreference("tcp_port")!!
+        tcpScanner = preferenceManager.findPreference("tcp_scanner")!!
         tcpTest = preferenceManager.findPreference("tcp_test")!!
 
         serverPort = preferenceManager.findPreference("server_port")!!
@@ -114,6 +121,48 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * Setup preference event listener.
      */
     private fun setupEventListener() {
+        // Scan QR Code.
+        // Check dependency.
+        val moduleInstallClient = context?.let { ModuleInstall.getClient(it) }
+        val optionalModuleApi = context?.let { GmsBarcodeScanning.getClient(it) }
+        moduleInstallClient
+            ?.areModulesAvailable(optionalModuleApi)
+            ?.addOnSuccessListener { it ->
+                if (it.areModulesAvailable()) {
+                    // Dependency available.
+                    tcpScanner.setOnPreferenceClickListener {
+                        val options = GmsBarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                            .build()
+                        val scanner = context?.let { GmsBarcodeScanning.getClient(it, options) }
+                        scanner?.startScan()
+                            ?.addOnSuccessListener { barcode ->
+                                try {
+                                    val rawValue: String? = barcode.rawValue
+                                    val add = Gson().fromJson(rawValue, AddressData::class.java)
+                                    tcpAddress.text = add.add
+                                    tcpPort.text = add.port.toString()
+                                    Toast.makeText(context, getString(R.string.tcp_scan_success), Toast.LENGTH_SHORT).show()
+                                }
+                                catch (_: Exception) {
+                                    Toast.makeText(context, getString(R.string.tcp_scan_failed), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        true
+                    }
+                }
+                else {
+                    // Dependency Unavailable.
+                    tcpScanner.summary = getString(R.string.tcp_scan_unavailable)
+                    tcpScanner.setOnPreferenceClickListener {
+                        tcpScanner.summary = getString(R.string.tcp_scan_downloading)
+                        moduleInstallClient.deferredInstall(optionalModuleApi)
+                        true
+                    }
+                }
+            }
+
+
         // Test connection preference.
         tcpTest.setOnPreferenceClickListener {
             tcpTest.summary = resources.getText(R.string.tcp_test_connecting)

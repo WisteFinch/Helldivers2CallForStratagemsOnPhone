@@ -162,6 +162,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fast_qr"
+version = "0.12.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4415f4c642f04fea6ada6ff450018f3c28c1e7248528584718220c449d7f5f4"
+
+[[package]]
 name = "foreign-types"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -459,6 +465,7 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "colored",
+ "fast_qr",
  "local_ipaddress",
  "rand",
  "rdev",

@@ -33,6 +33,12 @@
     <string name="tcp_add_title">Server address</string>
     <string name="tcp_port_title">Server port</string>
     <string name="tcp_retry_title">Retry times</string>
+    <string name="tcp_scan">Scan QR Code</string>
+    <string name="tcp_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
+    <string name="tcp_scan_unavailable">Unavailable, click to download GMS dependencies</string>
+    <string name="tcp_scan_downloading">Download requested, please try again later</string>
+    <string name="tcp_scan_success">Scan successful</string>
+    <string name="tcp_scan_failed">Scan failed</string>
     <string name="tcp_test_title">Test connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
