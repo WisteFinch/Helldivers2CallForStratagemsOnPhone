@@ -68,6 +68,7 @@ pub enum Operation {
     Independent = 2,
     Request = 3,
     Sync = 4,
+    Auth = 5,
 }
 
 impl Operation {
@@ -80,6 +81,8 @@ impl Operation {
             Self::Request
         } else if v == 4 {
             Self::Sync
+        } else if v == 5 {
+            Self::Auth
         } else {
             Self::Status
         }
@@ -109,4 +112,26 @@ impl Default for Config {
             right: String::from("d"),
         }
     }
+}
+
+pub enum Status {
+    Success = 0,
+    VersionMismatch = 1,
+    Unauthorized = 2,
+}
+
+impl fmt::Display for Status {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Success => write!(f, "0"),
+            Self::VersionMismatch => write!(f, "1"),
+            Self::Unauthorized => write!(f, "2"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Auth {
+    pub sid: String,
+    pub time: u64,
 }

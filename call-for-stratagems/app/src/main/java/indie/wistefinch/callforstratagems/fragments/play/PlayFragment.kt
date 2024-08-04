@@ -31,7 +31,9 @@ import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
 import indie.wistefinch.callforstratagems.socket.Client
+import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
 import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
+import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
 import indie.wistefinch.callforstratagems.socket.StratagemInputData
 import indie.wistefinch.callforstratagems.socket.StratagemInputPacket
@@ -174,6 +176,15 @@ class PlayFragment : Fragment() {
      */
     private var retryLimit: Int = 5
 
+    /**
+     * Device secure id.
+     */
+    private lateinit var sid: String
+
+    /**
+     * Socket auth token.     */
+    private lateinit var token: String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -186,6 +197,7 @@ class PlayFragment : Fragment() {
         address = preferences.getString("tcp_add", "127.0.0.1")!!
         port = preferences.getString("tcp_port", "23333")?.toInt()!!
         retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
+        sid = preferences.getString("sid", "0")!!
 
         // Set screen.
         if (!enableSimplifiedMode) {
@@ -532,7 +544,8 @@ class PlayFragment : Fragment() {
             // Initial connection.
             withContext(Dispatchers.Main) {
                 binding.playConnectTitle.text = String.format(
-                    getString(R.string.network_connecting),
+                    getString(R.string.network_add_suffix),
+                    String.format(getString(R.string.network_connecting)),
                     address,
                     port
                 )
@@ -545,15 +558,30 @@ class PlayFragment : Fragment() {
 
             // If the connection is not successful, retry.
             while (!isConnected && tryTimes < 5) {
+                withContext(Dispatchers.Main) {
+                    binding.playConnectTitle.text = String.format(
+                        getString(R.string.network_add_suffix),
+                        String.format(
+                            getString(R.string.network_waiting),
+                            tryTimes,
+                            retryLimit
+                        ),
+                        address,
+                        port
+                    )
+                }
                 tryTimes++
                 delay(2000)
                 withContext(Dispatchers.Main) {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_retry),
+                        getString(R.string.network_add_suffix),
+                        String.format(
+                            getString(R.string.network_retry),
+                            tryTimes,
+                            retryLimit
+                        ),
                         address,
-                        port,
-                        tryTimes,
-                        retryLimit
+                        port
                     )
                 }
                 networkLock.lock()
@@ -566,7 +594,8 @@ class PlayFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 if (isConnected) {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_connected),
+                        getString(R.string.network_add_suffix),
+                        String.format(getString(R.string.network_connected)),
                         address,
                         port
                     )
@@ -574,7 +603,8 @@ class PlayFragment : Fragment() {
                 }
                 else {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_failed),
+                        getString(R.string.network_add_suffix),
+                        String.format(getString(R.string.network_failed)),
                         address,
                         port
                     )
@@ -600,7 +630,33 @@ class PlayFragment : Fragment() {
             // Receive status.
             val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
             // Check the server status.
-            flag =  res.status == 0 && res.ver == version
+            when (res.status) {
+                0 -> flag = true
+                1 -> flag = false
+                2 -> {
+                    // Request authentication.
+                    withContext(Dispatchers.Main) {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_add_suffix),
+                            String.format(getString(R.string.network_auth), sid),
+                            address,
+                            port
+                        )
+                    }
+                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                    client.toggleTimeout(false)
+                    val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
+                    client.toggleTimeout(true)
+                    if (auth.auth) {
+                        token = auth.token
+                        flag = true
+                    }
+                    else {
+                        flag = false
+                    }
+                }
+                else -> flag = false
+            }
         } catch (_: Exception) { // Json convert error & socket timeout.
             flag = false
         }
@@ -643,7 +699,8 @@ class PlayFragment : Fragment() {
                 StratagemMacroData(
                     stratagemData.name,
                     stratagemData.steps
-                )
+                ),
+                token
             )
             networkLock.lock()
             try {
@@ -676,7 +733,8 @@ class PlayFragment : Fragment() {
                 StratagemInputData(
                     step,
                     type
-                )
+                ),
+                token
             )
             networkLock.lock()
             try {
@@ -705,7 +763,12 @@ class PlayFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.show()
 
         // Close client
-        client.disconnect()
+        if (connectingLock.isLocked) {
+            client.forceClose()
+        }
+        else {
+            client.disconnect()
+        }
 
         super.onDestroy()
     }
