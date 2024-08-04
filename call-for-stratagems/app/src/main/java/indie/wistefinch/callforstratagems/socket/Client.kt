@@ -5,7 +5,6 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
-import java.net.SocketException
 import java.util.Scanner
 
 /**
@@ -54,7 +53,7 @@ class Client {
         } catch (_: IOException) {
             return false
         }
-        socket.soTimeout = soTimeout
+        toggleTimeout()
         isConnected = true
         return true
     }
@@ -66,9 +65,21 @@ class Client {
         if (isConnected) {
             reader.close()
             writer.close()
-            socket.close()
             isConnected = false
+            socket.close()
         }
+    }
+
+    /**
+     * Force close the current connection.
+     */
+    fun forceClose() {
+        try {
+            socket.close()
+            reader.close()
+            writer.close()
+        }
+        catch(_: Exception) { }
     }
 
     /**
@@ -83,6 +94,18 @@ class Client {
      */
     fun receive(): String {
         return reader.nextLine()
+    }
+
+    /**
+     * Set whether to enable timeout.
+     */
+    fun toggleTimeout(flag: Boolean = true) {
+        if (flag) {
+            socket.soTimeout = soTimeout
+        }
+        else {
+            socket.soTimeout = 0
+        }
     }
 
 }

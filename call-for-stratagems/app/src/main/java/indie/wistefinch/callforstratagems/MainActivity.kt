@@ -4,12 +4,14 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,5 +40,14 @@ class MainActivity : AppCompatActivity() {
         val barConfig = AppBarConfiguration(navController.graph)
 
         findViewById<Toolbar>(R.id.toolbar).setupWithNavController(navController, barConfig)
+
+        // Setup sid
+        val preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val sid = preferences.getString("sid", "0")!!
+        val editor = preferences.edit()
+        if (sid == "0") {
+            editor.putString("sid", Util.getRandomString(16))
+            editor.apply()
+        }
     }
 }

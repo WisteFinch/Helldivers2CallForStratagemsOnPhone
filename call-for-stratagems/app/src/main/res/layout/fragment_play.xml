@@ -12,7 +12,7 @@
         android:id="@+id/play_connect_status"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:contentDescription="@string/network_status"
+        android:contentDescription="@string/play_network_status"
         android:src="@drawable/ic_circle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

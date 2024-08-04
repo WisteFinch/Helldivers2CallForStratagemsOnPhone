@@ -9,10 +9,12 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.Client
+import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
 import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
 import indie.wistefinch.callforstratagems.socket.ServerConfigData
@@ -52,6 +54,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var infoVersion: Preference
     private lateinit var infoRepo: Preference
 
+    private lateinit var sid: String
+    private lateinit var token: String
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
@@ -74,6 +79,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         infoVersion = preferenceManager.findPreference("info_version")!!
         infoRepo = preferenceManager.findPreference("info_repo")!!
+
+        val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
+        sid = preferences?.getString("sid", "0")!!
 
         setupFormat()
         setupEventListener()
@@ -132,28 +140,52 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         try {
                             val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
                             // Check the server status.
-                            withContext(Dispatchers.Main) {
-                                if (res.status == 0) {
-                                    // Check server version.
-                                    if (res.ver == version) {
-                                        tcpTest.summary = resources.getText(R.string.tcp_test_success)
+                            when (res.status) {
+                                0 -> {
+                                    withContext(Dispatchers.Main) {
+                                        tcpTest.summary =
+                                            resources.getText(R.string.tcp_test_success)
                                     }
-                                    else {
-                                        tcpTest.summary = String.format(getString(R.string.tcp_test_version_error),
+                                }
+                                1 -> {
+                                    withContext(Dispatchers.Main) {
+                                        tcpTest.summary = String.format(
+                                            getString(R.string.network_status_1),
                                             version,
                                             res.ver
                                         )
                                     }
                                 }
-                                else {
-                                    tcpTest.summary = String.format(getString(R.string.tcp_test_status_error),
+                                2 -> {
+                                    withContext(Dispatchers.Main) {
+                                        tcpTest.summary =
+                                            String.format(getString(R.string.network_auth), sid)
+                                    }
+                                    // Request authentication.
+                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                                    client.toggleTimeout(false)
+                                    val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
+                                    client.toggleTimeout(true)
+                                    withContext(Dispatchers.Main) {
+                                        if (auth.auth) {
+                                            tcpTest.summary =
+                                                String.format(getString(R.string.tcp_test_success))
+                                        }
+                                        else {
+                                            tcpTest.summary =
+                                                String.format(getString(R.string.network_auth_failed))
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    tcpTest.summary = String.format(getString(R.string.network_status_error),
                                         res.status
                                     )
                                 }
                             }
                         } catch (_: Exception) { // Json convert error & timeout.
                             withContext(Dispatchers.Main) {
-                                tcpTest.summary = resources.getText(R.string.tcp_test_response_error)
+                                tcpTest.summary = resources.getText(R.string.network_response_error)
                             }
                         }
                     }
@@ -190,7 +222,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 left = inputLeft.value!!,
                 right = inputRight.value!!,
             )
-            val packet = SyncConfigPacket(config)
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
             // Launch coroutine
@@ -199,10 +230,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     // Connect to the server.
                     val connected = client.connect(add, port)
                     if (connected) { // Connection successful.
-                        client.send(Gson().toJson(packet).toString())
                         withContext(Dispatchers.Main) {
-                            tcpPort.text = config.port.toString()
-                            syncConfig.summary = resources.getText(R.string.sync_config_finished)
+                            syncConfig.summary =
+                                String.format(getString(R.string.network_auth), sid)
+                        }
+                        // Request authentication.
+                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                        client.toggleTimeout(false)
+                        try {
+                            val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
+                            client.toggleTimeout(true)
+                            if (auth.auth) {
+                                client.send(Gson().toJson(SyncConfigPacket(config, auth.token)).toString())
+                                withContext(Dispatchers.Main) {
+                                    syncConfig.summary = resources.getText(R.string.sync_config_finished)
+                                }
+                            }
+                            else {
+                                withContext(Dispatchers.Main) {
+                                    syncConfig.summary =
+                                        String.format(getString(R.string.network_auth_failed))
+                                }
+                            }
+                        } catch (_: Exception) { // Json convert error & timeout.
+                            withContext(Dispatchers.Main) {
+                                syncConfig.summary = resources.getText(R.string.network_response_error)
+                            }
                         }
                     }
                     else { // Connection failed.

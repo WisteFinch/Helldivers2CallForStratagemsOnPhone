@@ -37,9 +37,6 @@
     <string name="tcp_test_waiting">等待服务器响应…</string>
     <string name="tcp_test_success">成功</string>
     <string name="tcp_test_failed">连接失败，请检查网络设置</string>
-    <string name="tcp_test_response_error">服务器响应错误，请检查服务器是否正常运行</string>
-    <string name="tcp_test_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
-    <string name="tcp_test_version_error">服务器版本错误，预期%1$s，实际%2$s</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">端口</string>
@@ -51,7 +48,7 @@
     <string name="input_right_title">输入：右</string>
     <string name="sync_config_title">应用配置</string>
     <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
-    <string name="sync_config_finished">同步完成，您需要重启服务器来应用配置</string>
+    <string name="sync_config_finished">请在服务端上接受请求，然后重启服务器来应用配置</string>
 
     <!-- Control Preferences -->
     <string name="enable_simplified_mode_title">启用精简模式</string>
@@ -83,10 +80,19 @@
     <string name="play_downward">下</string>
     <string name="play_backward">左</string>
     <string name="play_forward">右</string>
-    <string name="network_connecting">连接中… %1$s:%2$d</string>
-    <string name="network_retry">连接中… %1$s:%2$d (重试 %3$d/%4$d)</string>
-    <string name="network_connected">已连接 %1$s:%2$d</string>
-    <string name="network_failed">连接失败 %1$s:%2$d</string>
-    <string name="network_status">连接状态</string>
+    <string name="play_network_status">连接状态</string>
+
+    <!-- Network -->
+    <string name="network_connecting">连接中…</string>
+    <string name="network_retry">连接中… (重试 %1$d/%2$d)</string>
+    <string name="network_waiting">等待… (重试 %1$d/%2$d)</string>
+    <string name="network_connected">已连接</string>
+    <string name="network_failed">连接失败</string>
+    <string name="network_response_error">服务器响应错误，请检查服务器是否正常运行</string>
+    <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
+    <string name="network_status_1">服务器版本错误，预期%1$s，实际%2$s</string>
+    <string name="network_status_2">客户端未认证</string>
+    <string name="network_auth">等待服务端认证，本地sid为%1$s</string>
+    <string name="network_auth_failed">认证失败，请重试并在服务端接受认证请求</string>
 
 </resources>

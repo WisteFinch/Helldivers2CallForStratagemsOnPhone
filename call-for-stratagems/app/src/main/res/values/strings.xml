@@ -39,9 +39,6 @@
     <string name="tcp_test_waiting">Waiting for response…</string>
     <string name="tcp_test_success">Success</string>
     <string name="tcp_test_failed">Connection failed, please check the network settings</string>
-    <string name="tcp_test_response_error">Server response error, please check whether the server is running properly</string>
-    <string name="tcp_test_status_error">Server status error [%1$d], please check whether the server is running properly</string>
-    <string name="tcp_test_version_error">Server version error, expecting %1$s, actually %2$s</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
@@ -53,7 +50,7 @@
     <string name="input_right_title">Input: Right</string>
     <string name="sync_config_title">Apply configuration</string>
     <string name="sync_config_default">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
-    <string name="sync_config_finished">Synchronize complete, you need to restart the server to apply it</string>
+    <string name="sync_config_finished">Please accept the request on the server, then restart the server to apply the configuration</string>
 
     <!-- Control Preferences -->
     <string name="enable_simplified_mode_title">Enable simplified mode</string>
@@ -86,10 +83,20 @@
     <string name="play_downward">Downward</string>
     <string name="play_backward">Backward</string>
     <string name="play_forward">Forward</string>
-    <string name="network_connecting">Connecting… %1$s:%2$d</string>
-    <string name="network_retry">Connecting… %1$s:%2$d (retry %3$d/%4$d)</string>
-    <string name="network_connected">Connected %1$s:%2$d</string>
-    <string name="network_failed">Connect failed %1$s:%2$d</string>
-    <string name="network_status">Connect status</string>
+    <string name="play_network_status">Connect status</string>
+
+    <!-- Network -->
+    <string name="network_add_suffix" translatable="false">%1$s ┃ %2$s:%3$d</string>
+    <string name="network_connecting">Connecting…</string>
+    <string name="network_retry">Connecting… (retry %1$d/%2$d)</string>
+    <string name="network_waiting">Waiting… (retry %1$d/%2$d)</string>
+    <string name="network_connected">Connected</string>
+    <string name="network_failed">Connect failed</string>
+    <string name="network_response_error">Server response error, please check whether the server is running properly</string>
+    <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
+    <string name="network_status_1">Server version error, expecting %1$s, actually %2$s</string>
+    <string name="network_status_2">Client not authenticated</string>
+    <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
+    <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
 
 </resources>

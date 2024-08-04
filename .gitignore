@@ -21,5 +21,6 @@ target/
 local.properties
 
 server/config.json
+server/auth.json
 release
 call-for-stratagems/app
