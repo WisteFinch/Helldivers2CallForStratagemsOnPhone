@@ -20,7 +20,7 @@ i18n!("src/locales");
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
-const VERSION: &str = "0.3.0";
+const VERSION: &str = "0.3.1";
 const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
