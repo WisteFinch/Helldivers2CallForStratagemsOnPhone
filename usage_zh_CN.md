@@ -1,10 +1,12 @@
 <div align="center">
   
-# 1 用法
+# 软件用法
 
 [**English**](./usage.md) | [**中文**](./usage_zh_CN.md)
 
 </div>
+
+# 1 用法
 
 ## 1.1 下载和运行
 
