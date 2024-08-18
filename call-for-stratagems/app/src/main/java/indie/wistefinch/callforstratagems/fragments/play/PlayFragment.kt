@@ -419,19 +419,20 @@ class PlayFragment : Fragment() {
 
         // Set Uis and flags.
         if (!isFreeInput) {
-            itemSelected = true
-            currentItem = data
-            stepAdapter.setData(data.steps)
-            stepsList = data.steps.toMutableList()
-            binding.playStratagemTitle.text = data.name
-            binding.playBlank.visibility = View.INVISIBLE
-            binding.playStratagemTitle.visibility = View.VISIBLE
-            binding.playStepsScrollView.visibility = View.VISIBLE
-        }
-        else {
-            itemSelected = false
-            binding.playStratagemTitle.visibility = View.INVISIBLE
-            binding.playStepsScrollView.visibility = View.INVISIBLE
+            if (itemSelected && currentItem == data) {
+                resetUi()
+            }
+            else {
+                itemSelected = true
+                currentItem = data
+                stepAdapter.clear()
+                stepAdapter.setData(data.steps)
+                stepsList = data.steps.toMutableList()
+                binding.playStratagemTitle.text = data.name
+                binding.playBlank.visibility = View.INVISIBLE
+                binding.playStratagemTitle.visibility = View.VISIBLE
+                binding.playStepsScrollView.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -499,10 +500,17 @@ class PlayFragment : Fragment() {
         lifecycleScope.launch {
             activateStratagem(currentItem)
         }
+        resetUi()
+    }
+
+    /**
+     * Reset Ui
+     */
+    private fun resetUi() {
         // Reset Uis and flags
         itemSelected = false
         currentStepPos = 0
-        stepAdapter.setData(listOf())
+        stepAdapter.clear()
         binding.playBlank.visibility = View.VISIBLE
         binding.playStratagemTitle.visibility = View.INVISIBLE
         binding.playStepsScrollView.visibility = View.INVISIBLE
@@ -529,6 +537,7 @@ class PlayFragment : Fragment() {
                 lifecycleScope.launch {
                     activateStratagem(item)
                 }
+                resetUi()
             }
         }
         val itemTouchHelper = ItemTouchHelper(callback)

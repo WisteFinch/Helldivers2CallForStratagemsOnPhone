@@ -80,4 +80,14 @@ class StepPlayAdapter: RecyclerView.Adapter<StepPlayAdapter.ListViewHolder>() {
         this.dataList = list
         notifyDataSetChanged()
     }
+
+    /**
+     * Clear the adapter data
+     *
+     * Because of the small amount of data, there is no need to compare the difference, ignore the warning.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    fun clear() {
+        setData(listOf())
+    }
 }
