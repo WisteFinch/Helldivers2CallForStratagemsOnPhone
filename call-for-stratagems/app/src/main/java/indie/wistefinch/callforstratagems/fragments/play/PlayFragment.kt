@@ -182,8 +182,9 @@ class PlayFragment : Fragment() {
     private lateinit var sid: String
 
     /**
-     * Socket auth token.     */
-    private lateinit var token: String
+     * Socket authentication token.
+     */
+    private var token: String = "NULL"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
