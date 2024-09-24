@@ -25,3 +25,5 @@ server/auth.json
 release
 call-for-stratagems/app/build
 call-for-stratagems/app/release
+call-for-stratagems/app/src/main/assets/database/stratagem_db.db-wal
+call-for-stratagems/app/src/main/assets/database/stratagem_db.db-shm
