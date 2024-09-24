@@ -42,7 +42,11 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
     @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
-        holder.itemView.findViewById<TextView>(R.id.stratagem_edit_title).text = dataList[pos].name
+        val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
+        holder.itemView.findViewById<TextView>(R.id.stratagem_edit_title).text = when (lang) {
+            "zh-CN" -> dataList[pos].nameZh
+            else -> dataList[pos].name
+        }
 
         // Get icon resources.
         // The resource must be obtained by name, so ignore the discouraged warning.

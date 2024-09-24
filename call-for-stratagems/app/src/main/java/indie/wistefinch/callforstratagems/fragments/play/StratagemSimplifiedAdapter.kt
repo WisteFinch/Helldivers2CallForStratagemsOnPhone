@@ -1,4 +1,4 @@
-package indie.wistefinch.callforstratagems.fragments.viewgroup
+package indie.wistefinch.callforstratagems.fragments.play
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,20 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 
 /**
- * Adapter for the stratagem recycler view in [ViewGroupFragment]
+ * Adapter for the simplified stratagem recycler view in [PlayFragment]
  */
-class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHolder>() {
+class StratagemSimplifiedAdapter: RecyclerView.Adapter<StratagemSimplifiedAdapter.ListViewHolder>() {
+
+    /**
+     * Item click callback, transmit the stratagem data.
+     */
+    var onItemClick: ((StratagemData) -> Unit)? = null
 
     /**
      * All data in the adapter.
      */
-    private var dataList = emptyList<StratagemData>()
+    var dataList = emptyList<StratagemData>()
 
     /**
      * Context, used to obtain external information.
@@ -30,17 +34,11 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_view, parent, false))
+        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_simplified_play, parent, false))
     }
 
     @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        // Set card view text.
-        val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
-        holder.itemView.findViewById<TextView>(R.id.stratagem_view_title).text = when (lang) {
-            "zh-CN" -> dataList[pos].nameZh
-            else -> dataList[pos].name
-        }
         // For compatibility with lower SDKs, ignore the discouraged warning.
         val res = context.resources.getIdentifier(
             dataList[pos].icon,
@@ -48,7 +46,10 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
             context.packageName
         )
         if (res != 0) {
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_view_imageView).setImageResource(res)
+            holder.itemView.findViewById<ImageView>(R.id.stratagem_simplified_play_button).setImageResource(res)
+            holder.itemView.findViewById<ImageView>(R.id.stratagem_simplified_play_button).setOnClickListener {
+                onItemClick?.invoke(dataList[pos])
+            }
         }
     }
 

@@ -428,10 +428,15 @@ class PlayFragment : Fragment() {
                 stepAdapter.clear()
                 stepAdapter.setData(data.steps)
                 stepsList = data.steps.toMutableList()
-                binding.playStratagemTitle.text = data.name
                 binding.playBlank.visibility = View.INVISIBLE
                 binding.playStratagemTitle.visibility = View.VISIBLE
                 binding.playStepsScrollView.visibility = View.VISIBLE
+
+                val lang: String = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+                binding.playStratagemTitle.text = when (lang) {
+                    "zh-CN" -> data.nameZh
+                    else -> data.name
+                }
             }
         }
     }
@@ -693,6 +698,7 @@ class PlayFragment : Fragment() {
      * Activate stratagem, send stratagem data to the server.
      */
     private suspend fun activateStratagem(stratagemData: StratagemData) {
+        val lang: String = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         // Check and restart the client
         if (!isConnected) {
             if (connectingLock.isLocked) {
@@ -707,7 +713,10 @@ class PlayFragment : Fragment() {
         withContext(Dispatchers.IO) {
             val packet = StratagemMacroPacket(
                 StratagemMacroData(
-                    stratagemData.name,
+                    when (lang) {
+                        "zh-CN" -> stratagemData.nameZh
+                        else -> stratagemData.name
+                    },
                     stratagemData.steps
                 ),
                 token

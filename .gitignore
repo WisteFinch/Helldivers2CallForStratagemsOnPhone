@@ -23,4 +23,5 @@ local.properties
 server/config.json
 server/auth.json
 release
-call-for-stratagems/app
+call-for-stratagems/app/build
+call-for-stratagems/app/release
