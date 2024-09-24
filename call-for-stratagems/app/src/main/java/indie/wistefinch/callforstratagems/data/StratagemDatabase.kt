@@ -35,7 +35,7 @@ abstract class StratagemDatabase: RoomDatabase() {
                     "stratagem_database"
                 )
                     .allowMainThreadQueries()
-                    .createFromAsset("database/stratagem_initial_db.db")
+                    .createFromAsset("database/stratagem_db.db")
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
