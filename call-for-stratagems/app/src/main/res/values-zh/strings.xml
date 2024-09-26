@@ -33,8 +33,10 @@
     <string name="tcp_retry_title">重试次数</string>
     <string name="tcp_scan">扫描二维码</string>
     <string name="tcp_scan_desc">扫描服务端的二维码，快速获取连接配置</string>
-    <string name="tcp_scan_unavailable">不可用，点击下载谷歌服务依赖</string>
-    <string name="tcp_scan_downloading">已请求下载，稍后再试</string>
+    <string name="tcp_scan_unavailable">不可用，点击下载依赖</string>
+    <string name="tcp_scan_no_gms">不可用，缺少谷歌服务</string>
+    <string name="tcp_scan_downloading">下载中… </string>
+    <string name="tcp_scan_download_failed">下载失败</string>
     <string name="tcp_scan_success">扫描成功</string>
     <string name="tcp_scan_failed">扫描失败</string>
     <string name="tcp_test_title">测试连接</string>
@@ -64,6 +66,7 @@
 
     <!-- Info Preferences -->
     <string name="info_version">版本</string>
+    <string name="info_version_updatable">版本（可更新）</string>
     <string name="info_repo">项目仓库</string>
     <string name="info_repo_desc">在Github上查看源码</string>
 

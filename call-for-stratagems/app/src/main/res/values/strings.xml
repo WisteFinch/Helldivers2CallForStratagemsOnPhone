@@ -2,6 +2,7 @@
     <string name="app_name">CallForStratagems</string>
     <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
     <string name="release_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
+    <string name="release_api_url" translatable="false">https://api.github.com/repos/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
     <string name="default_string" translatable="false">NULL</string>
 
     <!-- Fragment Title -->
@@ -35,8 +36,10 @@
     <string name="tcp_retry_title">Retry times</string>
     <string name="tcp_scan">Scan QR Code</string>
     <string name="tcp_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
-    <string name="tcp_scan_unavailable">Unavailable, click to download GMS dependencies</string>
-    <string name="tcp_scan_downloading">Download requested, please try again later</string>
+    <string name="tcp_scan_unavailable">Unavailable, click to download dependencies</string>
+    <string name="tcp_scan_no_gms">Unavailable, GMS required</string>
+    <string name="tcp_scan_downloading">Downloading… </string>
+    <string name="tcp_scan_download_failed">Download failed</string>
     <string name="tcp_scan_success">Scan successful</string>
     <string name="tcp_scan_failed">Scan failed</string>
     <string name="tcp_test_title">Test connection</string>
@@ -66,6 +69,7 @@
 
     <!-- Info Preferences -->
     <string name="info_version">Version</string>
+    <string name="info_version_updatable">Version(Updatable)</string>
     <string name="info_repo">Project repository</string>
     <string name="info_repo_desc">View the source code on github</string>
 

@@ -11,7 +11,13 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.android.gms.common.moduleinstall.InstallStatusListener
 import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_CANCELED
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_COMPLETED
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_FAILED
 import com.google.gson.Gson
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
@@ -28,6 +34,9 @@ import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -129,6 +138,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             ?.areModulesAvailable(optionalModuleApi)
             ?.addOnSuccessListener { it ->
                 if (it.areModulesAvailable()) {
+                    tcpScanner.summary = getString(R.string.tcp_scan_desc)
                     // Dependency available.
                     tcpScanner.setOnPreferenceClickListener {
                         val options = GmsBarcodeScannerOptions.Builder()
@@ -155,8 +165,46 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     // Dependency Unavailable.
                     tcpScanner.summary = getString(R.string.tcp_scan_unavailable)
                     tcpScanner.setOnPreferenceClickListener {
+                        tcpScanner.isEnabled = false
                         tcpScanner.summary = getString(R.string.tcp_scan_downloading)
-                        moduleInstallClient.deferredInstall(optionalModuleApi)
+                        val options = GmsBarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                            .build()
+                        val scanner = context?.let { GmsBarcodeScanning.getClient(it, options) }!!
+
+                        // Setup install status listener.
+                        class ModuleInstallProgressListener : InstallStatusListener {
+                            override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
+                                update.progressInfo?.let {
+                                    tcpScanner.summary = getString(R.string.tcp_scan_downloading) + (it.bytesDownloaded * 100 / it.totalBytesToDownload).toInt() + "%"
+                                }
+                                if (isTerminateState(update.installState)) {
+                                    moduleInstallClient.unregisterListener(this)
+                                }
+                            }
+
+                            fun isTerminateState(@ModuleInstallStatusUpdate.InstallState state: Int): Boolean {
+                                return state == STATE_CANCELED || state == STATE_COMPLETED || state == STATE_FAILED
+                            }
+                        }
+                        val listener = ModuleInstallProgressListener()
+                        // Setup install request.
+                        val moduleInstallRequest =
+                            ModuleInstallRequest.newBuilder()
+                                .setListener(listener)
+                                .addApi(scanner)
+                                .build()
+                        // Setup install client and add listener.
+                        moduleInstallClient
+                            .installModules(moduleInstallRequest)
+                            .addOnSuccessListener {
+                                tcpScanner.isEnabled = true
+                                tcpScanner.summary = getString(R.string.tcp_scan_desc)
+                            }
+                            .addOnFailureListener {
+                                tcpScanner.isEnabled = true
+                                tcpScanner.summary = getString(R.string.tcp_scan_download_failed)
+                            }
                         true
                     }
                 }
@@ -340,6 +388,43 @@ class SettingsFragment : PreferenceFragmentCompat() {
             internet.addCategory(Intent.CATEGORY_BROWSABLE)
             startActivity(internet)
             true
+        }
+
+        // Check Update.
+        // Launch coroutine
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val connection: HttpsURLConnection ?
+                try {
+                    connection = (URL(resources.getString(R.string.release_api_url)).openConnection() as HttpsURLConnection).apply {
+                        requestMethod = "GET"
+                        connectTimeout = 10 * 1000
+                        readTimeout = 10 * 1000
+                    }
+                    connection.inputStream.bufferedReader().useLines {
+                        it.forEach {
+                            val str = StringBuilder().apply {
+                                append(it)
+                            }
+                            val json = JSONObject(str.toString())
+                            val newVer = json.getString("tag_name").substring(1)
+                            withContext(Dispatchers.Main) {
+                                // Set version.
+                                val pkgName = context?.packageName!!
+                                val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+                                val curVer = pkgInfo.versionName
+                                if (curVer != newVer) {
+                                    // For compatibility with lower SDKs, ignore the discouraged warning.
+                                    @Suppress("DEPRECATION")
+                                    infoVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ") ➡ " + newVer
+                                    infoVersion.title = resources.getString(R.string.info_version_updatable)
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (_: Exception) {}
+            }
         }
     }
 
