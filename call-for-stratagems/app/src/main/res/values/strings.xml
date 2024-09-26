@@ -39,7 +39,7 @@
     <string name="tcp_scan_unavailable">Unavailable, click to download dependencies</string>
     <string name="tcp_scan_no_gms">Unavailable, GMS required</string>
     <string name="tcp_scan_downloading">Downloading… </string>
-    <string name="tcp_scan_download_failed">Download failed</string>
+    <string name="tcp_scan_download_failed">Download failed, please try again later</string>
     <string name="tcp_scan_success">Scan successful</string>
     <string name="tcp_scan_failed">Scan failed</string>
     <string name="tcp_test_title">Test connection</string>

@@ -32,7 +32,7 @@
     <string name="tcp_port_title">服务器端口</string>
     <string name="tcp_retry_title">重试次数</string>
     <string name="tcp_scan">扫描二维码</string>
-    <string name="tcp_scan_desc">扫描服务端的二维码，快速获取连接配置</string>
+    <string name="tcp_scan_desc">扫描服务器的二维码，快速获取连接配置</string>
     <string name="tcp_scan_unavailable">不可用，点击下载依赖</string>
     <string name="tcp_scan_no_gms">不可用，缺少谷歌服务</string>
     <string name="tcp_scan_downloading">下载中… </string>
@@ -40,7 +40,7 @@
     <string name="tcp_scan_success">扫描成功</string>
     <string name="tcp_scan_failed">扫描失败</string>
     <string name="tcp_test_title">测试连接</string>
-    <string name="tcp_test_default">测试与服务端的连接</string>
+    <string name="tcp_test_default">测试与服务器的连接</string>
     <string name="tcp_test_connecting">请民主地等待…</string>
     <string name="tcp_test_waiting">等待服务器响应…</string>
     <string name="tcp_test_success">成功</string>
@@ -56,7 +56,7 @@
     <string name="input_right_title">输入：右</string>
     <string name="sync_config_title">应用配置</string>
     <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
-    <string name="sync_config_finished">请在服务端上接受请求，然后重启服务器来应用配置</string>
+    <string name="sync_config_finished">请在服务器上接受请求，然后重启服务器来应用配置</string>
 
     <!-- Control Preferences -->
     <string name="enable_simplified_mode_title">启用精简模式</string>
@@ -101,7 +101,7 @@
     <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
     <string name="network_status_1">服务器版本错误，预期%1$s，实际%2$s</string>
     <string name="network_status_2">客户端未认证</string>
-    <string name="network_auth">等待服务端认证，本地sid为%1$s</string>
-    <string name="network_auth_failed">认证失败，请重试并在服务端接受认证请求</string>
+    <string name="network_auth">等待服务器认证，本地sid为%1$s</string>
+    <string name="network_auth_failed">认证失败，请重试并在服务器接受认证请求</string>
 
 </resources>

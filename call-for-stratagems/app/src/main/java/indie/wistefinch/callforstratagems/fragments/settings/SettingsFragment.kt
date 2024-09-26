@@ -137,7 +137,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         moduleInstallClient
             ?.areModulesAvailable(optionalModuleApi)
             ?.addOnSuccessListener { it ->
-                if (it.areModulesAvailable()) {
+                val success = it
+                if (success.areModulesAvailable()) {
                     tcpScanner.summary = getString(R.string.tcp_scan_desc)
                     // Dependency available.
                     tcpScanner.setOnPreferenceClickListener {
@@ -199,7 +200,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             .installModules(moduleInstallRequest)
                             .addOnSuccessListener {
                                 tcpScanner.isEnabled = true
-                                tcpScanner.summary = getString(R.string.tcp_scan_desc)
+                                if (success.areModulesAvailable()) {
+                                    tcpScanner.summary = getString(R.string.tcp_scan_desc)
+                                }
+                                else {
+                                    tcpScanner.summary = getString(R.string.tcp_scan_download_failed)
+                                }
                             }
                             .addOnFailureListener {
                                 tcpScanner.isEnabled = true
