@@ -20,7 +20,7 @@ i18n!("src/locales");
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
-const VERSION: &str = "0.3.3";
+const VERSION: &str = "0.3.4";
 const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
@@ -380,11 +380,9 @@ async fn independent(value: Value, conf: &Config) -> Result<()> {
     Ok(())
 }
 
-fn simulate_key_event<F>(step: Step, event_type_fn: F, conf: &Config)
-where
-    F: Fn(rdev::Key) -> EventType,
+fn simulate_key_event(step: Step, event_type: u32, conf: &Config)
 {
-    let key = match step
+    let data = match step
     {
         Step::Open => conf.open.clone().to_key(),
         Step::Up => conf.up.clone().to_key(),
@@ -392,23 +390,37 @@ where
         Step::Left => conf.left.clone().to_key(),
         Step::Right => conf.right.clone().to_key(),
     };
-    simulate(&event_type_fn(key)).unwrap();
+    if event_type == 0 {
+        match data.key_type {
+            KeyType::Keyboard => simulate(&EventType::KeyPress(data.keyboard)).unwrap(),
+            KeyType::MouseButton => simulate(&EventType::ButtonPress(data.mouse_button)).unwrap(),
+            KeyType::WheelUp => simulate(&EventType::Wheel { delta_x: 0, delta_y: 1 }).unwrap(),
+            KeyType::WheelDown => simulate(&EventType::Wheel { delta_x: 0, delta_y: -1 }).unwrap()
+        }
+    } else {
+        match data.key_type {
+            KeyType::Keyboard => simulate(&EventType::KeyRelease(data.keyboard)).unwrap(),
+            KeyType::MouseButton => simulate(&EventType::ButtonRelease(data.mouse_button)).unwrap(),
+            KeyType::WheelUp => (),
+            KeyType::WheelDown => ()
+        }
+    }
 }
 
 async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
     match t {
         InputType::Click => {
-            simulate_key_event(step.clone(), EventType::KeyPress, conf);
+            simulate_key_event(step.clone(), 0, conf);
             print(step.clone());
             let _ = io::stdout().flush();
             sleep(Duration::from_millis(conf.delay as u64)).await;
-            simulate_key_event(step, EventType::KeyRelease, conf);
+            simulate_key_event(step, 1, conf);
         }
         InputType::Press => {
-            simulate_key_event(step, EventType::KeyPress, conf);
+            simulate_key_event(step, 0, conf);
         }
         InputType::Release => {
-            simulate_key_event(step, EventType::KeyRelease, conf);
+            simulate_key_event(step, 1, conf);
         }
         InputType::Begin => {
             print(t!("n_free_input"));
@@ -421,4 +433,3 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
 
     Ok(())
 }
-

@@ -4,18 +4,25 @@ use std::{
 };
 
 use colored::Colorize;
-use rdev::Key;
+use rdev::{Key, Button};
 use rust_i18n::{i18n, t};
+
+use crate::{InputData, KeyType};
 
 i18n!("src/locales");
 
 pub(crate) trait StringToKey {
-    fn to_key(self) -> Key;
+    fn to_key(self) -> InputData;
 }
 
 impl StringToKey for String {
-    fn to_key(self) -> Key {
-        match self.as_str() {
+    fn to_key(self) -> InputData {
+        let mut data: InputData = InputData {
+            key_type: KeyType::Keyboard,
+            keyboard: Key::Unknown(0),
+            mouse_button: Button::Unknown(0)
+        };
+        data.keyboard = match self.as_str() {
             "alt" => Key::Alt,
             "alt_gr" => Key::AltGr,
             "backspace" => Key::Backspace,
@@ -119,7 +126,26 @@ impl StringToKey for String {
             "kp_delete" => Key::KpDelete,
             "fn" => Key::Function,
             _ => Key::Unknown(0),
+        };
+        if data.keyboard == Key::Unknown(0) {
+            data.key_type = KeyType::MouseButton;
+            data.mouse_button = match self.as_str() {
+                "mouse_left" => Button::Left,
+                "mouse_right" => Button::Right,
+                "mouse_middle" => Button::Middle,
+                "mouse3" => Button::Unknown(2),
+                "mouse4" => Button::Unknown(1),
+                _ => Button::Unknown(0),
+            };
         }
+        if data.keyboard == Key::Unknown(0) && data.mouse_button == Button::Unknown(0) {
+            data.key_type = match self.as_str() {
+                "wheel_up" => KeyType::WheelUp,
+                "wheel_down" => KeyType::WheelDown,
+                _ => KeyType::Keyboard
+            }
+        }
+        data
     }
 }
 

@@ -1,26 +1,26 @@
 <resources>
     <!-- Input Preference -->
     <string-array name="input_entries">
-        <item>Alt</item>
-        <item>Alt Gr</item>
-        <item>Left Ctrl</item>
-        <item>Right Ctrl</item>
-        <item>Left Shift</item>
-        <item>Right Shift</item>
-        <item>Up Arrow</item>
-        <item>Down Arrow</item>
-        <item>Left Arrow</item>
-        <item>Right Arrow</item>
-        <item>Num1</item>
-        <item>Num2</item>
-        <item>Num3</item>
-        <item>Num4</item>
-        <item>Num5</item>
-        <item>Num6</item>
-        <item>Num7</item>
-        <item>Num8</item>
-        <item>Num9</item>
-        <item>Num0</item>
+        <item>左 Alt</item>
+        <item>右 Alt</item>
+        <item>左 Ctrl</item>
+        <item>右 Ctrl</item>
+        <item>左 Shift</item>
+        <item>右 Shift</item>
+        <item>上箭头</item>
+        <item>下箭头</item>
+        <item>左箭头</item>
+        <item>右箭头</item>
+        <item>数字 1</item>
+        <item>数字 2</item>
+        <item>数字 3</item>
+        <item>数字 4</item>
+        <item>数字 5</item>
+        <item>数字 6</item>
+        <item>数字 7</item>
+        <item>数字 8</item>
+        <item>数字 9</item>
+        <item>数字 0</item>
         <item>a</item>
         <item>b</item>
         <item>c</item>
@@ -85,29 +85,29 @@
         <item>Scroll Lock</item>
         <item>Num Lock</item>
         <item>Pause</item>
-        <item>kp Enter</item>
-        <item>kp -</item>
-        <item>kp +</item>
-        <item>kp *</item>
-        <item>kp /</item>
-        <item>kp Num0</item>
-        <item>kp Num1</item>
-        <item>kp Num2</item>
-        <item>kp Num3</item>
-        <item>kp Num4</item>
-        <item>kp Num5</item>
-        <item>kp Num6</item>
-        <item>kp Num7</item>
-        <item>kp Num8</item>
-        <item>kp Num9</item>
-        <item>kp Delete</item>
-        <item>Mouse Left</item>
-        <item>Mouse Right</item>
-        <item>Mouse Middle</item>
-        <item>Mouse 3</item>
-        <item>Mouse 4</item>
-        <item>Wheel Up</item>
-        <item>Wheel Down</item>
+        <item>小键盘 Enter</item>
+        <item>小键盘 -</item>
+        <item>小键盘 +</item>
+        <item>小键盘 *</item>
+        <item>小键盘 /</item>
+        <item>小键盘 0</item>
+        <item>小键盘 1</item>
+        <item>小键盘 2</item>
+        <item>小键盘 3</item>
+        <item>小键盘 4</item>
+        <item>小键盘 5</item>
+        <item>小键盘 6</item>
+        <item>小键盘 7</item>
+        <item>小键盘 8</item>
+        <item>小键盘 9</item>
+        <item>小键盘 Delete</item>
+        <item>鼠标左键</item>
+        <item>鼠标右键</item>
+        <item>鼠标中键</item>
+        <item>鼠标侧键 1</item>
+        <item>鼠标侧键 2</item>
+        <item>鼠标滚轮 上</item>
+        <item>鼠标滚轮 下</item>
     </string-array>
 
     <string-array name="input_values">
@@ -193,24 +193,24 @@
         <item>page_up</item>
         <item>print_screen</item>
         <item>scroll_lock</item>
-        <item>num_lock</item>
+        <item>数字_lock</item>
         <item>pause</item>
-        <item>kp_enter</item>
-        <item>kp-</item>
-        <item>kp+</item>
-        <item>kp*</item>
-        <item>kp/</item>
-        <item>kp0</item>
-        <item>kp1</item>
-        <item>kp2</item>
-        <item>kp3</item>
-        <item>kp4</item>
-        <item>kp5</item>
-        <item>kp6</item>
-        <item>kp7</item>
-        <item>kp8</item>
-        <item>kp9</item>
-        <item>kp_delete</item>
+        <item>小键盘_enter</item>
+        <item>小键盘-</item>
+        <item>小键盘+</item>
+        <item>小键盘*</item>
+        <item>小键盘/</item>
+        <item>小键盘0</item>
+        <item>小键盘1</item>
+        <item>小键盘2</item>
+        <item>小键盘3</item>
+        <item>小键盘4</item>
+        <item>小键盘5</item>
+        <item>小键盘6</item>
+        <item>小键盘7</item>
+        <item>小键盘8</item>
+        <item>小键盘9</item>
+        <item>小键盘_delete</item>
         <item>mouse_left</item>
         <item>mouse_right</item>
         <item>mouse_middle</item>
