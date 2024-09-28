@@ -137,7 +137,14 @@
     <PreferenceCategory app:title="@string/info_header">
 
         <Preference
-            app:key="info_version"
+            app:key="info_db_version"
+            app:title="@string/db_version"
+            app:summary="@string/default_string"
+            app:icon="@drawable/ic_info"
+            />
+
+        <Preference
+            app:key="info_app_version"
             app:title="@string/info_version"
             app:summary="@string/default_string"
             app:icon="@drawable/ic_info"

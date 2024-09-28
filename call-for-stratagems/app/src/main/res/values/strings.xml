@@ -3,6 +3,8 @@
     <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
     <string name="release_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
     <string name="release_api_url" translatable="false">https://api.github.com/repos/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
+    <string name="db_index_url" translatable="false">https://wistefinch.github.io/HD2CFS-Database/</string>
+    <string name="icons_path" translatable="false">/icons/</string>
     <string name="default_string" translatable="false">NULL</string>
 
     <!-- Fragment Title -->
@@ -68,8 +70,19 @@
     <string name="swipe_velocity_threshold_title">Gesture swipe velocity threshold(pixel/s)</string>
 
     <!-- Info Preferences -->
-    <string name="info_version">Version</string>
-    <string name="info_version_updatable">Version(Updatable)</string>
+    <string name="db_version">Database Version</string>
+    <string name="db_version_empty">Empty</string>
+    <string name="db_version_incomplete">Incomplete</string>
+    <string name="db_version_updatable">Database Version(Updatable)</string>
+    <string name="db_version_updatable_desc">%1$s ➡ %2$s</string>
+    <string name="db_version_updating">Database Version(Updating)</string>
+    <string name="db_version_updating_index_desc">Downloading index…</string>
+    <string name="db_version_updating_db_desc">Downloading database…</string>
+    <string name="db_version_updating_icons_desc">Downloading icons… (%1$d/%2$d)</string>
+    <string name="db_version_update_complete_desc">Update complete, please restart the app</string>
+    <string name="db_version_update_failed_desc">Update failed, please try again</string>
+    <string name="info_version">App Version</string>
+    <string name="info_version_updatable">App Version(Updatable)</string>
     <string name="info_repo">Project repository</string>
     <string name="info_repo_desc">View the source code on github</string>
 

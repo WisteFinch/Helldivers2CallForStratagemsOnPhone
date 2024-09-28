@@ -2,13 +2,16 @@ package indie.wistefinch.callforstratagems.fragments.play
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import java.io.File
 
 /**
  * Adapter for the stratagem recycler view in [PlayFragment]
@@ -37,19 +40,21 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_play, parent, false))
     }
 
-    @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        // For compatibility with lower SDKs, ignore the discouraged warning.
-        val res = context.resources.getIdentifier(
-            dataList[pos].icon,
-            "drawable",
-            context.packageName
-        )
-        if (res != 0) {
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_play_button).setImageResource(res)
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_play_button).setOnClickListener {
-                onItemClick?.invoke(dataList[pos])
-            }
+        // Set icon resources.
+        try {
+            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_play_button)
+                .setImageURI(
+                    Uri.fromFile(
+                        File(context.filesDir.path +
+                                context.resources.getString(R.string.icons_path) +
+                                dataList[pos].icon + ".svg")
+                    )
+                )
+        }
+        catch (_: Exception) {}
+        holder.itemView.findViewById<SVGImageView>(R.id.stratagem_play_button).setOnClickListener {
+            onItemClick?.invoke(dataList[pos])
         }
     }
 

@@ -1,10 +1,12 @@
 package indie.wistefinch.callforstratagems.fragments.settings
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -22,7 +24,12 @@ import com.google.gson.Gson
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.Util
+import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.socket.AddressData
 import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.Client
@@ -34,16 +41,24 @@ import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
-import java.net.URL
-import javax.net.ssl.HttpsURLConnection
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment: PreferenceFragmentCompat() {
 
     /**
      * The socket client.
      */
     private val client = Client()
+
+    /**
+     * The stratagem view model.
+     */
+    private val stratagemViewModel: StratagemViewModel by activityViewModels {
+        StratagemViewModelFactory(
+            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
 
     // View binding.
     // Connection preference
@@ -67,10 +82,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var swipeVelocity: EditTextPreference
 
     // Info preference
-    private lateinit var infoVersion: Preference
+    private lateinit var infoDbVersion: Preference
+    private lateinit var infoAppVersion: Preference
     private lateinit var infoRepo: Preference
 
     private lateinit var sid: String
+    private lateinit var dbVer: String
+
+    private lateinit var preferences: SharedPreferences
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -93,11 +112,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         swipeDistance = preferenceManager.findPreference("swipe_distance_threshold")!!
         swipeVelocity = preferenceManager.findPreference("swipe_velocity_threshold")!!
 
-        infoVersion = preferenceManager.findPreference("info_version")!!
+        infoDbVersion = preferenceManager.findPreference("info_db_version")!!
+        infoAppVersion = preferenceManager.findPreference("info_app_version")!!
         infoRepo = preferenceManager.findPreference("info_repo")!!
 
-        val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
-        sid = preferences?.getString("sid", "0")!!
+        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        sid = preferences.getString("sid", "0")!!
+        dbVer = preferences.getString("db_version", "0")!!
 
         setupFormat()
         setupEventListener()
@@ -174,7 +195,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         val scanner = context?.let { GmsBarcodeScanning.getClient(it, options) }!!
 
                         // Setup install status listener.
-                        class ModuleInstallProgressListener : InstallStatusListener {
+                        class ModuleInstallProgressListener: InstallStatusListener {
                             override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
                                 update.progressInfo?.let {
                                     tcpScanner.summary = getString(R.string.tcp_scan_downloading) + (it.bytesDownloaded * 100 / it.totalBytesToDownload).toInt() + "%"
@@ -229,7 +250,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val pkgName = context?.packageName!!
             val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
             val version = pkgInfo.versionName
-            infoVersion.summary = pkgInfo.versionName
+            infoAppVersion.summary = pkgInfo.versionName
             // Launch coroutine.
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
@@ -379,7 +400,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         // Open release url preference.
-        infoVersion.setOnPreferenceClickListener {
+        infoAppVersion.setOnPreferenceClickListener {
             val uri = Uri.parse(resources.getString(R.string.release_url))
             val internet = Intent(Intent.ACTION_VIEW, uri)
             internet.addCategory(Intent.CATEGORY_BROWSABLE)
@@ -396,41 +417,123 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
-        // Check Update.
+        // Check database update.
         // Launch coroutine
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val connection: HttpsURLConnection ?
+            val json = JSONObject(Util.downloadToStr(resources.getString(R.string.db_index_url)))
+            val newVer = json.getString("date")
+            withContext(Dispatchers.Main) {
+                if (dbVer != newVer) {
+                    infoDbVersion.summary =
+                        String.format(resources.getString(R.string.db_version_updatable_desc),
+                            infoDbVersion.summary,
+                            newVer
+                        )
+                    infoDbVersion.title =
+                        resources.getString(R.string.db_version_updatable)
+                }
+            }
+        }
+
+        // Check app update.
+        // Launch coroutine
+        lifecycleScope.launch {
+            val json = JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
+            val newVer = json.getString("tag_name").substring(1)
+            withContext(Dispatchers.Main) {
+                // Set version.
+                val pkgName = context?.packageName!!
+                val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+                val curVer = pkgInfo.versionName
+                if (curVer != newVer) {
+                    // For compatibility with lower SDKs, ignore the discouraged warning.
+                    @Suppress("DEPRECATION")
+                    infoAppVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ") ➡ " + newVer
+                    infoAppVersion.title = resources.getString(R.string.info_version_updatable)
+                }
+            }
+        }
+
+        // Update database.
+        infoDbVersion.setOnPreferenceClickListener {
+            lifecycleScope.launch {
+                infoDbVersion.isEnabled = false
+                withContext(Dispatchers.Main) {
+                    infoDbVersion.title = resources.getString(R.string.db_version_updating)
+                    infoDbVersion.summary = resources.getString(R.string.db_version_updating_index_desc)
+                }
+
                 try {
-                    connection = (URL(resources.getString(R.string.release_api_url)).openConnection() as HttpsURLConnection).apply {
-                        requestMethod = "GET"
-                        connectTimeout = 10 * 1000
-                        readTimeout = 10 * 1000
+                    val iconsPath = context?.filesDir?.path + "/icons/"
+                    preferences.edit().putString("db_version", "1").apply()
+
+                    // Download index.
+                    val indexObj = JSONObject(Util.downloadToStr(resources.getString(R.string.db_index_url)))
+                    val date = indexObj.getString("date")
+                    val dbUrl = resources.getString(R.string.db_index_url) + indexObj.getString("db_path")
+                    val iconsUrl = resources.getString(R.string.db_index_url) + indexObj.getString("icons_path")
+                    val iconsList: MutableList<String> = emptyList<String>().toMutableList()
+
+                    // Download database.
+                    withContext(Dispatchers.Main) {
+                        infoDbVersion.summary = resources.getString(R.string.db_version_updating_db_desc)
+                        infoDbVersion.title = resources.getString(R.string.db_version_updating)
                     }
-                    connection.inputStream.bufferedReader().useLines {
-                        it.forEach {
-                            val str = StringBuilder().apply {
-                                append(it)
-                            }
-                            val json = JSONObject(str.toString())
-                            val newVer = json.getString("tag_name").substring(1)
-                            withContext(Dispatchers.Main) {
-                                // Set version.
-                                val pkgName = context?.packageName!!
-                                val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-                                val curVer = pkgInfo.versionName
-                                if (curVer != newVer) {
-                                    // For compatibility with lower SDKs, ignore the discouraged warning.
-                                    @Suppress("DEPRECATION")
-                                    infoVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ") ➡ " + newVer
-                                    infoVersion.title = resources.getString(R.string.info_version_updatable)
-                                }
-                            }
+                    val dbObj = JSONObject(Util.downloadToStr(dbUrl))
+                    // Regenerate database.
+                    stratagemViewModel.deleteAll()
+                    val rows = dbObj.getJSONArray("objects")
+                        .getJSONObject(0)
+                        .getJSONArray("rows")
+                    for (i in 0 until rows.length()) {
+                        val row = rows.getJSONArray(i)
+                        val stepsArray = JSONArray(row.getString(4))
+                        val steps: MutableList<Int> = emptyList<Int>().toMutableList()
+                        for (j in 0 until stepsArray.length()) {
+                            steps.add(stepsArray.getInt(j))
                         }
+                        val item = StratagemData(
+                            row.getInt(0),
+                            row.getString(1),
+                            row.getString(2),
+                            row.getString(3),
+                            steps
+                        )
+                        iconsList.add(row.getString(3))
+                        stratagemViewModel.insertItem(item)
+                    }
+
+                    // Download icons.
+                    for (i in 0 until iconsList.size) {
+                        withContext(Dispatchers.Main) {
+                            infoDbVersion.summary = String.format(
+                                resources.getString(R.string.db_version_updating_icons_desc),
+                                i,
+                                iconsList.size
+                            )
+                            infoDbVersion.title = resources.getString(R.string.db_version_updating)
+                        }
+                        Util.download(iconsUrl + iconsList[i] + ".svg",
+                            iconsPath + iconsList[i] + ".svg",
+                            false
+                        )
+                    }
+
+                    preferences.edit().putString("db_version", date).apply()
+                    withContext(Dispatchers.Main) {
+                        infoDbVersion.summary = resources.getString(R.string.db_version_update_complete_desc)
+                    }
+                } catch (_: Exception) {
+                    withContext(Dispatchers.Main) {
+                        infoDbVersion.summary = resources.getString(R.string.db_version_update_failed_desc)
                     }
                 }
-                catch (_: Exception) {}
+                withContext(Dispatchers.Main) {
+                    infoDbVersion.title = resources.getString(R.string.db_version)
+                }
+                infoDbVersion.isEnabled = true
             }
+            true
         }
     }
 
@@ -438,12 +541,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * Setup the content of some preference
      */
     private fun setupContent() {
-        // Set version.
+        // Set database version
+        when (dbVer) {
+            "0" -> infoDbVersion.summary = resources.getString(R.string.db_version_empty)
+            "1" -> infoDbVersion.summary = resources.getString(R.string.db_version_incomplete)
+            else -> infoDbVersion.summary = dbVer
+        }
+
+        // Set app version.
         val pkgName = context?.packageName!!
         val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
         // For compatibility with lower SDKs, ignore the discouraged warning.
         @Suppress("DEPRECATION")
-        infoVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ")"
+        infoAppVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ")"
     }
 
     override fun onDestroy() {

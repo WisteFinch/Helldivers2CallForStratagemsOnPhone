@@ -49,4 +49,10 @@ interface StratagemDao {
      */
     @Delete
     suspend fun delete(item: StratagemData)
+
+    /**
+     * Delete all the entry in the database.
+     */
+    @Query("DELETE FROM stratagem_table")
+    suspend fun deleteAll()
 }

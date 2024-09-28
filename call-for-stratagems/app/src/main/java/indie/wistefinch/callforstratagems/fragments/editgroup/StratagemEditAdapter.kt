@@ -2,15 +2,17 @@ package indie.wistefinch.callforstratagems.fragments.editgroup
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import java.io.File
 
 /**
  * Adapter for the recycler view in [EditGroupFragment]
@@ -39,7 +41,6 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_edit, parent, false))
     }
 
-    @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
         val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
@@ -48,16 +49,18 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
             else -> dataList[pos].name
         }
 
-        // Get icon resources.
-        // The resource must be obtained by name, so ignore the discouraged warning.
-        val res = context.resources.getIdentifier(
-            dataList[pos].icon,
-            "drawable",
-            context.packageName
-        )
-        if (res != 0) {
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_edit_imageView).setImageResource(res)
+        // Set icon resources.
+        try {
+            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_edit_imageView)
+                .setImageURI(
+                    Uri.fromFile(
+                        File(context.filesDir.path +
+                                context.resources.getString(R.string.icons_path) +
+                                dataList[pos].icon + ".svg")
+                    )
+                )
         }
+        catch (_: Exception) {}
 
         // Set card view background.
         val cardView = holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView)

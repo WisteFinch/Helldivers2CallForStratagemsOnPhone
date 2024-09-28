@@ -2,13 +2,16 @@ package indie.wistefinch.callforstratagems.fragments.root
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import java.io.File
 
 /**
  * Adapter for the stratagem thumbnail recycler view in [GroupListAdapter]
@@ -32,17 +35,18 @@ class StratagemThumbnailAdapter: RecyclerView.Adapter<StratagemThumbnailAdapter.
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_thumbnail, parent, false))
     }
 
-    @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        // For compatibility with lower SDKs, ignore the discouraged warning.
-        val res = context.resources.getIdentifier(
-            dataList[pos].icon,
-            "drawable",
-            context.packageName
-        )
-        if (res != 0) {
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_thumbnail_imageView).setImageResource(res)
+        try {
+            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_thumbnail_imageView)
+                .setImageURI(
+                    Uri.fromFile(
+                        File(context.filesDir.path +
+                                context.resources.getString(R.string.icons_path) +
+                                dataList[pos].icon + ".svg")
+                    )
+                )
         }
+        catch (_: Exception) {}
     }
 
     override fun getItemCount(): Int {

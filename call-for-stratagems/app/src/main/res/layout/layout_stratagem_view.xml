@@ -6,7 +6,7 @@
     android:layout_margin="4dp"
     android:padding="8dp">
 
-    <ImageView
+    <com.caverock.androidsvg.SVGImageView
         android:id="@+id/stratagem_view_imageView"
         android:layout_width="64dp"
         android:layout_height="64dp"

@@ -2,8 +2,11 @@ package indie.wistefinch.callforstratagems.data.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import indie.wistefinch.callforstratagems.data.dao.StratagemDao
+import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import kotlinx.coroutines.launch
 
 /**
  * View Model to keep a reference to the database.
@@ -11,9 +14,11 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
 
     /**
-     * Cache all items form the database.
+     * Get all [StratagemData] form the database.
      */
-    val allItems: List<StratagemData> = stratagemDao.getItems()
+    fun getAllItems(): List<StratagemData> {
+        return stratagemDao.getItems()
+    }
 
     fun retrieveItem(id: Int): StratagemData {
         return stratagemDao.getItem(id)
@@ -21,6 +26,18 @@ class StratagemViewModel(private val stratagemDao: StratagemDao) : ViewModel() {
 
     fun isIdValid(id: Int): Boolean {
         return stratagemDao.valid(id)
+    }
+
+    fun deleteAll() {
+        viewModelScope.launch {
+            stratagemDao.deleteAll()
+        }
+    }
+
+    fun insertItem(item: StratagemData) {
+        viewModelScope.launch {
+            stratagemDao.insert(item)
+        }
     }
 
 }

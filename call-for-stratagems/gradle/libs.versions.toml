@@ -1,11 +1,9 @@
 [versions]
 agp = "8.5.0"
 kotlin = "1.9.0"
-coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-appcompat = "1.6.1"
 material = "1.10.0"
 constraintlayout = "2.1.4"
 navigationFragmentKtx = "2.6.0"
@@ -15,25 +13,20 @@ roomCompiler = "2.6.0"
 roomVersion = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 lifecycleLivedataKtx = "2.6.1"
-roomKtx = "2.6.0-alpha01"
+roomKtx = "2.6.1"
 gson = "2.11.0"
-androidxNavigationSafeargsGradlePlugin = "2.6.0-alpha08"
-navigationSafeArgsGradlePlugin = "2.6.0"
-navigationSafeArgsGradlePluginVersion = "1.0.0"
-androidxNavigationSafeArgsGradlePluginVersion = "2.7.0-beta02"
 playServicesCodeScanner = "16.0.0"
 playServicesBase = "18.2.0"
-playServicesTfliteJava = "16.0.1"
+androidsvgAar = "1.4"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.10.1" }
 androidx-room-compiler-v260 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
@@ -43,13 +36,9 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-androidx-androidx-navigation-safeargs-gradle-plugin = { group = "androidx.navigation.safeargs", name = "androidx.navigation.safeargs.gradle.plugin", version.ref = "androidxNavigationSafeargsGradlePlugin" }
-androidx-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePlugin" }
-navigation-safe-args-gradle-plugin = { group = "android.arch.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "navigationSafeArgsGradlePluginVersion" }
-androidx-navigation-navigation-safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "androidxNavigationSafeArgsGradlePluginVersion" }
 play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
-play-services-tflite-java = { group = "com.google.android.gms", name = "play-services-tflite-java", version.ref = "playServicesTfliteJava" }
+androidsvg-aar = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvgAar" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

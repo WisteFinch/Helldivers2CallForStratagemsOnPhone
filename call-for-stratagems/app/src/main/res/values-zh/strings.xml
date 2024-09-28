@@ -65,8 +65,19 @@
     <string name="swipe_velocity_threshold_title">手势速度阈值（像素/秒）</string>
 
     <!-- Info Preferences -->
-    <string name="info_version">版本</string>
-    <string name="info_version_updatable">版本（可更新）</string>
+    <string name="db_version">数据库版本</string>
+    <string name="db_version_empty">空</string>
+    <string name="db_version_incomplete">不完整</string>
+    <string name="db_version_updatable">数据库版本（可更新）</string>
+    <string name="db_version_updatable_desc">%1$s ➡ %2$s</string>
+    <string name="db_version_updating">数据库版本（正在更新）</string>
+    <string name="db_version_updating_index_desc">下载索引…</string>
+    <string name="db_version_updating_db_desc">下载数据库…</string>
+    <string name="db_version_updating_icons_desc">下载图标… (%1$d/%2$d)</string>
+    <string name="db_version_update_complete_desc">更新完成，请重启程序</string>
+    <string name="db_version_update_failed_desc">更新失败，请重试</string>
+    <string name="info_version">软件版本</string>
+    <string name="info_version_updatable">软件版本（可更新）</string>
     <string name="info_repo">项目仓库</string>
     <string name="info_repo_desc">在Github上查看源码</string>
 
