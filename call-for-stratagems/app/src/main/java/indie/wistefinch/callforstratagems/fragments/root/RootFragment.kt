@@ -1,5 +1,7 @@
 package indie.wistefinch.callforstratagems.fragments.root
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -15,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
@@ -58,6 +62,51 @@ class RootFragment : Fragment() {
     // View binding.
     private var _binding: FragmentRootBinding? = null
     private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        // Check database integrity.
+        val dbVer = preferences.getString("db_version", "0")!!
+        val ignoreDbCheck = preferences.getBoolean("hint_db_incomplete", false)
+        if ((dbVer == "0" || dbVer == "1") && !ignoreDbCheck) {
+            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
+                .setTitle(R.string.hint_db_incomplete)
+                .setMessage(R.string.hint_db_incomplete_desc)
+                .setIcon(R.drawable.ic_info)
+                .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                }.setNeutralButton(R.string.dialog_no_ask) { _, _ ->
+                    preferences.edit().putBoolean("hint_db_incomplete", true).apply()
+                }.create()
+            dialog.show()
+        }
+
+        // Check and show welcome.
+        val pkgName = context?.packageName!!
+        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        val ver = pkgInfo.versionName
+        val ignoreWelcome = preferences.getBoolean("hint_welcome_$ver", false)
+        if (!ignoreWelcome) {
+            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
+                .setTitle(String.format(resources.getString(R.string.hint_welcome), ver))
+                .setMessage(R.string.hint_welcome_desc)
+                .setIcon(R.mipmap.ic_launcher)
+                .setOnDismissListener {
+                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+                }.setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+                }.setNeutralButton(R.string.hint_welcome_usage) { _, _ ->
+                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+                    val uri = Uri.parse(resources.getString(R.string.usage_url))
+                    val internet = Intent(Intent.ACTION_VIEW, uri)
+                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                    startActivity(internet)
+                }.create()
+            dialog.show()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
