@@ -277,7 +277,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                                     withContext(Dispatchers.Main) {
                                         tcpTest.summary = String.format(
                                             getString(R.string.network_status_1),
-                                            version,
+                                            version.substring(0, version.lastIndexOf(".")),
                                             res.ver
                                         )
                                     }

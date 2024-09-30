@@ -124,7 +124,7 @@
     <string name="network_failed">Connect failed</string>
     <string name="network_response_error">Server response error, please check whether the server is running properly</string>
     <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
-    <string name="network_status_1">Server version error, expecting %1$s, actually %2$s</string>
+    <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
     <string name="network_status_2">Client not authenticated</string>
     <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
     <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>

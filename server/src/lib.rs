@@ -20,7 +20,7 @@ i18n!("src/locales");
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
-const VERSION: &str = "0.4.0";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
@@ -162,7 +162,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             Operation::Status => {
                 // Check version.
                 let ver = json["ver"].as_str().unwrap_or("NULL");
-                if ver == VERSION {
+                if compare_ver(ver, VERSION) {
                     // Check authentication.
                     if is_authed {
                         client

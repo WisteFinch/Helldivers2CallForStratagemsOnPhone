@@ -116,7 +116,7 @@
     <string name="network_failed">连接失败</string>
     <string name="network_response_error">服务器响应错误，请检查服务器是否正常运行</string>
     <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
-    <string name="network_status_1">服务器版本错误，预期%1$s，实际%2$s</string>
+    <string name="network_status_1">服务器版本错误，预期%1$s.x，实际%2$s</string>
     <string name="network_status_2">客户端未认证</string>
     <string name="network_auth">等待服务器认证，本地sid为%1$s</string>
     <string name="network_auth_failed">认证失败，请重试并在服务器接受认证请求</string>
