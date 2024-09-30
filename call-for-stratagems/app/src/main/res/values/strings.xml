@@ -3,6 +3,10 @@
     <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
     <string name="release_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
     <string name="release_api_url" translatable="false">https://api.github.com/repos/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
+    <string name="db_index_url" translatable="false">https://wistefinch.github.io/HD2CFS-Database/</string>
+    <string name="license_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/LICENSE</string>
+    <string name="usage_url">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/usage.md</string>
+    <string name="icons_path" translatable="false">/icons/</string>
     <string name="default_string" translatable="false">NULL</string>
 
     <!-- Fragment Title -->
@@ -40,6 +44,7 @@
     <string name="tcp_scan_no_gms">Unavailable, GMS required</string>
     <string name="tcp_scan_downloading">Downloading… </string>
     <string name="tcp_scan_download_failed">Download failed, please try again later</string>
+    <string name="tcp_scan_download_complete">Download complete, please restart the app</string>
     <string name="tcp_scan_success">Scan successful</string>
     <string name="tcp_scan_failed">Scan failed</string>
     <string name="tcp_test_title">Test connection</string>
@@ -68,13 +73,28 @@
     <string name="swipe_velocity_threshold_title">Gesture swipe velocity threshold(pixel/s)</string>
 
     <!-- Info Preferences -->
-    <string name="info_version">Version</string>
-    <string name="info_version_updatable">Version(Updatable)</string>
-    <string name="info_repo">Project repository</string>
-    <string name="info_repo_desc">View the source code on github</string>
-
-    <!-- Root Menu -->
-    <string name="root_menu_preferences_title">Preferences</string>
+    <string name="info_db_version">Database Version</string>
+    <string name="info_db_version_empty">Empty</string>
+    <string name="info_db_version_incomplete">Incomplete</string>
+    <string name="info_db_version_updatable">Database Version(Updatable)</string>
+    <string name="info_db_version_updatable_desc">%1$s ➡ %2$s</string>
+    <string name="info_db_version_updating">Database Version(Updating)</string>
+    <string name="info_db_version_updating_index_desc">Downloading index…</string>
+    <string name="info_db_version_updating_db_desc">Downloading database…</string>
+    <string name="info_db_version_updating_icons_desc">Downloading icons… (%1$d/%2$d)</string>
+    <string name="info_db_version_update_complete_desc">Update complete, please restart the app</string>
+    <string name="info_db_version_update_failed_desc">Update failed, please try again</string>
+    <string name="info_db_version_latest">Already the latest version</string>
+    <string name="info_app_version">App Version</string>
+    <string name="info_app_version_updatable">App Version(Updatable)</string>
+    <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
+    <string name="info_app_update_log">New Version: v%1$s</string>
+    <string name="info_about">About</string>
+    <string name="info_about_title">CallForStratagems v%1$s</string>
+    <string name="info_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by FloatingLight233 &amp; WisteFinch\n\nLicensed under MIT</string>
+    <string name="info_about_usage">Usage</string>
+    <string name="info_about_license">License</string>
+    <string name="info_about_repo">Project Repo</string>
 
     <!-- Edit Group Menu -->
     <string name="editGroup_menu_save_title">Save</string>
@@ -104,9 +124,26 @@
     <string name="network_failed">Connect failed</string>
     <string name="network_response_error">Server response error, please check whether the server is running properly</string>
     <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
-    <string name="network_status_1">Server version error, expecting %1$s, actually %2$s</string>
+    <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
     <string name="network_status_2">Client not authenticated</string>
     <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
     <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
+
+    <!-- Root Menu -->
+    <string name="root_menu_preferences_title">Preferences</string>
+
+    <!-- Dialog -->
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_download">Download</string>
+    <string name="dialog_ignore">Ignore</string>
+    <string name="dialog_no_ask">Don\'t ask again</string>
+
+    <!-- Hints -->
+    <string name="hint_db_incomplete">Database incomplete</string>
+    <string name="hint_db_incomplete_desc">The database is incomplete, please go to \"Settings-Info\" to update the database</string>
+    <string name="hint_welcome">Welcome to v%1$s</string>
+    <string name="hint_welcome_usage">Usage</string>
+    <string name="hint_welcome_desc">This update has redesigned the stratagem database. If you see any abnormal situations such as errors or missing stratagem (icon) after the update, simply go to \"Settings-Info\" and update the database, then the problems will be solved!</string>
 
 </resources>

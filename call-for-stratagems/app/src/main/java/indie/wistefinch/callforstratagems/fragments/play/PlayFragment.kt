@@ -331,20 +331,6 @@ class PlayFragment : Fragment() {
         binding.playMode.setOnClickListener {
             setFreeInputMode(!isFreeInput)
         }
-        /*
-        binding.playFreeInputUp.setOnClickListener {
-            onInputting(1)
-        }
-        binding.playFreeInputDown.setOnClickListener {
-            onInputting(2)
-        }
-        binding.playFreeInputLeft.setOnClickListener {
-            onInputting(3)
-        }
-        binding.playFreeInputDown.setOnClickListener {
-            onInputting(4)
-        }
-        */
 
         // Setup gesture detector.
         // Override the detector.

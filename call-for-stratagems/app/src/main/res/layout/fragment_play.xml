@@ -38,7 +38,7 @@
         android:layout_marginBottom="4dp"
         android:contentDescription="@string/play_banner_desc"
         android:scaleType="fitCenter"
-        android:src="@drawable/hd2_banner"
+        android:src="@drawable/ic_hd2_banner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

@@ -108,7 +108,7 @@ impl StringToKey for String {
             "." => Key::Dot,
             "/" => Key::Slash,
             "insert" => Key::Insert,
-            "kp_enter" => Key::KpReturn,
+            //"kp_enter" => Key::KpReturn,
             "kp-" => Key::KpMinus,
             "kp+" => Key::KpPlus,
             "kp*" => Key::KpMultiply,
@@ -168,4 +168,15 @@ pub fn print<T: Display>(str: T) {
 
 pub fn println<T: Display>(str: T) {
     println!("{}", str)
+}
+
+pub fn compare_ver(ver_a: &str, ver_b: &str) -> bool {
+    let mut a_split = ver_a.split(".");
+    let mut b_split = ver_b.split(".");
+    if a_split.next() == b_split.next() {
+        if a_split.next() == b_split.next() {
+            return true
+        }
+    }
+    return false
 }

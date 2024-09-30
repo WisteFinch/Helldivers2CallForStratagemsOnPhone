@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:padding="8dp">
 
-            <ImageView
+            <com.caverock.androidsvg.SVGImageView
                 android:id="@+id/stratagem_edit_imageView"
                 android:layout_width="64dp"
                 android:layout_height="64dp"

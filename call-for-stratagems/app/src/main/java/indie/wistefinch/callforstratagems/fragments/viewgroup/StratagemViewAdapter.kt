@@ -2,14 +2,16 @@ package indie.wistefinch.callforstratagems.fragments.viewgroup
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import java.io.File
 
 /**
  * Adapter for the stratagem recycler view in [ViewGroupFragment]
@@ -33,7 +35,6 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_view, parent, false))
     }
 
-    @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
         val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
@@ -41,15 +42,19 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
             "zh-CN" -> dataList[pos].nameZh
             else -> dataList[pos].name
         }
-        // For compatibility with lower SDKs, ignore the discouraged warning.
-        val res = context.resources.getIdentifier(
-            dataList[pos].icon,
-            "drawable",
-            context.packageName
-        )
-        if (res != 0) {
-            holder.itemView.findViewById<ImageView>(R.id.stratagem_view_imageView).setImageResource(res)
+
+        // Set icon resources.
+        try {
+            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_view_imageView)
+                .setImageURI(
+                    Uri.fromFile(
+                        File(context.filesDir.path +
+                            context.resources.getString(R.string.icons_path) +
+                            dataList[pos].icon + ".svg")
+                    )
+                )
         }
+        catch (_: Exception) {}
     }
 
     override fun getItemCount(): Int {

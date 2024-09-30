@@ -160,7 +160,7 @@ class EditGroupFragment : Fragment() {
         val recyclerView = binding.editGroupRecyclerView
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(100)
-        val list = stratagemViewModel.allItems
+        val list = stratagemViewModel.getAllItems()
         adapter.setData(list, currentItem.list.toMutableSet())
     }
 

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="1dp">
 
-    <ImageView
+    <com.caverock.androidsvg.SVGImageView
         android:id="@+id/stratagem_thumbnail_imageView"
         android:layout_width="32dp"
         android:layout_height="32dp"

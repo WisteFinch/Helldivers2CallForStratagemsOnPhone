@@ -13,8 +13,8 @@ android {
         applicationId = "indie.wistefinch.callforstratagems"
         minSdk = 26
         targetSdk = 34
-        versionCode = 8
-        versionName = "0.3.4"
+        versionCode = 9
+        versionName = "0.4.0"
         // Remove unnecessary language to reduce size.
         resourceConfigurations += listOf("en", "zh", "ru", "fr", "es", "ar")
 
@@ -44,7 +44,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -58,6 +57,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.play.services.base)
     implementation(libs.play.services.code.scanner)
+    implementation(libs.androidsvg.aar)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -85,7 +85,6 @@
         <item>Scroll Lock</item>
         <item>Num Lock</item>
         <item>Pause</item>
-        <item>kp Enter</item>
         <item>kp -</item>
         <item>kp +</item>
         <item>kp *</item>
@@ -195,7 +194,6 @@
         <item>scroll_lock</item>
         <item>num_lock</item>
         <item>pause</item>
-        <item>kp_enter</item>
         <item>kp-</item>
         <item>kp+</item>
         <item>kp*</item>

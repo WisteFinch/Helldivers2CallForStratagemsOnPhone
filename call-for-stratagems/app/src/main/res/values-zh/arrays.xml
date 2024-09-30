@@ -85,7 +85,6 @@
         <item>Scroll Lock</item>
         <item>Num Lock</item>
         <item>Pause</item>
-        <item>小键盘 Enter</item>
         <item>小键盘 -</item>
         <item>小键盘 +</item>
         <item>小键盘 *</item>
@@ -193,24 +192,23 @@
         <item>page_up</item>
         <item>print_screen</item>
         <item>scroll_lock</item>
-        <item>数字_lock</item>
+        <item>num_lock</item>
         <item>pause</item>
-        <item>小键盘_enter</item>
-        <item>小键盘-</item>
-        <item>小键盘+</item>
-        <item>小键盘*</item>
-        <item>小键盘/</item>
-        <item>小键盘0</item>
-        <item>小键盘1</item>
-        <item>小键盘2</item>
-        <item>小键盘3</item>
-        <item>小键盘4</item>
-        <item>小键盘5</item>
-        <item>小键盘6</item>
-        <item>小键盘7</item>
-        <item>小键盘8</item>
-        <item>小键盘9</item>
-        <item>小键盘_delete</item>
+        <item>kp-</item>
+        <item>kp+</item>
+        <item>kp*</item>
+        <item>kp/</item>
+        <item>kp0</item>
+        <item>kp1</item>
+        <item>kp2</item>
+        <item>kp3</item>
+        <item>kp4</item>
+        <item>kp5</item>
+        <item>kp6</item>
+        <item>kp7</item>
+        <item>kp8</item>
+        <item>kp9</item>
+        <item>kp_delete</item>
         <item>mouse_left</item>
         <item>mouse_right</item>
         <item>mouse_middle</item>

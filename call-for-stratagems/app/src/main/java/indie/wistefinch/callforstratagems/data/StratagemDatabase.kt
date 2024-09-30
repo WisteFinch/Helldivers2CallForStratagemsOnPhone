@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import indie.wistefinch.callforstratagems.data.dao.StratagemDao
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import java.io.File
 
 /**
  * Stratagem database.
@@ -27,18 +28,31 @@ abstract class StratagemDatabase: RoomDatabase() {
         private var INSTANCE: StratagemDatabase? = null
 
         fun getDatabase(context: Context): StratagemDatabase {
-            context.deleteDatabase("stratagem_database")
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    StratagemDatabase::class.java,
-                    "stratagem_database"
-                )
-                    .allowMainThreadQueries()
-                    .createFromAsset("database/stratagem_db.db")
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
+                var instance: StratagemDatabase ?
+                try {
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        StratagemDatabase::class.java,
+                        "stratagem_database"
+                    )
+                        .allowMainThreadQueries()
+                        .createFromAsset("database/stratagem_db.db")
+                        .fallbackToDestructiveMigration()
+                        .build()
+                } catch (_: Exception) {
+                    context.deleteDatabase("stratagem_database")
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        StratagemDatabase::class.java,
+                        "stratagem_database"
+                    )
+                        .allowMainThreadQueries()
+                        .createFromAsset("database/stratagem_db.db")
+                        .fallbackToDestructiveMigration()
+                        .build()
+                }
+                INSTANCE = instance!!
                 instance
             }
         }
