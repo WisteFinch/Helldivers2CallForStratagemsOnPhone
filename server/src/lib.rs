@@ -20,7 +20,7 @@ i18n!("src/locales");
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
-const VERSION: &str = "0.3.4";
+const VERSION: &str = "0.4.0";
 const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
@@ -132,6 +132,9 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             ));
             return Ok(());
         }
+
+        // Debug.
+        // println!("{}", std::str::from_utf8(&buffer[..size]).unwrap());
 
         // Parsing json.
         let json: Value = match serde_json::from_str(std::str::from_utf8(&buffer[..size]).unwrap())

@@ -108,7 +108,7 @@ impl StringToKey for String {
             "." => Key::Dot,
             "/" => Key::Slash,
             "insert" => Key::Insert,
-            "kp_enter" => Key::KpReturn,
+            //"kp_enter" => Key::KpReturn,
             "kp-" => Key::KpMinus,
             "kp+" => Key::KpPlus,
             "kp*" => Key::KpMultiply,
