@@ -22,6 +22,17 @@
     <!-- Fragment View Group -->
     <string name="viewGroup_play_FAB">开始</string>
 
+    <!-- Fragment Play -->
+    <string name="play_banner_desc">横幅</string>
+    <string name="play_exit">退出</string>
+    <string name="play_mode">输入模式</string>
+    <string name="play_freeInput">自由输入</string>
+    <string name="play_upward">上</string>
+    <string name="play_downward">下</string>
+    <string name="play_backward">左</string>
+    <string name="play_forward">右</string>
+    <string name="play_network_status">连接状态</string>
+
     <!-- Preference Titles -->
     <string name="connection_header">连接</string>
     <string name="sync_header">同步</string>
@@ -97,17 +108,6 @@
     <string name="viewGroup_menu_edit_title">编辑</string>
     <string name="viewGroup_menu_delete_title">删除</string>
 
-    <!-- Fragment Play -->
-    <string name="play_banner_desc">横幅</string>
-    <string name="play_exit">退出</string>
-    <string name="play_mode">输入模式</string>
-    <string name="play_freeInput">自由输入</string>
-    <string name="play_upward">上</string>
-    <string name="play_downward">下</string>
-    <string name="play_backward">左</string>
-    <string name="play_forward">右</string>
-    <string name="play_network_status">连接状态</string>
-
     <!-- Network -->
     <string name="network_connecting">连接中…</string>
     <string name="network_retry">连接中… (重试 %1$d/%2$d)</string>
@@ -133,9 +133,9 @@
 
     <!-- Hints -->
     <string name="hint_db_incomplete">数据库不完整</string>
-    <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置-信息”更新数据库</string>
+    <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息”更新数据库</string>
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
-    <string name="hint_welcome_desc">本次更新重新设计了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置-信息”并更新数据库即可解决！</string>
+    <string name="hint_welcome_desc">本次更新重新设计了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置>信息”并更新数据库即可解决！</string>
 
 </resources>

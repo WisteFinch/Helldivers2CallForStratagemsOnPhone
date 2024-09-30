@@ -38,3 +38,7 @@ cargo run
 1. Android Studio is required.
 2. Import `./call-for-stratagems` to Android Studio.
 3. Click `Run` button to compile.
+
+### Links
+
+- Stratagem database [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)

@@ -38,3 +38,7 @@ cargo run
 1. 需要安装Android Studio。
 2. 将`./call-for-stratagems`导入Android Studio。
 3. 点击`Run`按钮开始编译。
+
+### 相关链接
+
+- 战略配备数据库 [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)
