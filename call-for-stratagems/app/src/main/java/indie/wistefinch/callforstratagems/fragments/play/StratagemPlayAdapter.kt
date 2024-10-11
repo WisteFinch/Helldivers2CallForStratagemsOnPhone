@@ -33,6 +33,8 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
      */
     private lateinit var context: Context
 
+    private lateinit var dbName: String
+
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -48,9 +50,8 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
                     Uri.fromFile(
                         File(context.filesDir.path +
                                 context.resources.getString(R.string.icons_path) +
-                                dataList[pos].icon + ".svg")
-                    )
-                )
+                                "$dbName/" +
+                                dataList[pos].icon + ".svg")))
         }
         catch (_: Exception) {}
         holder.itemView.findViewById<SVGImageView>(R.id.stratagem_play_button).setOnClickListener {
@@ -68,8 +69,9 @@ class StratagemPlayAdapter: RecyclerView.Adapter<StratagemPlayAdapter.ListViewHo
      * Because the data won't change, there is no need to compare the difference, ignore the warning.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<StratagemData>) {
+    fun setData(list: List<StratagemData>, name: String) {
         this.dataList = list
+        dbName = name
         notifyDataSetChanged()
     }
 }

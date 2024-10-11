@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -67,7 +68,8 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
                 list.add(stratagemViewModel.retrieveItem(i))
             }
         }
-        adapter.setData(list.toList())
+        val preference = context.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        adapter.setData(list.toList(), preference.getString("db_name", context.resources.getString(R.string.db_hd2_name))!!)
         holder.itemView.findViewById<RecyclerView>(R.id.group_recyclerView).suppressLayout(true)
     }
 

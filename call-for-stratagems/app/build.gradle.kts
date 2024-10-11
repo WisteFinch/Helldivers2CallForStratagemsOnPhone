@@ -13,12 +13,14 @@ android {
         applicationId = "indie.wistefinch.callforstratagems"
         minSdk = 26
         targetSdk = 34
-        versionCode = 9
-        versionName = "0.4.0"
+        versionCode = 10
+        versionName = "0.4.1"
         // Remove unnecessary language to reduce size.
         resourceConfigurations += listOf("en", "zh", "ru", "fr", "es", "ar")
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 
     buildTypes {
@@ -30,16 +32,20 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
         viewBinding = true
     }
+
     buildToolsVersion = "34.0.0"
 }
 

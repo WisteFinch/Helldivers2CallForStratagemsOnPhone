@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.viewgroup
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,12 +9,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.CFSApplication
@@ -61,6 +64,8 @@ class ViewGroupFragment : Fragment() {
      */
     private lateinit var currentItem: GroupData
 
+    private lateinit var preferences: SharedPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,6 +83,24 @@ class ViewGroupFragment : Fragment() {
         binding.viewGroupPlayFAB.setOnClickListener {
             val bundle = bundleOf(Pair("currentItem", currentItem))
             findNavController().navigate(R.id.action_viewGroupFragment_to_playFragment, bundle)
+        }
+
+        // Check database name.
+        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        val dbName = preferences.getString("db_name", getString(R.string.db_hd2_name))
+        if (currentItem.dbName != "0" && currentItem.dbName != dbName) {
+            val dialog = AlertDialog.Builder(requireContext())
+                .setTitle(R.string.hint_group_db_not_match)
+                .setMessage(String.format(
+                    getString(R.string.hint_group_db_not_match_desc),
+                    currentItem.dbName,
+                    dbName
+                ))
+                .setIcon(R.drawable.ic_info)
+                .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+
+                }.create()
+            dialog.show()
         }
 
         setupRecyclerView()
@@ -126,7 +149,8 @@ class ViewGroupFragment : Fragment() {
                 list.add(stratagemViewModel.retrieveItem(i))
             }
         }
-        adapter.setData(list.toList())
+        val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        adapter.setData(list.toList(), preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
         binding.viewGroupRecyclerView.suppressLayout(true)
     }
 

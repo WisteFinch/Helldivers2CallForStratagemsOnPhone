@@ -79,19 +79,25 @@
 
     <!-- Info Preferences -->
     <string name="info_db_version">数据库版本</string>
+    <string name="info_db_version_desc">[%1$s] %2$s</string>
+    <string name="info_db_version_latest">[%1$s] %2$s (最新)</string>
     <string name="info_db_version_empty">空</string>
     <string name="info_db_version_incomplete">不完整</string>
+    <string name="info_db_version_check">数据库版本（检查更新）</string>
     <string name="info_db_version_updatable">数据库版本（可更新）</string>
-    <string name="info_db_version_updatable_desc">%1$s ➡ %2$s</string>
+    <string name="info_db_version_updatable_desc">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
     <string name="info_db_version_updating">数据库版本（正在更新）</string>
     <string name="info_db_version_updating_index_desc">下载索引…</string>
-    <string name="info_db_version_updating_db_desc">下载数据库…</string>
-    <string name="info_db_version_updating_icons_desc">下载图标… (%1$d/%2$d)</string>
-    <string name="info_db_version_update_complete_desc">更新完成，请重启程序</string>
+    <string name="info_db_version_updating_db_desc">[%1$s] 下载数据库…</string>
+    <string name="info_db_version_updating_icons_desc">[%1$s] 下载图标… (%2$d/%3$d)</string>
+    <string name="info_db_version_update_complete_desc">[%1$s] 更新完成，请重启程序</string>
     <string name="info_db_version_update_failed_desc">更新失败，请重试</string>
-    <string name="info_db_version_latest">已是最新版本</string>
+    <string name="info_db_version_update_latest">[%1$s] 已是最新版本</string>
     <string name="info_app_version">软件版本</string>
+    <string name="info_app_version_check">软件版本（检查更新）</string>
     <string name="info_app_version_updatable">软件版本（可更新）</string>
+    <string name="info_app_version_desc">%1$s</string>
+    <string name="info_app_version_latest">%1$s (最新)</string>
     <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
     <string name="info_app_update_log">新版本：v%1$s</string>
     <string name="info_about">关于</string>
@@ -100,6 +106,15 @@
     <string name="info_about_usage">用法</string>
     <string name="info_about_license">许可证</string>
     <string name="info_about_repo">项目仓库</string>
+
+    <!-- Update Channel Layout -->
+    <string name="info_db_update_title">选择数据库渠道</string>
+    <string name="info_db_update_channel_hd2">绝地潜兵2</string>
+    <string name="info_db_update_channel_hd">绝地潜兵1</string>
+    <string name="info_db_update_channel_custom">自定义</string>
+    <string name="info_db_update_channel_custom_url">自定义数据库索引地址</string>
+    <string name="info_db_update_clear">清除缓存</string>
+    <string name="info_db_update_clear_desc">清除缓存的战备数据库和图标文件</string>
 
     <!-- Edit Group Menu -->
     <string name="editGroup_menu_save_title">保存</string>
@@ -130,6 +145,10 @@
     <string name="dialog_download">前往下载</string>
     <string name="dialog_ignore">忽略</string>
     <string name="dialog_no_ask">不再询问</string>
+    <string name="dialog_help">帮助</string>
+
+    <!-- Toast -->
+    <string name="toast_complete">完成</string>
 
     <!-- Hints -->
     <string name="hint_db_incomplete">数据库不完整</string>
@@ -137,5 +156,7 @@
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
     <string name="hint_welcome_desc">本次更新重新设计了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置>信息”并更新数据库即可解决！</string>
+    <string name="hint_group_db_not_match">数据库不相符</string>
+    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。</string>
 
 </resources>

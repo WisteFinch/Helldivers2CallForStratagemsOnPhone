@@ -41,4 +41,5 @@ cargo run
 
 ### Links
 
-- Stratagem database [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)
+- Helldivers2 Stratagem Database [HD2CFS-Database](https://github.com/WisteFinch/HD2CFS-Database)
+- Helldivers Stratagem Database [HD2CFS-Database_HD](https://github.com/WisteFinch/HD2CFS-Database_HD)

@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.editgroup
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
@@ -65,6 +67,8 @@ class EditGroupFragment : Fragment() {
      */
     private var isEdit: Boolean = false
 
+    private lateinit var preferences: SharedPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,6 +76,8 @@ class EditGroupFragment : Fragment() {
         // Inflate the layout for this fragment.
         _binding = FragmentEditGroupBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
 
         // Setup view with arguments.
         isEdit = arguments?.getBoolean("isEdit")!!
@@ -85,7 +91,8 @@ class EditGroupFragment : Fragment() {
             currentItem = GroupData(
                 0,
                 "",
-                listOf(1, 2, 3) // The default stratagems: Reinforce, SOS and Resupply.
+                listOf(1, 2, 3), // The default stratagems: Reinforce, SOS and Resupply.,
+                preferences.getString("db_name", getString(R.string.db_hd2_name))!!
             )
         }
 
@@ -134,7 +141,8 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList()
+            adapter.enabledStratagem.sorted().toList(),
+            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }
 
@@ -149,7 +157,8 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList()
+            adapter.enabledStratagem.sorted().toList(),
+            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }
 
@@ -161,7 +170,10 @@ class EditGroupFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(100)
         val list = stratagemViewModel.getAllItems()
-        adapter.setData(list, currentItem.list.toMutableSet())
+        val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        adapter.setData(list,
+            currentItem.list.toMutableSet(),
+            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
     }
 
     companion object {

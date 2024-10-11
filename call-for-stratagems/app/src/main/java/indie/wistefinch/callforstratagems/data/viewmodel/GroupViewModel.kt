@@ -22,9 +22,10 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
     fun updateItem(
         id: Int,
         title: String,
-        list: List<Int>
+        list: List<Int>,
+        dbName: String
     ) {
-        val updatedItem = getUpdatedItemEntry(id, title, list)
+        val updatedItem = getUpdatedItemEntry(id, title, list, dbName)
         updateItem(updatedItem)
     }
 
@@ -36,9 +37,10 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
 
     fun addItem(
         title: String,
-        list: List<Int>
+        list: List<Int>,
+        dbName: String
     ) {
-        val newItem = getNewItemEntry(title, list)
+        val newItem = getNewItemEntry(title, list, dbName)
         insertItem(newItem)
     }
 
@@ -56,23 +58,27 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
 
     private fun getNewItemEntry(
         title: String,
-        list: List<Int>
+        list: List<Int>,
+        dbName: String
     ): GroupData {
         return GroupData(
             title = title,
-            list = list
+            list = list,
+            dbName = dbName
         )
     }
 
     private fun getUpdatedItemEntry(
         id: Int,
         title: String,
-        list: List<Int>
+        list: List<Int>,
+        dbName: String
     ): GroupData {
         return GroupData(
             id = id,
             title = title,
-            list = list
+            list = list,
+            dbName = dbName
         )
     }
 }

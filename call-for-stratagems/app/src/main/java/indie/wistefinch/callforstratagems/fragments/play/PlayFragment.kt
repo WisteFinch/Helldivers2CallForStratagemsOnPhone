@@ -272,6 +272,7 @@ class PlayFragment : Fragment() {
      * Setup stratagem recycler view in this fragment.
      */
     private fun setupRecyclerView() {
+        val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         if (enableSimplifiedMode) {
             // Setup simplified stratagem recycler view.
             val stratagemView = binding.playSimplifiedRecyclerView
@@ -284,7 +285,8 @@ class PlayFragment : Fragment() {
                     list.add(stratagemViewModel.retrieveItem(i))
                 }
             }
-            stratagemSimplifiedAdapter.setData(list.toList())
+            stratagemSimplifiedAdapter.setData(list.toList(),
+                preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
             // Setup click listener.
             stratagemSimplifiedAdapter.onItemClick = { data ->
                 // Activate stratagem
@@ -305,7 +307,8 @@ class PlayFragment : Fragment() {
                     list.add(stratagemViewModel.retrieveItem(i))
                 }
             }
-            stratagemAdapter.setData(list.toList())
+            stratagemAdapter.setData(list.toList(),
+                preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
             // Setup click listener.
             stratagemAdapter.onItemClick = { data ->
                 onStratagemClicked(data)

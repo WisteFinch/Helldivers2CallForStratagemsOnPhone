@@ -5,8 +5,13 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
@@ -42,8 +47,9 @@ import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONArray
+import java.io.File
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
@@ -87,8 +93,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var infoAppVersion: Preference
     private lateinit var infoAbout: Preference
 
+    // Environment
     private lateinit var sid: String
     private lateinit var dbVer: String
+    private lateinit var dbName: String
 
     private lateinit var preferences: SharedPreferences
 
@@ -120,6 +128,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         sid = preferences.getString("sid", "0")!!
         dbVer = preferences.getString("db_version", "0")!!
+        dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
 
         setupFormat()
         setupEventListener()
@@ -436,27 +445,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
         // Check database update.
         // Launch coroutine
         lifecycleScope.launch {
-            try {
-                val json = JSONObject(Util.downloadToStr(resources.getString(R.string.db_index_url)))
-                val newVer = json.getString("date")
-                withContext(Dispatchers.Main) {
-                    if (dbVer != newVer) {
-                        infoDbVersion.summary =
-                            String.format(resources.getString(R.string.info_db_version_updatable_desc),
-                                infoDbVersion.summary,
-                                newVer
-                            )
-                        infoDbVersion.title =
-                            resources.getString(R.string.info_db_version_updatable)
-                    }
-                }
-            }
-            catch (_: Exception) {}
+            checkDBUpdate()
         }
 
         // Check app update.
         // Launch coroutine
         lifecycleScope.launch {
+            infoAppVersion.title = resources.getString(R.string.info_app_version_check)
             try {
                 val json = JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
                 val newVer = json.getString("tag_name").substring(1)
@@ -466,12 +461,11 @@ class SettingsFragment: PreferenceFragmentCompat() {
                     val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
                     val curVer = pkgInfo.versionName
                     if (curVer != newVer) {
-                        // For compatibility with lower SDKs, ignore the discouraged warning.
-                        @Suppress("DEPRECATION")
                         infoAppVersion.summary = String.format(
                             resources.getString(R.string.info_app_version_updatable_desc),
-                            pkgInfo.versionName + "(" + pkgInfo.versionCode + ")",
-                            newVer)
+                            pkgInfo.versionName,
+                            newVer
+                        )
                         infoAppVersion.title = resources.getString(R.string.info_app_version_updatable)
                         // Open Update log.
                         infoAppVersion.setOnPreferenceClickListener {
@@ -494,100 +488,201 @@ class SettingsFragment: PreferenceFragmentCompat() {
                             true
                         }
                     }
+                    else {
+                        infoAppVersion.title = resources.getString(R.string.info_app_version)
+                    }
                 }
             }
-            catch (_: Exception) {}
+            catch (_: Exception) {
+                infoAppVersion.title = resources.getString(R.string.info_app_version)
+            }
         }
 
-        // Update database.
+        // Show update database dialog.
         infoDbVersion.setOnPreferenceClickListener {
-            lifecycleScope.launch {
-                infoDbVersion.isEnabled = false
-                withContext(Dispatchers.Main) {
-                    infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
-                    infoDbVersion.summary = resources.getString(R.string.info_db_version_updating_index_desc)
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val view: View = View.inflate(requireContext(), R.layout.layout_db_update_channel, null)
+            dialog.setView(view)
+            dialog.show()
+
+            val radioGroup = view.findViewById<RadioGroup>(R.id.db_update_group)
+            val confirm = view.findViewById<Button>(R.id.db_update_confirm)
+            val cancel = view.findViewById<Button>(R.id.db_update_cancel)
+            val clear = view.findViewById<Button>(R.id.db_update_clear)
+            val custom = view.findViewById<EditText>(R.id.db_update_custom_input)
+            var channel = preferences.getInt("db_update_channel", R.id.db_update_hd2)
+
+            radioGroup.check(channel)
+            custom.setText(preferences.getString("db_update_channel_custom", ""))
+            custom.isEnabled = preferences.getInt("db_update_channel", R.id.db_update_hd2) == R.id.db_update_custom
+
+            radioGroup.setOnCheckedChangeListener { _, checkedId ->
+                channel = checkedId
+                custom.isEnabled = checkedId == R.id.db_update_custom
+            }
+
+            // Set custom url.
+            custom.addTextChangedListener {
+                preferences.edit().putString("db_update_channel_custom", custom.text.toString()).apply()
+            }
+
+            // Clear cache.
+            clear.setOnClickListener {
+                val clearDialog = AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.info_db_update_clear)
+                    .setMessage(R.string.info_db_update_clear_desc)
+                    .setIcon(R.drawable.ic_info)
+                    .setPositiveButton(R.string.dialog_confirm) { _, _ ->
+                        val path = context?.filesDir?.path + "/icons"
+                        File(path).deleteRecursively()
+                        preferences.edit().putString("db_version", "0").apply()
+                        preferences.edit().putString("db_name", getString(R.string.default_string)).apply()
+                        preferences.edit().putInt("db_update_channel", R.id.db_update_hd2).apply()
+                        channel = R.id.db_update_hd2
+                        radioGroup.check(R.id.db_update_hd2)
+                        stratagemViewModel.deleteAll()
+
+                        Toast.makeText(context, getString(R.string.toast_complete), Toast.LENGTH_SHORT).show()
+
+                        lifecycleScope.launch {
+                            checkDBUpdate()
+                        }
+                    }.setNegativeButton(R.string.dialog_cancel) { _, _ ->
+
+                    }.create()
+                clearDialog.show()
+            }
+
+            // Cancel update.
+            cancel.setOnClickListener {
+                dialog.hide()
+            }
+
+            // Update database.
+            confirm.setOnClickListener {
+                dialog.hide()
+                preferences.edit().putInt("db_update_channel", channel).apply()
+                dbVer = preferences.getString("db_version", "0")!!
+                dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+
+                preferences.edit().putString("db_name", resources.getString(R.string.default_string)).apply()
+
+                var url: String = when (preferences.getInt("db_update_channel", R.id.db_update_hd2)) {
+                    R.id.db_update_hd2 -> getString(R.string.db_hd2_url)
+                    R.id.db_update_hd -> getString(R.string.db_hd_url)
+                    R.id.db_update_custom -> preferences.getString("db_update_channel_custom", "")!!
+                    else -> getString(R.string.db_hd2_url)
+                }
+                if (url.isEmpty()) {
+                    url = getString(R.string.default_string)
+                }
+                else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+                    url = "$url/"
                 }
 
-                try {
-                    val iconsPath = context?.filesDir?.path + "/icons/"
-                    preferences.edit().putString("db_version", "1").apply()
-
-                    // Download index.
-                    val indexObj = JSONObject(Util.downloadToStr(resources.getString(R.string.db_index_url)))
-                    val date = indexObj.getString("date")
-                    val dbUrl = resources.getString(R.string.db_index_url) + indexObj.getString("db_path")
-                    val iconsUrl = resources.getString(R.string.db_index_url) + indexObj.getString("icons_path")
-                    val iconsList: MutableList<String> = emptyList<String>().toMutableList()
-                    if (date == dbVer) {
-                        // Database is latest, no need to update.
-                        withContext(Dispatchers.Main) {
-                            infoDbVersion.summary = resources.getString(R.string.info_db_version_latest)
-                            infoDbVersion.title = resources.getString(R.string.info_db_version)
-                        }
-                        preferences.edit().putString("db_version", date).apply()
-                        return@launch
-                    }
-
-                    // Download database.
+                // Download database.
+                lifecycleScope.launch {
+                    infoDbVersion.isEnabled = false
                     withContext(Dispatchers.Main) {
-                        infoDbVersion.summary = resources.getString(R.string.info_db_version_updating_db_desc)
                         infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
-                    }
-                    val dbObj = JSONObject(Util.downloadToStr(dbUrl))
-                    // Regenerate database.
-                    stratagemViewModel.deleteAll()
-                    val rows = dbObj.getJSONArray("objects")
-                        .getJSONObject(0)
-                        .getJSONArray("rows")
-                    for (i in 0 until rows.length()) {
-                        val row = rows.getJSONArray(i)
-                        val stepsArray = JSONArray(row.getString(4))
-                        val steps: MutableList<Int> = emptyList<Int>().toMutableList()
-                        for (j in 0 until stepsArray.length()) {
-                            steps.add(stepsArray.getInt(j))
-                        }
-                        val item = StratagemData(
-                            row.getInt(0),
-                            row.getString(1),
-                            row.getString(2),
-                            row.getString(3),
-                            steps
-                        )
-                        iconsList.add(row.getString(3))
-                        stratagemViewModel.insertItem(item)
+                        infoDbVersion.summary = resources.getString(R.string.info_db_version_updating_index_desc)
                     }
 
-                    // Download icons.
-                    for (i in 0 until iconsList.size) {
+                    try {
+                        preferences.edit().putString("db_version", "1").apply()
+
+                        // Download index.
+                        val indexObj = JSONObject(Util.downloadToStr(url))
+                        val date = indexObj.getString("date")
+                        val dbUrl = url + indexObj.getString("db_path")
+                        val iconsUrl = url + indexObj.getString("icons_path")
+                        val iconsList: MutableList<String> = emptyList<String>().toMutableList()
+                        val name = indexObj.getString("name")
+                        val iconsPath = context?.filesDir?.path + "/icons/$name/"
+                        if (date == dbVer && name == dbName) {
+                            // Database is latest, no need to update.
+                            withContext(Dispatchers.Main) {
+                                infoDbVersion.summary = String.format(
+                                    resources.getString(R.string.info_db_version_update_latest),
+                                    name
+                                )
+                                infoDbVersion.title = resources.getString(R.string.info_db_version)
+                            }
+                            preferences.edit().putString("db_version", date).apply()
+                            return@launch
+                        }
+                        preferences.edit().putString("db_name", name).apply()
+
+                        // Download database.
                         withContext(Dispatchers.Main) {
                             infoDbVersion.summary = String.format(
-                                resources.getString(R.string.info_db_version_updating_icons_desc),
-                                i,
-                                iconsList.size
+                                resources.getString(R.string.info_db_version_updating_db_desc),
+                                name
                             )
                             infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
                         }
-                        Util.download(iconsUrl + iconsList[i] + ".svg",
-                            iconsPath + iconsList[i] + ".svg",
-                            false
-                        )
-                    }
+                        val dbObj = JSONObject(Util.downloadToStr(dbUrl))
+                        // Regenerate database.
+                        stratagemViewModel.deleteAll()
+                        val rows = dbObj.getJSONArray("objects")
+                            .getJSONObject(0)
+                            .getJSONArray("rows")
+                        for (i in 0 until rows.length()) {
+                            val row = rows.getJSONArray(i)
+                            val stepsArray = JSONArray(row.getString(4))
+                            val steps: MutableList<Int> = emptyList<Int>().toMutableList()
+                            for (j in 0 until stepsArray.length()) {
+                                steps.add(stepsArray.getInt(j))
+                            }
+                            val item = StratagemData(
+                                row.getInt(0),
+                                row.getString(1),
+                                row.getString(2),
+                                row.getString(3),
+                                steps
+                            )
+                            iconsList.add(row.getString(3))
+                            stratagemViewModel.insertItem(item)
+                        }
 
-                    preferences.edit().putString("db_version", date).apply()
-                    withContext(Dispatchers.Main) {
-                        infoDbVersion.summary = resources.getString(R.string.info_db_version_update_complete_desc)
+                        // Download icons.
+                        for (i in 0 until iconsList.size) {
+                            withContext(Dispatchers.Main) {
+                                infoDbVersion.summary = String.format(
+                                    resources.getString(R.string.info_db_version_updating_icons_desc),
+                                    name,
+                                    i,
+                                    iconsList.size
+                                )
+                                infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
+                            }
+                            Util.download(iconsUrl + iconsList[i] + ".svg",
+                                iconsPath + iconsList[i] + ".svg",
+                                false
+                            )
+                        }
+
+                        preferences.edit().putString("db_version", date).apply()
+                        withContext(Dispatchers.Main) {
+                            infoDbVersion.summary = String.format(
+                                resources.getString(R.string.info_db_version_update_complete_desc),
+                                name
+                            )
+                        }
+                    } catch (_: Exception) {
+                        withContext(Dispatchers.Main) {
+                            infoDbVersion.summary = resources.getString(R.string.info_db_version_update_failed_desc)
+                            infoDbVersion.isEnabled = true
+                        }
+                        preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
-                } catch (_: Exception) {
                     withContext(Dispatchers.Main) {
-                        infoDbVersion.summary = resources.getString(R.string.info_db_version_update_failed_desc)
-                        infoDbVersion.isEnabled = true
+                        infoDbVersion.title = resources.getString(R.string.info_db_version)
                     }
-                    preferences.edit().putBoolean("hint_db_incomplete", false).apply()
-                }
-                withContext(Dispatchers.Main) {
-                    infoDbVersion.title = resources.getString(R.string.info_db_version)
                 }
             }
+
             true
         }
     }
@@ -597,23 +692,76 @@ class SettingsFragment: PreferenceFragmentCompat() {
      */
     private fun setupContent() {
         // Set database version
-        when (dbVer) {
-            "0" -> infoDbVersion.summary = resources.getString(R.string.info_db_version_empty)
-            "1" -> infoDbVersion.summary = resources.getString(R.string.info_db_version_incomplete)
-            else -> infoDbVersion.summary = dbVer
-        }
+        infoDbVersion.summary = String.format(
+            resources.getString(R.string.info_db_version_desc),
+            dbName,
+            when (dbVer) {
+                "0" -> resources.getString(R.string.info_db_version_empty)
+                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                else -> dbVer
+            }
+        )
 
         // Set app version.
         val pkgName = context?.packageName!!
         val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-        // For compatibility with lower SDKs, ignore the discouraged warning.
-        @Suppress("DEPRECATION")
-        infoAppVersion.summary = pkgInfo.versionName + "(" + pkgInfo.versionCode + ")"
+        infoAppVersion.summary = String.format(
+            getString(R.string.info_app_version_desc),
+            pkgInfo.versionName
+        )
     }
 
     override fun onDestroy() {
         client.disconnect()
         super.onDestroy()
+    }
+
+    /**
+     * Check if the database is updatable.
+     */
+    private suspend fun checkDBUpdate() {
+        infoDbVersion.title = resources.getString(R.string.info_db_version_check)
+        try {
+            var url: String = when (preferences.getInt("db_update_channel", R.id.db_update_hd2)) {
+                R.id.db_update_hd2 -> getString(R.string.db_hd2_url)
+                R.id.db_update_hd -> getString(R.string.db_hd_url)
+                R.id.db_update_custom -> preferences.getString("db_update_channel_custom", "")!!
+                else -> getString(R.string.db_hd2_url)
+            }
+            if (url.isEmpty()) {
+                url = getString(R.string.default_string)
+            }
+            else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+                url = "$url/"
+            }
+
+            val json = JSONObject(Util.downloadToStr(url))
+            val newVer = json.getString("date")
+            dbVer = preferences.getString("db_version", "0")!!
+            withContext(Dispatchers.Main) {
+                if (dbVer != newVer) {
+                    infoDbVersion.summary =
+                        String.format(resources.getString(R.string.info_db_version_updatable_desc),
+                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            when (dbVer) {
+                                "0" -> resources.getString(R.string.info_db_version_empty)
+                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                else -> dbVer
+                            },
+                            json.getString("name"),
+                            newVer
+                        )
+                    infoDbVersion.title =
+                        resources.getString(R.string.info_db_version_updatable)
+                }
+                else {
+                    infoDbVersion.title = resources.getString(R.string.info_db_version)
+                }
+            }
+        }
+        catch (_: Exception) {
+            infoDbVersion.title = resources.getString(R.string.info_db_version)
+        }
     }
 
 }

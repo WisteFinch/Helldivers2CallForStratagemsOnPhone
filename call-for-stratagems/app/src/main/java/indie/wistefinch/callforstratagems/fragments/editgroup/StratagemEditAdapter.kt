@@ -34,6 +34,8 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      */
     lateinit var enabledStratagem: MutableSet<Int>
 
+    private lateinit var dbName: String
+
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -56,9 +58,8 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
                     Uri.fromFile(
                         File(context.filesDir.path +
                                 context.resources.getString(R.string.icons_path) +
-                                dataList[pos].icon + ".svg")
-                    )
-                )
+                                "$dbName/" +
+                                dataList[pos].icon + ".svg")))
         }
         catch (_: Exception) {}
 
@@ -102,9 +103,10 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      * ignore the warning.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<StratagemData>, set: MutableSet<Int>) {
+    fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String) {
         this.enabledStratagem = set
         this.dataList = list
+        dbName = name
         notifyDataSetChanged()
     }
 }

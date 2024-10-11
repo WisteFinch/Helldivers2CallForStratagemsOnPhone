@@ -12,6 +12,7 @@
         <item name="alertDialogTheme">@style/AppAlertDialog</item>
         <item name="cardViewStyle">@style/AppCardView</item>
         <item name="floatingActionButtonStyle">@style/AppFAB</item>
+        <item name="fontFamily">@font/hc_sinclair_medium</item>
     </style>
 
     <style name="Theme.CallForStratagems" parent="Base.Theme.CallForStratagems" />
