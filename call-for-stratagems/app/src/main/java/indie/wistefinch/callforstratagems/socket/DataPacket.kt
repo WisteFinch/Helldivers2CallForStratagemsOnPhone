@@ -1,9 +1,12 @@
 package indie.wistefinch.callforstratagems.socket
 
+import androidx.annotation.Keep
+
 
 /**
  * Request server status.
  */
+@Keep
 data class RequestStatusPacket (
     var ver: String,
     var opt: Int = 0,
@@ -12,6 +15,7 @@ data class RequestStatusPacket (
 /**
  * Receive server status data.
  */
+@Keep
 data class ReceiveStatusData (
     var status: Int,
     var ver: String,
@@ -20,6 +24,7 @@ data class ReceiveStatusData (
 /**
  * Stratagem macro data.
  */
+@Keep
 data class StratagemMacroData (
     var name: String,
     var steps: List<Int>,
@@ -28,6 +33,7 @@ data class StratagemMacroData (
 /**
  * Activate stratagem macro.
  */
+@Keep
 data class StratagemMacroPacket (
     var macro: StratagemMacroData,
     var token: String,
@@ -37,6 +43,7 @@ data class StratagemMacroPacket (
 /**
  * Stratagem input data.
  */
+@Keep
 data class StratagemInputData (
     var step: Int,
     var type: Int,
@@ -45,6 +52,7 @@ data class StratagemInputData (
 /**
  * Activate stratagem input.
  */
+@Keep
 data class StratagemInputPacket (
     var input: StratagemInputData,
     var token: String,
@@ -54,6 +62,7 @@ data class StratagemInputPacket (
 /**
  * Server configuration data.
  */
+@Keep
 data class ServerConfigData (
     var port: Int,
     var delay: Int,
@@ -67,6 +76,7 @@ data class ServerConfigData (
 /**
  * Synchronize server configuration.
  */
+@Keep
 data class SyncConfigPacket (
     var config: ServerConfigData,
     var token: String,
@@ -76,6 +86,7 @@ data class SyncConfigPacket (
 /**
  * Request authentication.
  */
+@Keep
 data class RequestAuthPacket (
     var sid: String,
     var opt: Int = 5,
@@ -84,6 +95,7 @@ data class RequestAuthPacket (
 /**
  * Receive authentication token.
  */
+@Keep
 data class ReceiveAuthData (
     var auth: Boolean,
     var token: String,
@@ -92,6 +104,7 @@ data class ReceiveAuthData (
 /**
  * Address data.
  */
+@Keep
 data class AddressData (
     var add: String,
     var port: Int,

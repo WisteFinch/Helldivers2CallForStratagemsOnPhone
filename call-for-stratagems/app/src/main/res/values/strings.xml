@@ -54,13 +54,9 @@
     <string name="tcp_retry_title">Retry Times</string>
     <string name="tcp_scan">Scan QR Code</string>
     <string name="tcp_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
-    <string name="tcp_scan_unavailable">Unavailable, click to download dependencies</string>
-    <string name="tcp_scan_no_gms">Unavailable, GMS required</string>
-    <string name="tcp_scan_downloading">Downloading… </string>
-    <string name="tcp_scan_download_failed">Download failed, please try again later</string>
-    <string name="tcp_scan_download_complete">Download complete, please restart the app</string>
-    <string name="tcp_scan_success">Scan successful</string>
-    <string name="tcp_scan_failed">Scan failed</string>
+    <string name="tcp_scan_success">Scan Successful</string>
+    <string name="tcp_scan_failed">Scan Failed</string>
+    <string name="tcp_scan_canceled">Scan Canceled</string>
     <string name="tcp_test_title">Test Connection</string>
     <string name="tcp_test_default">Test the connection to the PC server</string>
     <string name="tcp_test_connecting">Connecting…</string>
@@ -89,7 +85,7 @@
     <!-- Info Preferences -->
     <string name="info_db_version">Database Version</string>
     <string name="info_db_version_desc">[%1$s] %2$s</string>
-    <string name="info_db_version_latest">[%1$s] %2$s (最新)</string>
+    <string name="info_db_version_latest">[%1$s] %2$s (latest)</string>
     <string name="info_db_version_empty">Empty</string>
     <string name="info_db_version_incomplete">Incomplete</string>
     <string name="info_db_version_check">Database Version (Checking)</string>
@@ -111,7 +107,7 @@
     <string name="info_app_update_log">New Version: v%1$s</string>
     <string name="info_about">About</string>
     <string name="info_about_title">CallForStratagems v%1$s</string>
-    <string name="info_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by FloatingLight233 &amp; WisteFinch\n\nLicensed under MIT</string>
+    <string name="info_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
     <string name="info_about_usage">Usage</string>
     <string name="info_about_license">License</string>
     <string name="info_about_repo">Project Repo</string>
@@ -142,7 +138,6 @@
     <string name="network_response_error">Server response error, please check whether the server is running properly</string>
     <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
     <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
-    <string name="network_status_2">Client not authenticated</string>
     <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
     <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
 
@@ -155,7 +150,6 @@
     <string name="dialog_download">Download</string>
     <string name="dialog_ignore">Ignore</string>
     <string name="dialog_no_ask">Don\'t ask again</string>
-    <string name="dialog_help">Help</string>
 
     <!-- Toast -->
     <string name="toast_complete">Complete</string>
@@ -165,7 +159,7 @@
     <string name="hint_db_incomplete_desc">The database is incomplete, please go to \"Settings>Info\" to update the database</string>
     <string name="hint_welcome">Welcome to v%1$s</string>
     <string name="hint_welcome_usage">Usage</string>
-    <string name="hint_welcome_desc">This update has redesigned the stratagem database. If you see any abnormal situations such as errors or missing stratagem (icon) after the update, simply go to \"Settings>Info\" and update the database, then the problems will be solved!</string>
+    <string name="hint_welcome_desc">This update has improved the stratagem database. If you see any abnormal situations such as errors or missing stratagem (icon) after the update, simply go to \"Settings>Info\" and update the database, then the problems will be solved!</string>
     <string name="hint_group_db_not_match">Database not match</string>
     <string name="hint_group_db_not_match_desc">This group was created under database [%1$s], but it is currently in database [%2$s]. Continuing to use it may result in errors.</string>
     

@@ -18,6 +18,7 @@ gson = "2.11.0"
 playServicesCodeScanner = "16.0.0"
 playServicesBase = "18.2.0"
 androidsvgAar = "1.4"
+zxingLite = "3.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.10.1" }
@@ -39,6 +40,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 androidsvg-aar = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvgAar" }
+zxing-lite = { group = "com.github.jenly1314", name = "zxing-lite", version.ref = "zxingLite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

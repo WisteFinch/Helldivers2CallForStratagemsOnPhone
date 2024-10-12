@@ -1,5 +1,7 @@
 package indie.wistefinch.callforstratagems.fragments.settings
 
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -10,7 +12,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,37 +23,30 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.google.android.gms.common.moduleinstall.InstallStatusListener
-import com.google.android.gms.common.moduleinstall.ModuleInstall
-import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_CANCELED
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_COMPLETED
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_FAILED
 import com.google.gson.Gson
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.king.camera.scan.CameraScan
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.Util
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
+import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.socket.AddressData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.Client
 import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
 import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
+import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
 import indie.wistefinch.callforstratagems.socket.ServerConfigData
 import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
+
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
@@ -99,6 +96,30 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var dbName: String
 
     private lateinit var preferences: SharedPreferences
+
+    // Activity launcher.
+    private val requestQRScanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        when (result.resultCode) {
+            RESULT_OK -> {
+                val data = result.data?.getStringExtra(CameraScan.SCAN_RESULT)
+                try {
+                    val add = Gson().fromJson(data, AddressData::class.java)
+                    tcpAddress.text = add.add
+                    tcpPort.text = add.port.toString()
+                    Toast.makeText(requireContext(), getString(R.string.tcp_scan_success), Toast.LENGTH_SHORT).show()
+                }
+                catch (_: Exception) {
+                    Toast.makeText(requireContext(), getString(R.string.tcp_scan_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            RESULT_CANCELED -> {
+                Toast.makeText(requireContext(), getString(R.string.tcp_scan_canceled), Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(requireContext(), getString(R.string.tcp_scan_failed), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -162,91 +183,12 @@ class SettingsFragment: PreferenceFragmentCompat() {
      */
     private fun setupEventListener() {
         // Scan QR Code.
-        // Check dependency.
-        val moduleInstallClient = context?.let { ModuleInstall.getClient(it) }
-        val optionalModuleApi = context?.let { GmsBarcodeScanning.getClient(it) }
-        moduleInstallClient
-            ?.areModulesAvailable(optionalModuleApi)
-            ?.addOnSuccessListener { it ->
-                if (it.areModulesAvailable()) {
-                    tcpScanner.summary = getString(R.string.tcp_scan_desc)
-                    // Dependency available.
-                    tcpScanner.setOnPreferenceClickListener {
-                        val options = GmsBarcodeScannerOptions.Builder()
-                            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                            .build()
-                        val scanner = context?.let { GmsBarcodeScanning.getClient(it, options) }
-                        scanner?.startScan()
-                            ?.addOnSuccessListener { barcode ->
-                                try {
-                                    val rawValue: String? = barcode.rawValue
-                                    val add = Gson().fromJson(rawValue, AddressData::class.java)
-                                    tcpAddress.text = add.add
-                                    tcpPort.text = add.port.toString()
-                                    Toast.makeText(
-                                        context,
-                                        getString(R.string.tcp_scan_success),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } catch (_: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        getString(R.string.tcp_scan_failed),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        true
-                    }
-                } else {
-                    // Dependency Unavailable.
-                    tcpScanner.summary = getString(R.string.tcp_scan_unavailable)
-                    tcpScanner.setOnPreferenceClickListener {
-                        tcpScanner.isEnabled = false
-                        tcpScanner.summary = getString(R.string.tcp_scan_downloading)
-                        val options = GmsBarcodeScannerOptions.Builder()
-                            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                            .build()
-                        val scanner = context?.let { GmsBarcodeScanning.getClient(it, options) }!!
-
-                        // Setup install status listener.
-                        class ModuleInstallProgressListener : InstallStatusListener {
-                            override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
-                                update.progressInfo?.let {
-                                    tcpScanner.summary =
-                                        getString(R.string.tcp_scan_downloading) + (it.bytesDownloaded * 100 / it.totalBytesToDownload).toInt() + "%"
-                                }
-                                if (isTerminateState(update.installState)) {
-                                    moduleInstallClient.unregisterListener(this)
-                                }
-                            }
-
-                            fun isTerminateState(@ModuleInstallStatusUpdate.InstallState state: Int): Boolean {
-                                return state == STATE_CANCELED || state == STATE_COMPLETED || state == STATE_FAILED
-                            }
-                        }
-
-                        val listener = ModuleInstallProgressListener()
-                        // Setup install request.
-                        val moduleInstallRequest =
-                            ModuleInstallRequest.newBuilder()
-                                .setListener(listener)
-                                .addApi(scanner)
-                                .build()
-                        // Setup install client and add listener.
-                        moduleInstallClient
-                            .installModules(moduleInstallRequest)
-                            .addOnSuccessListener {
-                                tcpScanner.summary = getString(R.string.tcp_scan_download_complete)
-                            }
-                            .addOnFailureListener {
-                                tcpScanner.isEnabled = true
-                                tcpScanner.summary = getString(R.string.tcp_scan_download_failed)
-                            }
-                        true
-                    }
-                }
-            }
+        tcpScanner.setOnPreferenceClickListener {
+            val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(requireContext(), R.anim.from_right, R.anim.to_right)
+            val intent = Intent(requireContext(), QRCodeScanActivity::class.java)
+            requestQRScanLauncher.launch(intent, optionsCompat)
+            true
+        }
 
 
         // Test connection preference.
@@ -490,6 +432,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
                     }
                     else {
                         infoAppVersion.title = resources.getString(R.string.info_app_version)
+                        infoAppVersion.summary = String.format(
+                            resources.getString(R.string.info_app_version_latest),
+                            pkgInfo.versionName
+                        )
                     }
                 }
             }
@@ -756,6 +702,15 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 }
                 else {
                     infoDbVersion.title = resources.getString(R.string.info_db_version)
+                    infoDbVersion.summary =
+                        String.format(resources.getString(R.string.info_db_version_latest),
+                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            when (dbVer) {
+                                "0" -> resources.getString(R.string.info_db_version_empty)
+                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                else -> dbVer
+                            }
+                        )
                 }
             }
         }

@@ -45,13 +45,9 @@
     <string name="tcp_retry_title">重试次数</string>
     <string name="tcp_scan">扫描二维码</string>
     <string name="tcp_scan_desc">扫描服务器的二维码，快速获取连接配置</string>
-    <string name="tcp_scan_unavailable">不可用，点击下载依赖</string>
-    <string name="tcp_scan_no_gms">不可用，缺少谷歌服务</string>
-    <string name="tcp_scan_downloading">下载中… </string>
-    <string name="tcp_scan_download_failed">下载失败</string>
-    <string name="tcp_scan_download_complete">下载完成，请重启程序</string>
     <string name="tcp_scan_success">扫描成功</string>
     <string name="tcp_scan_failed">扫描失败</string>
+    <string name="tcp_scan_canceled">扫码取消</string>
     <string name="tcp_test_title">测试连接</string>
     <string name="tcp_test_default">测试与服务器的连接</string>
     <string name="tcp_test_connecting">请民主地等待…</string>
@@ -102,7 +98,7 @@
     <string name="info_app_update_log">新版本：v%1$s</string>
     <string name="info_about">关于</string>
     <string name="info_about_title">呼叫战略配备 v%1$s</string>
-    <string name="info_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n由 FloatingLight233 &amp; WisteFinch 制作\n\n在MIT许可证下发布</string>
+    <string name="info_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
     <string name="info_about_usage">用法</string>
     <string name="info_about_license">许可证</string>
     <string name="info_about_repo">项目仓库</string>
@@ -132,7 +128,6 @@
     <string name="network_response_error">服务器响应错误，请检查服务器是否正常运行</string>
     <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
     <string name="network_status_1">服务器版本错误，预期%1$s.x，实际%2$s</string>
-    <string name="network_status_2">客户端未认证</string>
     <string name="network_auth">等待服务器认证，本地sid为%1$s</string>
     <string name="network_auth_failed">认证失败，请重试并在服务器接受认证请求</string>
 
@@ -145,7 +140,6 @@
     <string name="dialog_download">前往下载</string>
     <string name="dialog_ignore">忽略</string>
     <string name="dialog_no_ask">不再询问</string>
-    <string name="dialog_help">帮助</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>
@@ -155,8 +149,8 @@
     <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息”更新数据库</string>
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
-    <string name="hint_welcome_desc">本次更新重新设计了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置>信息”并更新数据库即可解决！</string>
+    <string name="hint_welcome_desc">本次更新改进了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置>信息”并更新数据库即可解决！</string>
     <string name="hint_group_db_not_match">数据库不相符</string>
-    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。</string>
+    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误</string>
 
 </resources>
