@@ -41,4 +41,10 @@ cargo run
 
 ### 相关链接
 
-- 战略配备数据库 [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)
+- 绝地潜兵2战备数据库 [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)
+- 绝地潜兵战备数据库 [HD2CFS-Database_HD](https://github.com/WisteFinch/HD2CFS-Database_HD)
+
+### 使用的开源库
+
+- [AndroidSVG](https://github.com/BigBadaboom/androidsvg) 安卓的SVG渲染库
+- [ZXingLite](https://github.com/jenly1314/ZXingLite) 🔥 ZXing的精简极速版，优化扫码和生成二维码/条形码
