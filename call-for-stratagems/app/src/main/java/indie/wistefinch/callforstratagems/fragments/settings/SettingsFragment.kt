@@ -184,7 +184,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private fun setupEventListener() {
         // Scan QR Code.
         tcpScanner.setOnPreferenceClickListener {
-            val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(requireContext(), R.anim.from_right, R.anim.to_right)
+            val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(requireContext(), R.anim.from_right, R.anim.to_left)
             val intent = Intent(requireContext(), QRCodeScanActivity::class.java)
             requestQRScanLauncher.launch(intent, optionsCompat)
             true

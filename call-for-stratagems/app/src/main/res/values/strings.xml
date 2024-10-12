@@ -20,7 +20,7 @@
 
     <!-- Fragment Root -->
     <string name="root_new_group_FAB">New Stratagems Group</string>
-    <string name="root_no_group">The Galactic War awaits</string>
+    <string name="root_no_group">The Galactic War Awaits</string>
     <string name="root_no_group_img">No stratagems group</string>
 
     <!-- Fragment Edit Group -->
