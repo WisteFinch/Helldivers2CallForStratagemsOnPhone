@@ -105,6 +105,7 @@
         <item>Mouse Middle</item>
         <item>Mouse 3</item>
         <item>Mouse 4</item>
+        <item>Mouse 5</item>
         <item>Wheel Up</item>
         <item>Wheel Down</item>
     </string-array>
@@ -214,6 +215,7 @@
         <item>mouse_middle</item>
         <item>mouse3</item>
         <item>mouse4</item>
+        <item>mouse5</item>
         <item>wheel_up</item>
         <item>wheel_down</item>
     </string-array>

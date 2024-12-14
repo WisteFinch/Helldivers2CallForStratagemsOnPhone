@@ -135,6 +135,7 @@ impl StringToKey for String {
                 "mouse_middle" => Button::Middle,
                 "mouse3" => Button::Unknown(2),
                 "mouse4" => Button::Unknown(1),
+                "mouse5" => Button::Unknown(3),
                 _ => Button::Unknown(0),
             };
         }

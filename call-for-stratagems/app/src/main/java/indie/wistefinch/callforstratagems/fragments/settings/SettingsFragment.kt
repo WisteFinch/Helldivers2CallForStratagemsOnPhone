@@ -546,6 +546,9 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         val iconsList: MutableList<String> = emptyList<String>().toMutableList()
                         val name = indexObj.getString("name")
                         val iconsPath = context?.filesDir?.path + "/icons/$name/"
+
+                        // Analyze the index.
+                        preferences.edit().putString("db_name", name).apply()
                         if (date == dbVer && name == dbName) {
                             // Database is latest, no need to update.
                             withContext(Dispatchers.Main) {
@@ -558,7 +561,6 @@ class SettingsFragment: PreferenceFragmentCompat() {
                             preferences.edit().putString("db_version", date).apply()
                             return@launch
                         }
-                        preferences.edit().putString("db_name", name).apply()
 
                         // Download database.
                         withContext(Dispatchers.Main) {

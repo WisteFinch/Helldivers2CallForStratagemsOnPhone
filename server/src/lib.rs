@@ -25,7 +25,7 @@ const AUTH_TIMEOUT: u64 = 259200;
 
 pub async fn run() -> Result<()> {
     // Check locale.
-    if get_locale().unwrap().as_str() == "zh-CN" {
+    if get_locale().unwrap().as_str() == "zh-CN" || get_locale().unwrap().as_str() == "zh" {
         rust_i18n::set_locale("zh-CN");
     } else {
         rust_i18n::set_locale("zh-CN");

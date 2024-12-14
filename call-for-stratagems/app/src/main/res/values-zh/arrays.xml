@@ -105,6 +105,7 @@
         <item>鼠标中键</item>
         <item>鼠标侧键 1</item>
         <item>鼠标侧键 2</item>
+        <item>鼠标侧键 3</item>
         <item>鼠标滚轮 上</item>
         <item>鼠标滚轮 下</item>
     </string-array>
@@ -214,6 +215,7 @@
         <item>mouse_middle</item>
         <item>mouse3</item>
         <item>mouse4</item>
+        <item>mouse5</item>
         <item>wheel_up</item>
         <item>wheel_down</item>
     </string-array>
