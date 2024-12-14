@@ -440,7 +440,9 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 }
             }
             catch (_: Exception) {
-                infoAppVersion.title = resources.getString(R.string.info_app_version)
+                withContext(Dispatchers.Main) {
+                    infoAppVersion.title = resources.getString(R.string.info_app_version)
+                }
             }
         }
 
@@ -717,7 +719,9 @@ class SettingsFragment: PreferenceFragmentCompat() {
             }
         }
         catch (_: Exception) {
-            infoDbVersion.title = resources.getString(R.string.info_db_version)
+            withContext(Dispatchers.Main) {
+                infoDbVersion.title = resources.getString(R.string.info_db_version)
+            }
         }
     }
 

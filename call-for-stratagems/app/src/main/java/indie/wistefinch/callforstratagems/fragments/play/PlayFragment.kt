@@ -715,7 +715,9 @@ class PlayFragment : Fragment() {
                 client.send(Gson().toJson(packet).toString())
             }
             catch (e: Exception) {
-                Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                }
             }
             networkLock.unlock()
         }
@@ -749,7 +751,9 @@ class PlayFragment : Fragment() {
                 client.send(Gson().toJson(packet).toString())
             }
             catch (e: Exception) {
-                Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                }
             }
             networkLock.unlock()
         }
