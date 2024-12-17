@@ -138,14 +138,23 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
             ));
             return Ok(());
         }
+        let request_raw = std::str::from_utf8(&buffer[..size]).unwrap();
 
         // Display debug log.
         if debug {
-            debug_log(format!(" >>> {}", std::str::from_utf8(&buffer[..size]).unwrap()));
+            debug_log(format!(" >>> {}", &request_raw));
         }
 
+        // Remove redundant requests.
+        let index = request_raw.find('\n').unwrap();
+        let request = &request_raw[..index + 1];
+        if debug && request_raw.len() != index +1 {
+            debug_log(format!("{} {}", t!("d_remove_redundant") , request));
+        }
+        
+
         // Parsing json.
-        let json: Value = match serde_json::from_str(std::str::from_utf8(&buffer[..size]).unwrap())
+        let json: Value = match serde_json::from_str(request)
         {
             Ok(ok) => ok,
             Err(_) => {

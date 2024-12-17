@@ -43,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Vector
 import kotlin.math.abs
@@ -555,9 +556,9 @@ class PlayFragment : Fragment() {
                 )
                 binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.orange, context?.theme))
             }
-            networkLock.lock()
-            isConnected = client.connect(address, port)
-            networkLock.unlock()
+            networkLock.withLock {
+                isConnected = client.connect(address, port)
+            }
             isConnected = checkClient()
 
             // If the connection is not successful, retry.
@@ -588,9 +589,9 @@ class PlayFragment : Fragment() {
                         port
                     )
                 }
-                networkLock.lock()
-                isConnected = client.connect(address, port)
-                networkLock.unlock()
+                networkLock.withLock {
+                    isConnected = client.connect(address, port)
+                }
                 isConnected = checkClient()
             }
 
@@ -627,44 +628,44 @@ class PlayFragment : Fragment() {
             return false
         }
         var flag: Boolean
-        networkLock.lock()
-        try {
-            // Send status request.
-            client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-            // Receive status.
-            val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-            // Check the server status.
-            when (res.status) {
-                0 -> flag = true
-                1 -> flag = false
-                2 -> {
-                    // Request authentication.
-                    withContext(Dispatchers.Main) {
-                        binding.playConnectTitle.text = String.format(
-                            getString(R.string.network_add_suffix),
-                            String.format(getString(R.string.network_auth), sid),
-                            address,
-                            port
-                        )
+        networkLock.withLock {
+            try {
+                // Send status request.
+                client.send(Gson().toJson(RequestStatusPacket(version)).toString())
+                // Receive status.
+                val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+                // Check the server status.
+                when (res.status) {
+                    0 -> flag = true
+                    1 -> flag = false
+                    2 -> {
+                        // Request authentication.
+                        withContext(Dispatchers.Main) {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_add_suffix),
+                                String.format(getString(R.string.network_auth), sid),
+                                address,
+                                port
+                            )
+                        }
+                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                        client.toggleTimeout(false)
+                        val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
+                        client.toggleTimeout(true)
+                        if (auth.auth) {
+                            token = auth.token
+                            flag = true
+                        }
+                        else {
+                            flag = false
+                        }
                     }
-                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                    client.toggleTimeout(false)
-                    val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                    client.toggleTimeout(true)
-                    if (auth.auth) {
-                        token = auth.token
-                        flag = true
-                    }
-                    else {
-                        flag = false
-                    }
+                    else -> flag = false
                 }
-                else -> flag = false
+            } catch (_: Exception) { // Json convert error & socket timeout.
+                flag = false
             }
-        } catch (_: Exception) { // Json convert error & socket timeout.
-            flag = false
         }
-        networkLock.unlock()
         return flag
     }
 
@@ -710,16 +711,18 @@ class PlayFragment : Fragment() {
                 ),
                 token
             )
-            networkLock.lock()
-            try {
-                client.send(Gson().toJson(packet).toString())
-            }
-            catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+
+            if(networkLock.tryLock()) {
+                try {
+                    client.send(Gson().toJson(packet).toString())
                 }
+                catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+                networkLock.unlock()
             }
-            networkLock.unlock()
         }
     }
 
@@ -746,16 +749,17 @@ class PlayFragment : Fragment() {
                 ),
                 token
             )
-            networkLock.lock()
-            try {
-                client.send(Gson().toJson(packet).toString())
-            }
-            catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+            if (networkLock.tryLock()) {
+                try {
+                    client.send(Gson().toJson(packet).toString())
                 }
+                catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+                networkLock.unlock()
             }
-            networkLock.unlock()
         }
     }
 
