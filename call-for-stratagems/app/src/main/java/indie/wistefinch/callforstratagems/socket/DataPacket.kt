@@ -72,6 +72,7 @@ data class ServerConfigData (
     var down: String,
     var left: String,
     var right: String,
+    var ip: String,
 )
 
 /**

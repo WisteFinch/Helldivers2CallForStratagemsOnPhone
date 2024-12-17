@@ -13,8 +13,8 @@ android {
         applicationId = "indie.wistefinch.callforstratagems"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "0.4.1"
+        versionCode = 11
+        versionName = "0.5.0"
         // Remove unnecessary language to reduce size.
         resourceConfigurations += listOf("en", "zh", "ru", "fr", "es", "ar")
 
