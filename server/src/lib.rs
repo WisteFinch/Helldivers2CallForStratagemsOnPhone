@@ -141,7 +141,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
 
         // Display debug log.
         if debug {
-            debug_log(format!("{}", std::str::from_utf8(&buffer[..size]).unwrap()));
+            debug_log(format!(" >>> {}", std::str::from_utf8(&buffer[..size]).unwrap()));
         }
 
         // Parsing json.
@@ -170,28 +170,37 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
             Operation::Status => {
                 // Check version.
                 let ver = json["ver"].as_str().unwrap_or("NULL");
+                let res: String;
                 if compare_ver(ver, VERSION) {
                     // Check authentication.
                     if is_authed {
-                        client
-                        .write_all(format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Success).as_bytes())
-                        .await?;
+                        res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Success);
                     } else {
-                        client
-                        .write_all(format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Unauthorized).as_bytes())
-                        .await?;
+                        res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Unauthorized)
                     }
                 } else {
                     warning(format!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2")));
-                    client
-                    .write_all(format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::VersionMismatch).as_bytes())
-                    .await?;
+                    res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::VersionMismatch);
                 }
+
+                if debug {
+                    debug_log(format!(" <<< {}", res));
+                }
+
+                client
+                .write_all(res.as_bytes())
+                .await?;
             }
             Operation::Request => {
                 if is_authed && client_token == token {
+                    let res: String = serde_json::to_string(&conf).unwrap();
+
+                    if debug {
+                        debug_log(format!(" <<< {}", res));
+                    }
+
                     client
-                    .write_all(serde_json::to_string(&conf).unwrap().as_bytes())
+                    .write_all(res.as_bytes())
                     .await?;
                     info(format!("{}{}", t!("info_send_config"), client.peer_addr()?))
                 } else {
@@ -271,16 +280,21 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                 }
 
                 // Send token to client.
+                let res: String;
                 if is_authed {
-                    client
-                        .write_all(format!("{{\"auth\":{},\"token\":{}}}\n", is_authed.clone(), token).as_bytes())
-                        .await?;
+                    res = format!("{{\"auth\":{},\"token\":\"{}\"}}\n", is_authed.clone(), token);
                     save_auth(serde_json::to_string(&auths.clone()).unwrap().as_str()).await
                 } else {
-                    client
-                        .write_all(format!("{{\"auth\":{}}}\n", is_authed.clone()).as_bytes())
-                        .await?;
+                    res = format!("{{\"auth\":{}}}\n", is_authed.clone());
                 }
+
+                if debug {
+                    debug_log(format!(" <<< {}", res));
+                }
+
+                client
+                        .write_all(res.as_bytes())
+                        .await?;
             },
         }
     }
