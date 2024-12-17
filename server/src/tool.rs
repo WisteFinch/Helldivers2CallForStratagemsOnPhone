@@ -171,6 +171,10 @@ pub fn println<T: Display>(str: T) {
     println!("{}", str)
 }
 
+pub fn debug_log<T: Display>(str: T) {
+    print!("{}{}", t!("n_debug").bright_yellow(), str)
+}
+
 pub fn compare_ver(ver_a: &str, ver_b: &str) -> bool {
     let mut a_split = ver_a.split(".");
     let mut b_split = ver_b.split(".");

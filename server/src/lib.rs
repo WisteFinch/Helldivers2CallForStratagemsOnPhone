@@ -23,7 +23,7 @@ const AUTH_PATH: &str = "./auth.json";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTH_TIMEOUT: u64 = 259200;
 
-pub async fn run() -> Result<()> {
+pub async fn run(debug : bool) -> Result<()> {
     // Check locale.
     if get_locale().unwrap().as_str() == "zh-CN" || get_locale().unwrap().as_str() == "zh" {
         rust_i18n::set_locale("zh-CN");
@@ -32,6 +32,12 @@ pub async fn run() -> Result<()> {
     }
 
     println(format!("{}{VERSION}{}", t!("title_1"), t!("title_2")));
+
+    // Debug mode.
+    if debug {
+        warning(format!("{}", t!("debug_mode")));
+    }
+
     // Load configuration.
     let conf: Config = match load_config().await
     {
@@ -101,11 +107,11 @@ pub async fn run() -> Result<()> {
     // Handle connection.
     loop {
         let (client, _address) = listener.accept().await?;
-        tokio::spawn(handle_connection(client, conf.clone()));
+        tokio::spawn(handle_connection(client, conf.clone(), debug));
     }
 }
 
-async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
+async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> Result<()> {
     let mut is_authed = false;
     let token: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -133,8 +139,10 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             return Ok(());
         }
 
-        // Debug.
-        // println!("{}", std::str::from_utf8(&buffer[..size]).unwrap());
+        // Display debug log.
+        if debug {
+            debug_log(format!("{}", std::str::from_utf8(&buffer[..size]).unwrap()));
+        }
 
         // Parsing json.
         let json: Value = match serde_json::from_str(std::str::from_utf8(&buffer[..size]).unwrap())

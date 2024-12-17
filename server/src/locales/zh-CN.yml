@@ -33,3 +33,5 @@ n_free_input: 自由输入：
 n_err: '[错误] '
 n_warn: '[警告] '
 n_info: '[信息] '
+n_debug: '[调试] '
+debug_mode: '已启用调试模式'
