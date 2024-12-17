@@ -75,6 +75,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var serverPort: EditTextPreference
     private lateinit var inputDelay: EditTextPreference
     private lateinit var inputOpen: ListPreference
+    private lateinit var inputTypeOpen: ListPreference
     private lateinit var inputUp: ListPreference
     private lateinit var inputDown: ListPreference
     private lateinit var inputLeft: ListPreference
@@ -133,6 +134,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
         serverPort = preferenceManager.findPreference("server_port")!!
         inputDelay = preferenceManager.findPreference("input_delay")!!
         inputOpen = preferenceManager.findPreference("input_open")!!
+        inputTypeOpen = preferenceManager.findPreference("input_type_open")!!
         inputUp = preferenceManager.findPreference("input_up")!!
         inputDown = preferenceManager.findPreference("input_down")!!
         inputLeft = preferenceManager.findPreference("input_left")!!
@@ -294,6 +296,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 port = serverPort.text?.toInt()!!,
                 delay = inputDelay.text?.toInt()!!,
                 open = inputOpen.value!!,
+                openType = inputTypeOpen.value!!,
                 up = inputUp.value!!,
                 down = inputDown.value!!,
                 left = inputLeft.value!!,

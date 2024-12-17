@@ -353,7 +353,18 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
 
     // Press open
     print(format!("{name}: "));
-    execute(Step::Open, InputType::Press, conf).await.unwrap();
+    if conf.openType == "hold" {
+        execute(Step::Open, InputType::Press, conf).await.unwrap();
+    } else if conf.openType == "long_press" {
+        execute(Step::Open, InputType::Press, conf).await.unwrap();
+        sleep(Duration::from_millis(400)).await;
+        execute(Step::Open, InputType::Release, conf).await.unwrap();
+    } else if conf.openType == "double_tap" {
+        execute(Step::Open, InputType::Click, conf).await.unwrap();
+        execute(Step::Open, InputType::Click, conf).await.unwrap();
+    } else {
+        execute(Step::Open, InputType::Click, conf).await.unwrap();
+    }
 
     // Click steps
     for i in list {
@@ -363,7 +374,9 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
     }
 
     // Release open
-    execute(Step::Open, InputType::Release, conf).await.unwrap();
+    if conf.openType == "hold" {
+        execute(Step::Open, InputType::Release, conf).await.unwrap();
+    }
     println!();
 
     Ok(())

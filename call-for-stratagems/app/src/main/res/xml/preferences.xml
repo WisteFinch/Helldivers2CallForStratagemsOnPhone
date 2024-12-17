@@ -62,6 +62,15 @@
             app:icon="@drawable/ic_keyboard"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="hold"
+            app:entries="@array/input_type_entries"
+            app:entryValues="@array/input_type_values"
+            app:key="input_type_open"
+            app:title="@string/input_type_open_title"
+            app:icon="@drawable/ic_keyboard"
+            app:useSimpleSummaryProvider="true" />
+
 
         <ListPreference
             app:defaultValue="w"

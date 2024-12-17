@@ -103,11 +103,14 @@ impl Operation {
     }
 }
 
+// To comply with the JSON specification, ignore non_snake_case warnings.
+#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Config {
     pub port: u64,
     pub delay: u64,
     pub open: String,
+    pub openType: String,
     pub up: String,
     pub down: String,
     pub left: String,
@@ -120,6 +123,7 @@ impl Default for Config {
             port: 23333,
             delay: 25,
             open: String::from("ctrl_left"),
+            openType: String::from("hold"),
             up: String::from("w"),
             down: String::from("s"),
             left: String::from("a"),

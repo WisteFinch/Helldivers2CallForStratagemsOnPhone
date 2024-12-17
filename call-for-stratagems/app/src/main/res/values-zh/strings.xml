@@ -59,6 +59,7 @@
     <string name="server_port_title">端口</string>
     <string name="input_delay_title">输入延迟（毫秒）</string>
     <string name="input_open_title">输入：打开战略配备</string>
+    <string name="input_type_open_title">类型: 打开战略配备</string>
     <string name="input_up_title">输入：上</string>
     <string name="input_down_title">输入：下</string>
     <string name="input_left_title">输入：左</string>

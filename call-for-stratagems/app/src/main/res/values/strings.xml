@@ -68,6 +68,7 @@
     <string name="server_port_title">Port</string>
     <string name="input_delay_title">Input Interval Time(ms)</string>
     <string name="input_open_title">Input: Open Stratagems List</string>
+    <string name="input_type_open_title">Type: Open Stratagems List</string>
     <string name="input_up_title">Input: Up</string>
     <string name="input_down_title">Input: Down</string>
     <string name="input_left_title">Input: Left</string>

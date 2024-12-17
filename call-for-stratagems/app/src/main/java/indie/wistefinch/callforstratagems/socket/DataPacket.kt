@@ -67,6 +67,7 @@ data class ServerConfigData (
     var port: Int,
     var delay: Int,
     var open: String,
+    var openType: String,
     var up: String,
     var down: String,
     var left: String,

@@ -220,4 +220,20 @@
         <item>wheel_down</item>
     </string-array>
 
+    <string-array name="input_type_entries">
+        <item>Hold</item>
+        <item>Press</item>
+        <item>Long Press</item>
+        <item>Tap</item>
+        <item>Double Tap</item>
+    </string-array>
+
+    <string-array name="input_type_values">
+        <item>hold</item>
+        <item>press</item>
+        <item>long_press</item>
+        <item>tap</item>
+        <item>double_tap</item>
+    </string-array>
+
 </resources>
