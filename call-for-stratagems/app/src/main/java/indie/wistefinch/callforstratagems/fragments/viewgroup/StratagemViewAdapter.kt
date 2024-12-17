@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemInfoDialog
 import java.io.File
 
 /**
@@ -56,6 +58,14 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
                             dataList[pos].icon + ".svg")))
         }
         catch (_: Exception) {}
+
+        // Set long click listener.
+        holder.itemView.findViewById<CardView>(R.id.stratagem_view_cardView).setOnLongClickListener {
+            val dialog = StratagemInfoDialog(context)
+            dialog.show()
+            dialog.setData(dataList[pos], dbName)
+            true
+        }
     }
 
     override fun getItemCount(): Int {

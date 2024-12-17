@@ -31,6 +31,13 @@
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_rootFragment_to_stratagemsListFragment"
+            app:destination="@id/stratagemsListFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
     <fragment
         android:id="@+id/editGroupFragment"
@@ -74,5 +81,14 @@
         <action
             android:id="@+id/action_playFragment_to_viewGroupFragment"
             app:destination="@id/viewGroupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stratagemsListFragment"
+        android:name="indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemsListFragment"
+        android:label="@string/fragment_stratagemsList"
+        tools:layout="@layout/fragment_stratagems_list" >
+        <action
+            android:id="@+id/action_stratagemsListFragment_to_rootFragment"
+            app:destination="@id/rootFragment" />
     </fragment>
 </navigation>

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemInfoDialog
 import java.io.File
 
 /**
@@ -76,6 +77,14 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
                 enabledStratagem.add(dataList[pos].id)
             }
             setCardViewBg(cardView, dataList[pos].id)
+        }
+
+        // Set long click listener.
+        holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView).setOnLongClickListener {
+            val dialog = StratagemInfoDialog(context)
+            dialog.show()
+            dialog.setData(dataList[pos], dbName)
+            true
         }
     }
 

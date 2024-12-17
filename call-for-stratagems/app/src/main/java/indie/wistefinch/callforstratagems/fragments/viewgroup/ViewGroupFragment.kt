@@ -151,7 +151,6 @@ class ViewGroupFragment : Fragment() {
         }
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         adapter.setData(list.toList(), preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
-        binding.viewGroupRecyclerView.suppressLayout(true)
     }
 
     companion object {

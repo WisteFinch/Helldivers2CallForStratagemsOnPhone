@@ -148,6 +148,10 @@ class RootFragment : Fragment() {
                         findNavController().navigate(R.id.action_rootFragment_to_settingsFragment)
                         true
                     }
+                    R.id.root_menu_stratagemsList -> {
+                        findNavController().navigate(R.id.action_rootFragment_to_stratagemsListFragment)
+                        true
+                    }
                     else -> false
                 }
             }
