@@ -152,7 +152,6 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
             debug_log(format!("{} {}", t!("d_remove_redundant") , request));
         }
         
-
         // Parsing json.
         let json: Value = match serde_json::from_str(request)
         {
