@@ -1,38 +1,39 @@
 title_1: '=== 呼叫战略配备 v'
 title_2: ' ==='
-info_listening: 监听：
-info_connect: 建立连接：
-info_close: 连接被客户端关闭：
-err_parse_json_failed: 解析请求失败！
-err_parse_opt_failed: 解析操作失败！
-warn_force_close: 关闭连接：
-warn_ver_1: 客户端版本为
-warn_ver_2: ，可能会导致错误
-info_send_config: 发送配置到：
-warn_reject_request: 认证失败，拒绝请求！
+info_listening: '监听：'
+info_connect: '建立连接：'
+info_close: '连接被客户端关闭：'
+err_parse_json_failed: '解析请求失败！'
+err_parse_opt_failed: '解析操作失败！'
+warn_force_close: '关闭连接：'
+warn_ver_1: '客户端版本为'
+warn_ver_2: '，可能会导致错误'
+info_send_config: '发送配置到：'
+warn_reject_request: '认证失败，拒绝请求！'
 ask_sync: '是否允许同步配置？(Y/N)： '
-n_sync_conf: 同步请求自：
-n_scan_qr_code: 使用手机端扫描二维码以获取连接配置
-warn_conf_load_failed: 读取配置失败，使用默认配置！
-warn_conf_network_temp: 使用临时网络配置
-info_conf_loaded: 已加载配置文件
-warn_reject_sync: 拒绝同步请求！
-n_auth_2: ，sid：
-n_auth_1: 认证请求自：
-ask_auth: 是否允许认证该客户端？(Y/N)：
-info_auth: 客户端已认证
-warn_reject_auth: 客户端认证已拒绝！
-info_sync_complete: 配置已同步，需要重启服务器
-info_conf_saved: 配置已保存
-err_sync_failed: 同步配置失败！
-err_conf_save_failed: 保存配置失败！
-err_auth_save_failed: 认证信息保存失败！
-err_parse_step_failed: 解析步骤失败！
-err_parse_input_failed: 解析输入类型失败！
-n_free_input: 自由输入：
+n_sync_conf: '同步请求自：'
+n_scan_qr_code: '使用手机端扫描二维码以获取连接配置'
+warn_conf_load_failed: '读取配置失败，使用默认配置！'
+warn_conf_network_temp: '使用临时网络配置'
+info_conf_loaded: '已加载配置文件'
+warn_reject_sync: '拒绝同步请求！'
+n_auth_2: '，sid：'
+n_auth_1: '认证请求自：'
+ask_auth: '是否允许认证该客户端？(Y/N)：'
+info_auth: '客户端已认证'
+warn_reject_auth: '客户端认证已拒绝！'
+info_sync_complete: '配置已同步，需要重启服务器'
+info_conf_saved: '配置已保存'
+err_sync_failed: '同步配置失败！'
+err_conf_save_failed: '保存配置失败！'
+err_auth_save_failed: '认证信息保存失败！'
+err_parse_step_failed: '解析步骤失败！'
+err_parse_input_failed: '解析输入类型失败！'
+n_free_input: '自由输入：'
 n_err: '[错误] '
 n_warn: '[警告] '
 n_info: '[信息] '
 n_debug: '[调试] '
 debug_mode: '已启用调试模式'
 d_remove_redundant: '多余请求已剔除：'
+d_specific_ip: '已指定ip地址：'

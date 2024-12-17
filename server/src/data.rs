@@ -115,6 +115,7 @@ pub struct Config {
     pub down: String,
     pub left: String,
     pub right: String,
+    pub ip: String,
 }
 
 impl Default for Config {
@@ -128,6 +129,7 @@ impl Default for Config {
             down: String::from("s"),
             left: String::from("a"),
             right: String::from("d"),
+            ip: String::from(""),
         }
     }
 }

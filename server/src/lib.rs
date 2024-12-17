@@ -70,17 +70,28 @@ pub async fn run(debug : bool) -> Result<()> {
         .collect::<Vec<Auth>>();
     save_auth(serde_json::to_string(&filtered).unwrap().as_str()).await;
 
+    // Get ip address.
+    let mut ip: String = if conf.ip.is_empty() {
+        local_ipaddress::get().unwrap()
+    } else {
+        if debug {
+            warning(format!("{}{}", t!("d_specific_ip"), conf.ip.clone()));
+        }
+        conf.ip.clone()
+    };
+
     // Listen port.
     let listener =
-        match TcpListener::bind(format!("{}:{}", local_ipaddress::get().unwrap(), conf.port)).await
+        match TcpListener::bind(format!("{}:{}", ip, conf.port)).await
         {
             Ok(ok) => ok,
             Err(err) => {
                 error(err);
+                ip = local_ipaddress::get().unwrap();
                 warning(t!("warn_conf_network_temp"));
                 TcpListener::bind(format!(
                     "{}:{}",
-                    local_ipaddress::get().unwrap(),
+                    ip,
                     0
                 ))
                 .await?
@@ -96,7 +107,7 @@ pub async fn run(debug : bool) -> Result<()> {
     println!();
     println(t!("n_scan_qr_code"));
     let qrcode = QRBuilder::new(format!("{{\"add\":\"{}\",\"port\":{}}}",
-            local_ipaddress::get().unwrap(),
+            ip,
             conf.port
         ))
         .build()
@@ -149,7 +160,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
         let index = request_raw.find('\n').unwrap();
         let request = &request_raw[..index + 1];
         if debug && request_raw.len() != index +1 {
-            debug_log(format!("{} {}", t!("d_remove_redundant") , request));
+            debug_log(format!("{}{}", t!("d_remove_redundant") , request));
         }
         
         // Parsing json.
@@ -222,7 +233,12 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
                     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-                        save_config(json["config"].to_string().as_str(), true).await
+                        let mut c: Config = match serde_json::from_str(json["config"].to_string().as_str()) {
+                            Ok(s) => s,
+                            Err(_) => Config::default()
+                        };
+                        c.ip = conf.ip.clone();
+                        save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
                     } else {
                         warning(t!("warn_reject_sync"));
                     }

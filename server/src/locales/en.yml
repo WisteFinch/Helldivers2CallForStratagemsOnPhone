@@ -1,5 +1,5 @@
-err_parse_json_failed: Failed to parse request data!
-err_parse_opt_failed: Failed to parse operation!
+err_parse_json_failed: 'Failed to parse request data!'
+err_parse_opt_failed: 'Failed to parse operation!'
 info_close: 'Connection closed by client: '
 title_1: '=== Call for stratagem server v'
 title_2: ' ==='
@@ -9,30 +9,31 @@ warn_force_close: 'Close Connection: '
 warn_ver_1: 'Client version is '
 warn_ver_2: ', may not work properly.'
 info_send_config: 'Sended configuration to: '
-warn_reject_request: Authentication failed, reject request！
+warn_reject_request: 'Authentication failed, reject request!'
 ask_sync: 'Do you want to synchronize this configuration? (Y/N): '
 n_sync_conf: 'Synchronization request from '
-n_scan_qr_code: Scan this QR code to obtain the connection configuration.
-warn_conf_load_failed: Failed to load configuration, loading default configuration!
-warn_conf_network_temp: Using temporary network configuration
-info_conf_loaded: Configuration loaded
-warn_reject_sync: Synchronization request rejected!
+n_scan_qr_code: 'Scan this QR code to obtain the connection configuration.'
+warn_conf_load_failed: 'Failed to load configuration, loading default configuration!'
+warn_conf_network_temp: 'Using temporary network configuration'
+info_conf_loaded: 'Configuration loaded'
+warn_reject_sync: 'Synchronization request rejected!'
 n_auth_2: ', sid: '
 n_auth_1: 'Authentication request from '
 ask_auth: 'Do you want to authenticate this client? (Y/N): '
-info_auth: Client authenticated
-warn_reject_auth: Client authentication rejected!
-info_sync_complete: Configuration synchronized, need to restart the server
-info_conf_saved: Configuration saved
-err_sync_failed: Failed to synchronize configuration!
-err_conf_save_failed: Failed to save configuration!
-err_auth_save_failed: Failed to save authentication data!
-err_parse_step_failed: Failed to parse steps!
-err_parse_input_failed: Failed to parse input type!
+info_auth: 'Client authenticated'
+warn_reject_auth: 'Client authentication rejected!'
+info_sync_complete: 'Configuration synchronized, need to restart the server'
+info_conf_saved: 'Configuration saved'
+err_sync_failed: 'Failed to synchronize configuration!'
+err_conf_save_failed: 'Failed to save configuration!'
+err_auth_save_failed: 'Failed to save authentication data!'
+err_parse_step_failed: 'Failed to parse steps!'
+err_parse_input_failed: 'Failed to parse input type!'
 n_free_input: 'Free input: '
 n_err: '[ERROR] '
 n_warn: '[WARNING] '
 n_info: '[INFO] '
 n_debug: '[DEBUG] '
 debug_mode: 'Debug mode enabled'
-d_remove_redundant: 'Redundant requests removed:'
+d_remove_redundant: 'Redundant requests removed: '
+d_specific_ip: 'IP address specified: '

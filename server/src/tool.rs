@@ -172,7 +172,7 @@ pub fn println<T: Display>(str: T) {
 }
 
 pub fn debug_log<T: Display>(str: T) {
-    print!("{}{}", t!("n_debug").bright_yellow(), str)
+    print!("{}{}", t!("n_debug").magenta(), str)
 }
 
 pub fn compare_ver(ver_a: &str, ver_b: &str) -> bool {
