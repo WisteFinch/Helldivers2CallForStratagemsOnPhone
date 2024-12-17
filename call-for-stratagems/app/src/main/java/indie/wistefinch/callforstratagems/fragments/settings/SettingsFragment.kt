@@ -301,6 +301,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 down = inputDown.value!!,
                 left = inputLeft.value!!,
                 right = inputRight.value!!,
+                ip = "",
             )
             val add = tcpAddress.text!!
             val port: Int = tcpPort.text?.toInt()!!
@@ -462,15 +463,25 @@ class SettingsFragment: PreferenceFragmentCompat() {
             val cancel = view.findViewById<Button>(R.id.db_update_cancel)
             val clear = view.findViewById<Button>(R.id.db_update_clear)
             val custom = view.findViewById<EditText>(R.id.db_update_custom_input)
-            var channel = preferences.getInt("db_update_channel", R.id.db_update_hd2)
+            var channel = preferences.getInt("db_update_channel", 0)
 
-            radioGroup.check(channel)
+            radioGroup.check(when (channel) {
+                0 -> R.id.db_update_hd2
+                1 -> R.id.db_update_hd
+                2 -> R.id.db_update_custom
+                else -> R.id.db_update_hd2
+            })
             custom.setText(preferences.getString("db_update_channel_custom", ""))
-            custom.isEnabled = preferences.getInt("db_update_channel", R.id.db_update_hd2) == R.id.db_update_custom
+            custom.isEnabled = channel == 2
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
-                channel = checkedId
-                custom.isEnabled = checkedId == R.id.db_update_custom
+                channel = when (checkedId) {
+                    R.id.db_update_hd2 -> 0
+                    R.id.db_update_hd -> 1
+                    R.id.db_update_custom -> 2
+                    else -> 0
+                }
+                custom.isEnabled = channel == 2
             }
 
             // Set custom url.
@@ -489,8 +500,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         File(path).deleteRecursively()
                         preferences.edit().putString("db_version", "0").apply()
                         preferences.edit().putString("db_name", getString(R.string.default_string)).apply()
-                        preferences.edit().putInt("db_update_channel", R.id.db_update_hd2).apply()
-                        channel = R.id.db_update_hd2
+                        preferences.edit().putInt("db_update_channel", 0).apply()
+                        channel = 0
                         radioGroup.check(R.id.db_update_hd2)
                         stratagemViewModel.deleteAll()
 
@@ -519,10 +530,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
                 preferences.edit().putString("db_name", resources.getString(R.string.default_string)).apply()
 
-                var url: String = when (preferences.getInt("db_update_channel", R.id.db_update_hd2)) {
-                    R.id.db_update_hd2 -> getString(R.string.db_hd2_url)
-                    R.id.db_update_hd -> getString(R.string.db_hd_url)
-                    R.id.db_update_custom -> preferences.getString("db_update_channel_custom", "")!!
+                var url: String = when (preferences.getInt("db_update_channel", 0)) {
+                    0 -> getString(R.string.db_hd2_url)
+                    1 -> getString(R.string.db_hd_url)
+                    2 -> preferences.getString("db_update_channel_custom", "")!!
                     else -> getString(R.string.db_hd2_url)
                 }
                 if (url.isEmpty()) {
@@ -675,10 +686,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private suspend fun checkDBUpdate() {
         infoDbVersion.title = resources.getString(R.string.info_db_version_check)
         try {
-            var url: String = when (preferences.getInt("db_update_channel", R.id.db_update_hd2)) {
-                R.id.db_update_hd2 -> getString(R.string.db_hd2_url)
-                R.id.db_update_hd -> getString(R.string.db_hd_url)
-                R.id.db_update_custom -> preferences.getString("db_update_channel_custom", "")!!
+            var url: String = when (preferences.getInt("db_update_channel", 0)) {
+                0 -> getString(R.string.db_hd2_url)
+                1 -> getString(R.string.db_hd_url)
+                2 -> preferences.getString("db_update_channel_custom", "")!!
                 else -> getString(R.string.db_hd2_url)
             }
             if (url.isEmpty()) {
