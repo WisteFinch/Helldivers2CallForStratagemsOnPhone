@@ -2,6 +2,8 @@ package indie.wistefinch.callforstratagems.fragments.editgroup
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -83,6 +85,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
         holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView).setOnLongClickListener {
             val dialog = StratagemInfoDialog(context)
             dialog.show()
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.setData(dataList[pos], dbName)
             true
         }
