@@ -153,7 +153,7 @@
     <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息”更新数据库</string>
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
-    <string name="hint_welcome_desc">本次更新改进了战备数据库，如果您在更新后看到了报错、战备（图标）缺失等异常情况，只需前往“设置>信息”并更新数据库即可解决！</string>
+    <string name="hint_welcome_desc">本次更新后服务端配置将会丢失，请前往“设置>同步”重新同步！</string>
     <string name="hint_group_db_not_match">数据库不相符</string>
     <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误</string>
 
