@@ -97,7 +97,8 @@
     <string name="info_app_version_desc">%1$s</string>
     <string name="info_app_version_latest">%1$s (最新)</string>
     <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
-    <string name="info_app_update_log">新版本：v%1$s</string>
+    <string name="info_app_version_log_updatable">新版本：v%1$s</string>
+    <string name="info_app_version_log_latest">当前版本：v%1$s</string>
     <string name="info_about">关于</string>
     <string name="info_about_title">呼叫战略配备 v%1$s</string>
     <string name="info_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>

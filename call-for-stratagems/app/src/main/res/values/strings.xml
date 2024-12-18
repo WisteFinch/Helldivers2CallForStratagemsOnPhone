@@ -106,7 +106,8 @@
     <string name="info_app_version_desc">%1$s</string>
     <string name="info_app_version_latest">%1$s (latest)</string>
     <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
-    <string name="info_app_update_log">New Version: v%1$s</string>
+    <string name="info_app_version_log_updatable">New Version: v%1$s</string>
+    <string name="info_app_version_log_latest">Current Version: v%1$s</string>
     <string name="info_about">About</string>
     <string name="info_about_title">CallForStratagems v%1$s</string>
     <string name="info_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>

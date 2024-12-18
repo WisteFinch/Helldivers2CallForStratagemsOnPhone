@@ -406,6 +406,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                     val pkgName = context?.packageName!!
                     val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
                     val curVer = pkgInfo.versionName
+                    var title: String
                     if (curVer != newVer) {
                         infoAppVersion.summary = String.format(
                             resources.getString(R.string.info_app_version_updatable_desc),
@@ -413,26 +414,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
                             newVer
                         )
                         infoAppVersion.title = resources.getString(R.string.info_app_version_updatable)
-                        // Open Update log.
-                        infoAppVersion.setOnPreferenceClickListener {
-                            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
-                                .setTitle(String.format(
-                                    resources.getString(R.string.info_app_update_log),
-                                    newVer
-                                ))
-                                .setMessage(json.getString("body"))
-                                .setIcon(R.mipmap.ic_launcher)
-                                .setPositiveButton(R.string.dialog_download) { _, _ ->
-                                    val uri = Uri.parse(resources.getString(R.string.release_url))
-                                    val internet = Intent(Intent.ACTION_VIEW, uri)
-                                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                                    startActivity(internet)
-                                }.setNegativeButton(R.string.dialog_cancel) { _, _ ->
-
-                                }.create()
-                            dialog.show()
-                            true
-                        }
+                        title = String.format(
+                            resources.getString(R.string.info_app_version_log_updatable),
+                            newVer
+                        )
                     }
                     else {
                         infoAppVersion.title = resources.getString(R.string.info_app_version)
@@ -440,6 +425,27 @@ class SettingsFragment: PreferenceFragmentCompat() {
                             resources.getString(R.string.info_app_version_latest),
                             pkgInfo.versionName
                         )
+                        title = String.format(
+                            resources.getString(R.string.info_app_version_log_latest),
+                            curVer
+                        )
+                    }
+                    // Open version log.
+                    infoAppVersion.setOnPreferenceClickListener {
+                        val dialog: AlertDialog = AlertDialog.Builder(requireContext())
+                            .setTitle(title)
+                            .setMessage(json.getString("body"))
+                            .setIcon(R.mipmap.ic_launcher)
+                            .setPositiveButton(R.string.dialog_download) { _, _ ->
+                                val uri = Uri.parse(resources.getString(R.string.release_url))
+                                val internet = Intent(Intent.ACTION_VIEW, uri)
+                                internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                                startActivity(internet)
+                            }.setNegativeButton(R.string.dialog_cancel) { _, _ ->
+
+                            }.create()
+                        dialog.show()
+                        true
                     }
                 }
             }
