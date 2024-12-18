@@ -56,6 +56,26 @@ pub async fn run(debug : bool) -> Result<()> {
         }
     };
 
+    // Display config.
+    info(format!("{}\n  {}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n  {}\n    {}{}",
+        t!("n_conf_title"),
+        t!("n_conf_input"),
+        t!("n_conf_input_delay"),
+        conf.delay.clone(),
+        t!("n_conf_input_open"),
+        conf.open,
+        t!("n_conf_input_up"),
+        conf.up,
+        t!("n_conf_input_down"),
+        conf.down,
+        t!("n_conf_input_left"),
+        conf.left,
+        t!("n_conf_input_right"),
+        conf.right,
+        t!("n_conf_type"),
+        t!("n_conf_type_open"),
+        conf.openType,));
+
     // Check authentication data
     let current_time = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -113,6 +133,7 @@ pub async fn run(debug : bool) -> Result<()> {
         .build()
         .unwrap();
     println(qrcode.to_str());
+    println(t!("n_admin"));
     println!();
 
     // Handle connection.
