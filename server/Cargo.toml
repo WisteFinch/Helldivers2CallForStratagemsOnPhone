@@ -19,3 +19,8 @@ rand = "0.8.5"
 fast_qr = "0.12.5"
 rust-i18n = "3.0.1"
 sys-locale = "0.3.1"
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
