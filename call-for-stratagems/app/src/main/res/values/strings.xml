@@ -83,6 +83,7 @@
     <string name="enable_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
     <string name="swipe_distance_threshold_title">Gesture Swipe Distance Threshold (pixel)</string>
     <string name="swipe_velocity_threshold_title">Gesture Swipe Velocity Threshold (pixel/s)</string>
+    <string name="lang_stratagem_title">Language: Stratagem Name</string>
 
     <!-- Info Preferences -->
     <string name="info_db_version">Database Version</string>

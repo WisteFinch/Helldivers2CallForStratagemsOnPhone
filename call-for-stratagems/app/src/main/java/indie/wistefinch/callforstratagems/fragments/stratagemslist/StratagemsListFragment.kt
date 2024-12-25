@@ -47,13 +47,17 @@ class StratagemsListFragment : Fragment() {
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val dbName = preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
+        var lang = preference.getString("lang_stratagem", "auto")!!
+        if (lang == "auto") {
+            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+        }
 
         binding.stratagemsListTitle.text = dbName
 
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(100)
-        adapter.setData(stratagemViewModel.getAllItems(), dbName)
+        adapter.setData(stratagemViewModel.getAllItems(), dbName, lang)
 
         return view
     }

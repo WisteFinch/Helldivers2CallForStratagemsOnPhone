@@ -24,10 +24,9 @@ class StratagemInfoDialog(context: Context) : Dialog(context) {
         setContentView(R.layout.layout_stratagem_info)
     }
 
-    fun setData(data: StratagemData, dbName: String)
+    fun setData(data: StratagemData, dbName: String, lang: String)
     {
         // Set card view text.
-        val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
         findViewById<TextView>(R.id.stratagem_info_title).text = when (lang) {
             "zh-CN" -> data.nameZh
             else -> data.name

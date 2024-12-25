@@ -39,6 +39,8 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
     private lateinit var dbName: String
 
+    private var lang: String = "auto"
+
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -48,7 +50,6 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
-        val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
         holder.itemView.findViewById<TextView>(R.id.stratagem_edit_title).text = when (lang) {
             "zh-CN" -> dataList[pos].nameZh
             else -> dataList[pos].name
@@ -86,7 +87,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
             val dialog = StratagemInfoDialog(context)
             dialog.show()
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.setData(dataList[pos], dbName)
+            dialog.setData(dataList[pos], dbName, lang)
             true
         }
     }
@@ -115,10 +116,11 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      * ignore the warning.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String) {
+    fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String, lang: String) {
         this.enabledStratagem = set
         this.dataList = list
         dbName = name
+        this.lang = lang
         notifyDataSetChanged()
     }
 }

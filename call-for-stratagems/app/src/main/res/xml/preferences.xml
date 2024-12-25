@@ -141,6 +141,15 @@
             app:icon="@drawable/ic_speed"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="auto"
+            app:entries="@array/lang_stratagem_entries"
+            app:entryValues="@array/lang_stratagem_values"
+            app:key="lang_stratagem"
+            app:title="@string/lang_stratagem_title"
+            app:icon="@drawable/ic_language"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/info_header">

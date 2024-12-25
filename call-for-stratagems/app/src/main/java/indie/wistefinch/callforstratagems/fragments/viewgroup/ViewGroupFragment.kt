@@ -150,7 +150,13 @@ class ViewGroupFragment : Fragment() {
             }
         }
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        adapter.setData(list.toList(), preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
+        var lang: String = preference.getString("lang_stratagem", "auto")!!
+        if (lang == "auto") {
+            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+        }
+        adapter.setData(list.toList(), preference.getString("db_name",
+            context?.resources?.getString(R.string.db_hd2_name))!!,
+            lang)
     }
 
     companion object {

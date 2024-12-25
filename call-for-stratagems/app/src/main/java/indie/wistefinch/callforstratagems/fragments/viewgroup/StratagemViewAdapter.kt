@@ -34,6 +34,8 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
 
     private lateinit var dbName: String
 
+    private var lang: String = "auto"
+
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -43,7 +45,6 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
-        val lang: String = context.resources.configuration.locales.get(0).toLanguageTag()
         holder.itemView.findViewById<TextView>(R.id.stratagem_view_title).text = when (lang) {
             "zh-CN" -> dataList[pos].nameZh
             else -> dataList[pos].name
@@ -66,7 +67,7 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
             val dialog = StratagemInfoDialog(context)
             dialog.show()
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.setData(dataList[pos], dbName)
+            dialog.setData(dataList[pos], dbName, lang)
             true
         }
     }
@@ -81,9 +82,10 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
      * Because the data won't change, there is no need to compare the difference, ignore the warning.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<StratagemData>, name: String) {
+    fun setData(list: List<StratagemData>, name: String, lang: String) {
         this.dataList = list
         dbName = name
+        this.lang = lang
         notifyDataSetChanged()
     }
 }

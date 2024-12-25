@@ -187,6 +187,11 @@ class PlayFragment : Fragment() {
      */
     private var token: String = "NULL"
 
+    /**
+     * Language of stratagem name
+     */
+    private var lang: String = "auto"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -200,6 +205,10 @@ class PlayFragment : Fragment() {
         port = preferences.getString("tcp_port", "23333")?.toInt()!!
         retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
         sid = preferences.getString("sid", "0")!!
+        lang = preferences.getString("lang_stratagem", "auto")!!
+        if (lang == "auto") {
+            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+        }
 
         // Set screen.
         if (!enableSimplifiedMode) {
@@ -422,7 +431,6 @@ class PlayFragment : Fragment() {
                 binding.playStratagemTitle.visibility = View.VISIBLE
                 binding.playStepsScrollView.visibility = View.VISIBLE
 
-                val lang: String = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
                 binding.playStratagemTitle.text = when (lang) {
                     "zh-CN" -> data.nameZh
                     else -> data.name
@@ -688,7 +696,6 @@ class PlayFragment : Fragment() {
      * Activate stratagem, send stratagem data to the server.
      */
     private suspend fun activateStratagem(stratagemData: StratagemData) {
-        val lang: String = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         // Check and restart the client
         if (!isConnected) {
             if (connectingLock.isLocked) {

@@ -236,4 +236,16 @@
         <item>double_tap</item>
     </string-array>
 
+    <string-array name="lang_stratagem_entries">
+        <item>跟随系统</item>
+        <item>简体中文</item>
+        <item>英文（English）</item>
+    </string-array>
+
+    <string-array name="lang_stratagem_values">
+        <item>auto</item>
+        <item>zh-CN</item>
+        <item>en</item>
+    </string-array>
+
 </resources>

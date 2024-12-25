@@ -171,9 +171,14 @@ class EditGroupFragment : Fragment() {
         recyclerView.autoFitColumns(100)
         val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        var lang: String = preference.getString("lang_stratagem", "auto")!!
+        if (lang == "auto") {
+            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+        }
         adapter.setData(list,
             currentItem.list.toMutableSet(),
-            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
+            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!,
+            lang)
     }
 
     companion object {
