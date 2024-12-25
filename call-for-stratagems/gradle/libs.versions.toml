@@ -15,8 +15,6 @@ lifecycleViewmodelKtx = "2.6.1"
 lifecycleLivedataKtx = "2.6.1"
 roomKtx = "2.6.1"
 gson = "2.11.0"
-playServicesCodeScanner = "16.0.0"
-playServicesBase = "18.2.0"
 androidsvgAar = "1.4"
 zxingLite = "3.2.0"
 
@@ -37,8 +35,6 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "playServicesCodeScanner" }
-play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 androidsvg-aar = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvgAar" }
 zxing-lite = { group = "com.github.jenly1314", name = "zxing-lite", version.ref = "zxingLite" }
 
