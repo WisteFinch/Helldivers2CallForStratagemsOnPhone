@@ -28,7 +28,7 @@ pub async fn run(debug : bool) -> Result<()> {
     if get_locale().unwrap().as_str() == "zh-CN" || get_locale().unwrap().as_str() == "zh" {
         rust_i18n::set_locale("zh-CN");
     } else {
-        rust_i18n::set_locale("zh-CN");
+        rust_i18n::set_locale("en");
     }
 
     println(format!("{}{VERSION}{}", t!("title_1"), t!("title_2")));
