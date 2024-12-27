@@ -4,9 +4,7 @@ use std::{
 };
 
 use colored::Colorize;
-use rust_i18n::{i18n, t};
-
-i18n!("src/locales");
+use rust_i18n::t;
 
 pub fn error<T: Display>(str: T) {
     println!("{}{}", t!("n_err").red(), str)

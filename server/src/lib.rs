@@ -5,13 +5,12 @@ use std::{fs, io};
 use fast_qr::qr::QRBuilder;
 use key::KeyFromString as _;
 use rand::{distributions::Alphanumeric, Rng};
-use rdev::{simulate, EventType};
+use rdev::EventType;
 use rust_i18n::{i18n, t};
 use serde_json::Value;
-use sys_locale::get_locale;
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
-use tokio::time::{sleep, Duration};
+use tokio::time::Duration;
 
 mod key;
 
@@ -30,7 +29,8 @@ const AUTH_TIMEOUT: u64 = 60 * 60 * 24 * 3;
 
 pub async fn run(debug: bool) -> Result<()> {
     // Check locale.
-    if get_locale().unwrap().as_str() == "zh-CN" || get_locale().unwrap().as_str() == "zh" {
+    let locale = sys_locale::get_locale().unwrap();
+    if ["zh-CN", "zh"].contains(&locale.as_str()) {
         rust_i18n::set_locale("zh-CN");
     } else {
         rust_i18n::set_locale("en");
@@ -404,7 +404,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
     } else if conf.open_type == "long_press" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
-        sleep(Duration::from_millis(400)).await;
+        tokio::time::sleep(Duration::from_millis(400)).await;
         execute(Step::Open, InputType::Release, conf).await.unwrap();
     } else if conf.open_type == "double_tap" {
         execute(Step::Open, InputType::Click, conf).await.unwrap();
@@ -466,14 +466,16 @@ fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
     // TODO: avoid unwrap
     if event_type == 0 {
         match data {
-            InputData::Keyboard(key) => simulate(&EventType::KeyPress(key)).unwrap(),
-            InputData::MouseButton(button) => simulate(&EventType::ButtonPress(button)).unwrap(),
-            InputData::WheelUp => simulate(&EventType::Wheel {
+            InputData::Keyboard(key) => rdev::simulate(&EventType::KeyPress(key)).unwrap(),
+            InputData::MouseButton(button) => {
+                rdev::simulate(&EventType::ButtonPress(button)).unwrap()
+            }
+            InputData::WheelUp => rdev::simulate(&EventType::Wheel {
                 delta_x: 0,
                 delta_y: 1,
             })
             .unwrap(),
-            InputData::WheelDown => simulate(&EventType::Wheel {
+            InputData::WheelDown => rdev::simulate(&EventType::Wheel {
                 delta_x: 0,
                 delta_y: -1,
             })
@@ -481,8 +483,10 @@ fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
         }
     } else {
         match data {
-            InputData::Keyboard(key) => simulate(&EventType::KeyRelease(key)).unwrap(),
-            InputData::MouseButton(button) => simulate(&EventType::ButtonRelease(button)).unwrap(),
+            InputData::Keyboard(key) => rdev::simulate(&EventType::KeyRelease(key)).unwrap(),
+            InputData::MouseButton(button) => {
+                rdev::simulate(&EventType::ButtonRelease(button)).unwrap()
+            }
             InputData::WheelUp | InputData::WheelDown => (),
         };
     }
@@ -495,7 +499,7 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
             simulate_key_event(step.clone(), 0, conf);
             print(step.clone());
             let _ = io::stdout().flush();
-            sleep(Duration::from_millis(conf.delay)).await;
+            tokio::time::sleep(Duration::from_millis(conf.delay)).await;
             simulate_key_event(step, 1, conf);
         }
         InputType::Press => {
@@ -511,7 +515,7 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
             println!();
         }
     }
-    sleep(Duration::from_millis(conf.delay)).await;
+    tokio::time::sleep(Duration::from_millis(conf.delay)).await;
 
     Ok(())
 }
