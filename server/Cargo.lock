@@ -738,6 +738,7 @@ dependencies = [
  "colored",
  "fast_qr",
  "local_ipaddress",
+ "log",
  "rand",
  "rdev",
  "rust-i18n",

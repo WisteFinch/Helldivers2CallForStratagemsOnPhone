@@ -4,6 +4,7 @@ use std::{fs, io};
 
 use fast_qr::qr::QRBuilder;
 use key::KeyFromString as _;
+use log::{debug, error, info, warn};
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::EventType;
 use rust_i18n::{i18n, t};
@@ -15,6 +16,7 @@ use tokio::time::Duration;
 mod key;
 
 pub mod data;
+pub mod logger;
 pub mod tool;
 
 use data::*;
@@ -27,7 +29,7 @@ const AUTH_PATH: &str = "./auth.json";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTH_TIMEOUT: u64 = 60 * 60 * 24 * 3;
 
-pub async fn run(debug: bool) -> Result<()> {
+pub async fn run() -> Result<()> {
     // Check locale.
     let locale = sys_locale::get_locale().unwrap();
     if ["zh-CN", "zh"].contains(&locale.as_str()) {
@@ -36,21 +38,16 @@ pub async fn run(debug: bool) -> Result<()> {
         rust_i18n::set_locale("en");
     }
 
-    println(format!("{}{VERSION}{}", t!("title_1"), t!("title_2")));
-
-    // Debug mode.
-    if debug {
-        warning(format!("{}", t!("debug_mode")));
-    }
+    println(format!("{}{}{}", t!("title_1"), VERSION, t!("title_2")));
 
     // Load configuration.
     let conf: Config = match load_config().await {
         Some(s) => {
-            info(t!("info_conf_loaded"));
+            info!("{}", t!("info_conf_loaded"));
             s
         }
         None => {
-            warning(t!("warn_conf_load_failed"));
+            warn!("{}", t!("warn_conf_load_failed"));
             save_config(
                 serde_json::to_string(&Config::default()).unwrap().as_str(),
                 false,
@@ -61,7 +58,7 @@ pub async fn run(debug: bool) -> Result<()> {
     };
 
     // Display config.
-    info(format!(
+    info!(
         "{}\n  {}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n  {}\n    {}{}",
         t!("n_conf_title"),
         t!("n_conf_input"),
@@ -80,7 +77,7 @@ pub async fn run(debug: bool) -> Result<()> {
         t!("n_conf_type"),
         t!("n_conf_type_open"),
         conf.open_type,
-    ));
+    );
 
     // Check authentication data
     let current_time = SystemTime::now()
@@ -98,9 +95,7 @@ pub async fn run(debug: bool) -> Result<()> {
     let mut ip: String = if conf.ip.is_empty() {
         local_ipaddress::get().unwrap()
     } else {
-        if debug {
-            warning(format!("{}{}", t!("d_specific_ip"), conf.ip.clone()));
-        }
+        debug!("{}{}", t!("d_specific_ip"), conf.ip.clone());
         conf.ip.clone()
     };
 
@@ -108,17 +103,13 @@ pub async fn run(debug: bool) -> Result<()> {
     let listener = match TcpListener::bind(format!("{}:{}", ip, conf.port)).await {
         Ok(ok) => ok,
         Err(err) => {
-            error(err);
+            error!("{}", err);
             ip = local_ipaddress::get().unwrap();
-            warning(t!("warn_conf_network_temp"));
+            warn!("{}", t!("warn_conf_network_temp"));
             TcpListener::bind(format!("{}:{}", ip, 0)).await?
         }
     };
-    info(format!(
-        "{}{}",
-        t!("info_listening"),
-        listener.local_addr().unwrap()
-    ));
+    info!("{}{}", t!("info_listening"), listener.local_addr().unwrap());
 
     // Print QR
     println!();
@@ -133,11 +124,11 @@ pub async fn run(debug: bool) -> Result<()> {
     // Handle connection.
     loop {
         let (client, _address) = listener.accept().await?;
-        tokio::spawn(handle_connection(client, conf.clone(), debug));
+        tokio::spawn(handle_connection(client, conf.clone()));
     }
 }
 
-async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> Result<()> {
+async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
     let mut is_authed = false;
     let token: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -146,44 +137,42 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
         .collect();
 
     println!();
-    info(format!("{}{}", t!("info_connect"), client.peer_addr()?));
+    info!("{}{}", t!("info_connect"), client.peer_addr()?);
     let mut buffer = vec![0; 4096];
 
     // Handel client requests.
     loop {
         let size = client.read(&mut buffer).await?;
         if size == 0 {
-            info(format!("{}{}", t!("info_close"), client.peer_addr()?));
+            info!("{}{}", t!("info_close"), client.peer_addr()?);
             return Ok(());
         }
         let request_raw = std::str::from_utf8(&buffer[..size]).unwrap();
 
-        // Display debug log.
-        if debug {
-            debug_log(format!(" >>> {}", &request_raw));
-        }
+        debug!(" >>> {}", &request_raw);
 
         // Remove redundant requests.
         let index = request_raw.find('\n').unwrap();
         let request = &request_raw[..index + 1];
-        if debug && request_raw.len() != index + 1 {
-            debug_log(format!("{}{}", t!("d_remove_redundant"), request));
+
+        if request_raw.len() != index + 1 {
+            debug!("{}{}", t!("d_remove_redundant"), request);
         }
 
         // Parsing json.
         let json: Value = match serde_json::from_str(request) {
             Ok(ok) => ok,
             Err(_) => {
-                error(t!("err_parse_json_failed"));
-                warning(format!("{}{}", t!("warn_force_close"), client.peer_addr()?));
+                error!("{}", t!("err_parse_json_failed"));
+                warn!("{}{}", t!("warn_force_close"), client.peer_addr()?);
                 return Ok(());
             }
         };
         let opt: Operation = match json["opt"].as_u64() {
             Some(s) => Operation::from_u64(s),
             None => {
-                error(t!("err_parse_opt_failed"));
-                warning(format!("{}{}", t!("warn_force_close"), client.peer_addr()?));
+                error!("{}", t!("err_parse_opt_failed"));
+                warn!("{}{}", t!("warn_force_close"), client.peer_addr()?);
                 return Ok(());
             }
         };
@@ -206,16 +195,14 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                         )
                     }
                 } else {
-                    warning(format!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2")));
+                    warn!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2"));
                     res = format!(
                         "{{\"status\":{},\"ver\":{VERSION}}}\n",
                         Status::VersionMismatch
                     );
                 }
 
-                if debug {
-                    debug_log(format!(" <<< {}", res));
-                }
+                debug!(" <<< {}", res);
 
                 client.write_all(res.as_bytes()).await?;
             }
@@ -223,14 +210,12 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                 if is_authed && client_token == token {
                     let res: String = serde_json::to_string(&conf).unwrap();
 
-                    if debug {
-                        debug_log(format!(" <<< {}", res));
-                    }
+                    debug!(" <<< {}", res);
 
                     client.write_all(res.as_bytes()).await?;
-                    info(format!("{}{}", t!("info_send_config"), client.peer_addr()?))
+                    info!("{}{}", t!("info_send_config"), client.peer_addr()?)
                 } else {
-                    warning(t!("warn_reject_request"))
+                    warn!("{}", t!("warn_reject_request"))
                 }
             }
             Operation::Sync => {
@@ -246,24 +231,24 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                         c.ip = conf.ip.clone();
                         save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
                     } else {
-                        warning(t!("warn_reject_sync"));
+                        warn!("{}", t!("warn_reject_sync"));
                     }
                 } else {
-                    warning(t!("warn_reject_request"))
+                    warn!("{}", t!("warn_reject_request"))
                 }
             }
             Operation::Combined => {
                 if is_authed && client_token == token {
                     macros(json["macro"].clone(), &conf).await?
                 } else {
-                    warning(t!("warn_reject_request"))
+                    warn!("{}", t!("warn_reject_request"))
                 }
             }
             Operation::Independent => {
                 if is_authed && client_token == token {
                     independent(json["input"].clone(), &conf).await?
                 } else {
-                    warning(t!("warn_reject_request"))
+                    warn!("{}", t!("warn_reject_request"))
                 }
             }
             Operation::Auth => {
@@ -297,7 +282,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                     io::stdin().read_line(&mut input).unwrap();
                     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
                         is_authed = true;
-                        info(t!("info_auth"));
+                        info!("{}", t!("info_auth"));
                         if is_exist {
                             for v in &mut auths {
                                 if v.sid == sid {
@@ -311,7 +296,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                             });
                         }
                     } else {
-                        warning(t!("warn_reject_auth"));
+                        warn!("{}", t!("warn_reject_auth"));
                     }
                 }
 
@@ -328,9 +313,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                     res = format!("{{\"auth\":{}}}\n", is_authed.clone());
                 }
 
-                if debug {
-                    debug_log(format!(" <<< {}", res));
-                }
+                debug!(" <<< {}", res);
 
                 client.write_all(res.as_bytes()).await?;
             }
@@ -366,17 +349,17 @@ async fn save_config(str: &str, sync: bool) {
     match fs::write(CONF_PATH, str) {
         Ok(_) => match sync {
             true => {
-                info(t!("info_sync_complete"));
+                info!("{}", t!("info_sync_complete"));
                 std::process::exit(0);
             }
-            false => info(t!("info_conf_saved")),
+            false => info!("{}", t!("info_conf_saved")),
         },
         Err(_) => match sync {
             true => {
-                error(t!("err_sync_failed"));
+                error!("{}", t!("err_sync_failed"));
                 std::process::exit(0);
             }
-            false => error(t!("err_conf_save_failed")),
+            false => error!("{}", t!("err_conf_save_failed")),
         },
     }
 }
@@ -384,7 +367,7 @@ async fn save_config(str: &str, sync: bool) {
 async fn save_auth(str: &str) {
     match fs::write(AUTH_PATH, str) {
         Ok(_) => {}
-        Err(_) => error(t!("err_auth_save_failed")),
+        Err(_) => error!("{}", t!("err_auth_save_failed")),
     }
 }
 
@@ -393,7 +376,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
     let list = match value["steps"].as_array() {
         Some(s) => s,
         None => {
-            error(t!("err_parse_step_failed"));
+            error!("{}", t!("err_parse_step_failed"));
             return Ok(());
         }
     };
@@ -433,14 +416,14 @@ async fn independent(value: Value, conf: &Config) -> Result<()> {
     let step = match value["step"].as_u64() {
         Some(s) => Step::from_u64(s),
         None => {
-            error(t!("err_parse_step_failed"));
+            error!("{}", t!("err_parse_step_failed"));
             return Ok(());
         }
     };
     let t = match value["type"].as_u64() {
         Some(s) => InputType::from_u64(s),
         None => {
-            error(t!("err_parse_input_failed"));
+            error!("{}", t!("err_parse_input_failed"));
             return Ok(());
         }
     };
@@ -459,7 +442,7 @@ fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
     };
     let Some(data) = InputData::from_str(data_str) else {
         // TODO: i18n
-        error("err_parse_input_failed");
+        error!("{}", "err_parse_input_failed");
         return;
     };
 
