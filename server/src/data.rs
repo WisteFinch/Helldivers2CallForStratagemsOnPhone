@@ -1,6 +1,7 @@
-use rdev::{Button, Key};
 use serde::{Deserialize, Serialize};
 use std::fmt;
+
+use crate::key::KeyFromString;
 
 pub enum InputType {
     Click = 0,
@@ -22,17 +23,27 @@ impl InputType {
     }
 }
 
-pub enum KeyType {
-    Keyboard = 0,
-    MouseButton = 1,
-    WheelUp = 2,
-    WheelDown = 3,
+pub enum InputData {
+    Keyboard(rdev::Key),
+    MouseButton(rdev::Button),
+    WheelUp,
+    WheelDown,
 }
 
-pub struct InputData {
-    pub key_type: KeyType,
-    pub keyboard: Key,
-    pub mouse_button: Button,
+impl KeyFromString for InputData {
+    fn from_str(s: &str) -> Option<Self> {
+        if let Some(key) = rdev::Key::from_str(s) {
+            return Some(Self::Keyboard(key));
+        }
+        if let Some(button) = rdev::Button::from_str(s) {
+            return Some(Self::MouseButton(button));
+        }
+        match s {
+            "wheel_up" => Some(Self::WheelUp),
+            "wheel_down" => Some(Self::WheelDown),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -91,13 +102,13 @@ impl Operation {
 }
 
 // To comply with the JSON specification, ignore non_snake_case warnings.
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Config {
     pub port: u64,
     pub delay: u64,
     pub open: String,
-    pub openType: String,
+    pub open_type: String,
     pub up: String,
     pub down: String,
     pub left: String,
@@ -111,7 +122,7 @@ impl Default for Config {
             port: 23333,
             delay: 25,
             open: String::from("ctrl_left"),
-            openType: String::from("hold"),
+            open_type: String::from("hold"),
             up: String::from("w"),
             down: String::from("s"),
             left: String::from("a"),

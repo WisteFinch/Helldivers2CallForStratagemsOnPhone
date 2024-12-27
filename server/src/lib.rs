@@ -3,6 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, io};
 
 use fast_qr::qr::QRBuilder;
+use key::KeyFromString as _;
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::{simulate, EventType};
 use rust_i18n::{i18n, t};
@@ -11,6 +12,8 @@ use sys_locale::get_locale;
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::{sleep, Duration};
+
+mod key;
 
 pub mod data;
 pub mod tool;
@@ -76,7 +79,7 @@ pub async fn run(debug: bool) -> Result<()> {
         conf.right,
         t!("n_conf_type"),
         t!("n_conf_type_open"),
-        conf.openType,
+        conf.open_type,
     ));
 
     // Check authentication data
@@ -397,13 +400,13 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
 
     // Press open
     print(format!("{name}: "));
-    if conf.openType == "hold" {
+    if conf.open_type == "hold" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
-    } else if conf.openType == "long_press" {
+    } else if conf.open_type == "long_press" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
         sleep(Duration::from_millis(400)).await;
         execute(Step::Open, InputType::Release, conf).await.unwrap();
-    } else if conf.openType == "double_tap" {
+    } else if conf.open_type == "double_tap" {
         execute(Step::Open, InputType::Click, conf).await.unwrap();
         execute(Step::Open, InputType::Click, conf).await.unwrap();
     } else {
@@ -418,7 +421,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
     }
 
     // Release open
-    if conf.openType == "hold" {
+    if conf.open_type == "hold" {
         execute(Step::Open, InputType::Release, conf).await.unwrap();
     }
     println!();
@@ -447,40 +450,47 @@ async fn independent(value: Value, conf: &Config) -> Result<()> {
 }
 
 fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
-    let data = match step {
-        Step::Open => conf.open.clone().to_key(),
-        Step::Up => conf.up.clone().to_key(),
-        Step::Down => conf.down.clone().to_key(),
-        Step::Left => conf.left.clone().to_key(),
-        Step::Right => conf.right.clone().to_key(),
+    let data_str = match step {
+        Step::Open => conf.open.as_str(),
+        Step::Up => conf.up.as_str(),
+        Step::Down => conf.down.as_str(),
+        Step::Left => conf.left.as_str(),
+        Step::Right => conf.right.as_str(),
     };
+    let Some(data) = InputData::from_str(data_str) else {
+        // TODO: i18n
+        error("err_parse_input_failed");
+        return;
+    };
+
+    // TODO: avoid unwrap
     if event_type == 0 {
-        match data.key_type {
-            KeyType::Keyboard => simulate(&EventType::KeyPress(data.keyboard)).unwrap(),
-            KeyType::MouseButton => simulate(&EventType::ButtonPress(data.mouse_button)).unwrap(),
-            KeyType::WheelUp => simulate(&EventType::Wheel {
+        match data {
+            InputData::Keyboard(key) => simulate(&EventType::KeyPress(key)).unwrap(),
+            InputData::MouseButton(button) => simulate(&EventType::ButtonPress(button)).unwrap(),
+            InputData::WheelUp => simulate(&EventType::Wheel {
                 delta_x: 0,
                 delta_y: 1,
             })
             .unwrap(),
-            KeyType::WheelDown => simulate(&EventType::Wheel {
+            InputData::WheelDown => simulate(&EventType::Wheel {
                 delta_x: 0,
                 delta_y: -1,
             })
             .unwrap(),
         }
     } else {
-        match data.key_type {
-            KeyType::Keyboard => simulate(&EventType::KeyRelease(data.keyboard)).unwrap(),
-            KeyType::MouseButton => simulate(&EventType::ButtonRelease(data.mouse_button)).unwrap(),
-            KeyType::WheelUp => (),
-            KeyType::WheelDown => (),
-        }
+        match data {
+            InputData::Keyboard(key) => simulate(&EventType::KeyRelease(key)).unwrap(),
+            InputData::MouseButton(button) => simulate(&EventType::ButtonRelease(button)).unwrap(),
+            InputData::WheelUp | InputData::WheelDown => (),
+        };
     }
 }
 
 async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
     match t {
+        // TODO: 应当在解析完成所有step无错误后再开始执行
         InputType::Click => {
             simulate_key_event(step.clone(), 0, conf);
             print(step.clone());
