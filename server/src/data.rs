@@ -30,13 +30,13 @@ pub enum KeyType {
     Keyboard = 0,
     MouseButton = 1,
     WheelUp = 2,
-    WheelDown = 3
+    WheelDown = 3,
 }
 
 pub struct InputData {
     pub key_type: KeyType,
     pub keyboard: Key,
-    pub mouse_button: Button
+    pub mouse_button: Button,
 }
 
 #[derive(Clone)]
