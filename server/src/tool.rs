@@ -178,10 +178,9 @@ pub fn debug_log<T: Display>(str: T) {
 pub fn compare_ver(ver_a: &str, ver_b: &str) -> bool {
     let mut a_split = ver_a.split(".");
     let mut b_split = ver_b.split(".");
-    if a_split.next() == b_split.next() {
-        if a_split.next() == b_split.next() {
-            return true
-        }
+    if a_split.next() == b_split.next() && a_split.next() == b_split.next() {
+        return true
     }
-    return false
+
+    false
 }

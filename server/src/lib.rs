@@ -21,7 +21,7 @@ i18n!("src/locales");
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
-const AUTH_TIMEOUT: u64 = 259200;
+const AUTH_TIMEOUT: u64 = 60 * 60 * 24 * 3;
 
 pub async fn run(debug : bool) -> Result<()> {
     // Check locale.
@@ -81,10 +81,7 @@ pub async fn run(debug : bool) -> Result<()> {
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let auths = match load_auth().await {
-        Some(s) => s,
-        None => vec![]
-    };
+    let auths = (load_auth().await).unwrap_or_default();
     let filtered = auths.into_iter()
         .filter(|x| x.time.abs_diff(current_time) <= AUTH_TIMEOUT)
         .collect::<Vec<Auth>>();
@@ -254,10 +251,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
                     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-                        let mut c: Config = match serde_json::from_str(json["config"].to_string().as_str()) {
-                            Ok(s) => s,
-                            Err(_) => Config::default()
-                        };
+                        let mut c: Config = serde_json::from_str(json["config"].to_string().as_str()).unwrap_or_default();
                         c.ip = conf.ip.clone();
                         save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
                     } else {
@@ -287,10 +281,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool) -> 
                     .duration_since(UNIX_EPOCH)
                     .unwrap()
                     .as_secs();
-                let mut auths = match load_auth().await {
-                    Some(s) => s,
-                    None => vec![]
-                };
+                let mut auths = (load_auth().await).unwrap_or_default();
 
                 // Check if authentication is available.
                 let mut is_exist = false;
@@ -496,7 +487,7 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
             simulate_key_event(step.clone(), 0, conf);
             print(step.clone());
             let _ = io::stdout().flush();
-            sleep(Duration::from_millis(conf.delay as u64)).await;
+            sleep(Duration::from_millis(conf.delay)).await;
             simulate_key_event(step, 1, conf);
         }
         InputType::Press => {
