@@ -1,5 +1,3 @@
-err_parse_json_failed: Failed to parse request data!
-err_parse_opt_failed: Failed to parse operation!
 info_close: 'Connection closed by client: '
 title_1: '=== Call for stratagem server v'
 title_2: ' ==='
@@ -29,6 +27,12 @@ err_conf_save_failed: Failed to save configuration!
 err_auth_save_failed: Failed to save authentication data!
 err_parse_step_failed: Failed to parse steps!
 err_parse_input_failed: Failed to parse input type!
+err_parse_ip: Failed to parse IP address
+err_bind_socket: Failed to bind socket
+err_json: Failed to parse JSON data
+err_bind_addr: Failed to listening on address
+err_invalid_utf8: Invalid UTF-8 data
+err_parse_opt: Failed to parse operation!
 n_free_input: 'Free input: '
 n_err: '[ERROR] '
 n_warn: '[WARNING] '

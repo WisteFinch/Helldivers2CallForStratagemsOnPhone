@@ -1,4 +1,6 @@
 use std::io::Write;
+use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, io};
 
@@ -8,26 +10,46 @@ use log::{debug, error, info, warn};
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::EventType;
 use rust_i18n::{i18n, t};
-use serde_json::Value;
-use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::Duration;
 
-mod key;
-
-pub mod data;
-pub mod logger;
-pub mod tool;
-
+use crate::error::I18NError;
 use data::*;
 use tool::*;
 
+mod data;
+mod error;
+mod key;
+mod logger;
+mod tool;
+
 i18n!("src/locales");
+
+type Result<T> = std::result::Result<T, I18NError>;
 
 const CONF_PATH: &str = "./config.json";
 const AUTH_PATH: &str = "./auth.json";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTH_TIMEOUT: u64 = 60 * 60 * 24 * 3;
+
+#[derive(Debug)]
+struct Session {
+    #[allow(dead_code)]
+    pub addr: SocketAddr,
+    pub token: String,
+    pub is_authenticated: bool,
+}
+
+impl Session {
+    fn new(addr: SocketAddr) -> Self {
+        Self {
+            addr,
+            token: "".to_string(),
+            is_authenticated: false,
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() {
@@ -111,34 +133,37 @@ async fn run() -> Result<()> {
         .into_iter()
         .filter(|x| x.time.abs_diff(current_time) <= AUTH_TIMEOUT)
         .collect::<Vec<Auth>>();
-    save_auth(serde_json::to_string(&filtered).unwrap().as_str()).await;
+    save_auth(serde_json::to_string(&filtered)?.as_str()).await;
 
     // Get ip address.
-    let mut ip: String = if conf.ip.is_empty() {
-        local_ipaddress::get().unwrap()
+    let ip: Ipv4Addr = if conf.ip.is_empty() {
+        let ip_string = local_ipaddress::get().unwrap_or("127.0.0.1".to_string());
+        Ipv4Addr::from_str(&ip_string).unwrap()
     } else {
-        debug!("{}{}", t!("d_specific_ip"), conf.ip.clone());
-        conf.ip.clone()
-    };
-
-    // Listen port.
-    let listener = match TcpListener::bind(format!("{}:{}", ip, conf.port)).await {
-        Ok(ok) => ok,
-        Err(err) => {
-            error!("{}", err);
-            ip = local_ipaddress::get().unwrap();
-            warn!("{}", t!("warn_conf_network_temp"));
-            TcpListener::bind(format!("{}:{}", ip, 0)).await?
+        debug!("{}{}", t!("d_specific_ip"), conf.ip);
+        match Ipv4Addr::from_str(&conf.ip) {
+            Ok(ip) => ip,
+            Err(e) => {
+                error!("Failed to parse ip address: {}", e);
+                warn!("{}", t!("warn_conf_network_temp"));
+                let ip_string = local_ipaddress::get().unwrap_or("127.0.0.1".to_string());
+                Ipv4Addr::from_str(&ip_string).unwrap()
+            }
         }
     };
+
+    let socket_addr: SocketAddrV4 = SocketAddrV4::new(ip, conf.port as u16);
+
+    // Listen port.
+    let listener = TcpListener::bind(socket_addr)
+        .await
+        .map_err(I18NError::BindAddr)?;
     info!("{}{}", t!("info_listening"), listener.local_addr().unwrap());
 
     // Print QR
     println!();
     println(t!("n_scan_qr_code"));
-    let qrcode = QRBuilder::new(format!("{{\"add\":\"{}\",\"port\":{}}}", ip, conf.port))
-        .build()
-        .unwrap();
+    let qrcode = QRBuilder::new(format!(r#"{{"add":"{}","port":{}}}"#, ip, conf.port)).build()?;
     println(qrcode.to_str());
     println(t!("n_admin"));
     println!();
@@ -151,15 +176,18 @@ async fn run() -> Result<()> {
 }
 
 async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
-    let mut is_authed = false;
-    let token: String = rand::thread_rng()
+    println!();
+    info!("{}{}", t!("info_connect"), client.peer_addr()?);
+
+    let mut session = Session::new(client.peer_addr()?);
+    session.token = rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(16)
         .map(char::from)
         .collect();
+    session.is_authenticated = false;
+    debug!("Created session: {:?}\n", session);
 
-    println!();
-    info!("{}{}", t!("info_connect"), client.peer_addr()?);
     let mut buffer = vec![0; 4096];
 
     // Handel client requests.
@@ -169,7 +197,14 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             info!("{}{}", t!("info_close"), client.peer_addr()?);
             return Ok(());
         }
-        let request_raw = std::str::from_utf8(&buffer[..size]).unwrap();
+
+        let request_raw = match std::str::from_utf8(&buffer[..size]) {
+            Ok(r) => r,
+            Err(e) => {
+                error!("{}", I18NError::InvalidUtf8(e));
+                continue;
+            }
+        };
 
         debug!(" >>> {}", &request_raw);
 
@@ -181,166 +216,168 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             debug!("{}{}", t!("d_remove_redundant"), request);
         }
 
-        // Parsing json.
-        let json: Value = match serde_json::from_str(request) {
-            Ok(ok) => ok,
-            Err(_) => {
-                error!("{}", t!("err_parse_json_failed"));
-                warn!("{}{}", t!("warn_force_close"), client.peer_addr()?);
-                return Ok(());
-            }
+        if let Err(e) = handle_message(&mut client, request, &mut session, &conf).await {
+            error!("{}", e);
+            continue;
         };
-        let opt: Operation = match json["opt"].as_u64() {
-            Some(s) => Operation::from_u64(s),
-            None => {
-                error!("{}", t!("err_parse_opt_failed"));
-                warn!("{}{}", t!("warn_force_close"), client.peer_addr()?);
-                return Ok(());
-            }
-        };
+    }
+}
 
-        // Analyse operation.
-        let client_token = json["token"].as_str().unwrap_or("NULL");
-        match opt {
-            Operation::Status => {
-                // Check version.
-                let ver = json["ver"].as_str().unwrap_or("NULL");
-                let res: String;
-                if compare_ver(ver, VERSION) {
-                    // Check authentication.
-                    if is_authed {
-                        res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Success);
-                    } else {
-                        res = format!(
-                            "{{\"status\":{},\"ver\":{VERSION}}}\n",
-                            Status::Unauthorized
-                        )
-                    }
+async fn handle_message(
+    client: &mut TcpStream,
+    message: &str,
+    session: &mut Session,
+    conf: &Config,
+) -> Result<()> {
+    let addr = client.peer_addr()?;
+
+    // Parsing json.
+    let json: serde_json::Value = serde_json::from_str(message)?;
+    let opt: Operation = match json["opt"].as_u64() {
+        Some(s) => Operation::from_u64(s),
+        None => return Err(I18NError::ParseOperation),
+    };
+
+    // Analyse operation.
+    let client_token = json["token"].as_str().unwrap_or("NULL");
+    match opt {
+        Operation::Status => {
+            // Check version.
+            let ver = json["ver"].as_str().unwrap_or("NULL");
+            let res: String;
+            if compare_ver(ver, VERSION) {
+                // Check authentication.
+                if session.is_authenticated {
+                    res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Success);
                 } else {
-                    warn!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2"));
                     res = format!(
                         "{{\"status\":{},\"ver\":{VERSION}}}\n",
-                        Status::VersionMismatch
-                    );
+                        Status::Unauthorized
+                    )
                 }
+            } else {
+                warn!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2"));
+                res = format!(
+                    "{{\"status\":{},\"ver\":{VERSION}}}\n",
+                    Status::VersionMismatch
+                );
+            }
+
+            debug!(" <<< {}", res);
+
+            client.write_all(res.as_bytes()).await?;
+        }
+        Operation::Request => {
+            if session.is_authenticated && client_token == session.token {
+                let res: String = serde_json::to_string(&conf).unwrap();
 
                 debug!(" <<< {}", res);
 
                 client.write_all(res.as_bytes()).await?;
-            }
-            Operation::Request => {
-                if is_authed && client_token == token {
-                    let res: String = serde_json::to_string(&conf).unwrap();
-
-                    debug!(" <<< {}", res);
-
-                    client.write_all(res.as_bytes()).await?;
-                    info!("{}{}", t!("info_send_config"), client.peer_addr()?)
-                } else {
-                    warn!("{}", t!("warn_reject_request"))
-                }
-            }
-            Operation::Sync => {
-                if is_authed && client_token == token {
-                    println(format!("{}{}", t!("n_sync_conf"), client.peer_addr()?));
-                    print(t!("ask_sync"));
-                    let mut input = String::new();
-                    io::stdin().read_line(&mut input).unwrap();
-                    if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-                        let mut c: Config =
-                            serde_json::from_str(json["config"].to_string().as_str())
-                                .unwrap_or_default();
-                        c.ip = conf.ip.clone();
-                        save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
-                    } else {
-                        warn!("{}", t!("warn_reject_sync"));
-                    }
-                } else {
-                    warn!("{}", t!("warn_reject_request"))
-                }
-            }
-            Operation::Combined => {
-                if is_authed && client_token == token {
-                    macros(json["macro"].clone(), &conf).await?
-                } else {
-                    warn!("{}", t!("warn_reject_request"))
-                }
-            }
-            Operation::Independent => {
-                if is_authed && client_token == token {
-                    independent(json["input"].clone(), &conf).await?
-                } else {
-                    warn!("{}", t!("warn_reject_request"))
-                }
-            }
-            Operation::Auth => {
-                let sid = json["sid"].as_str().unwrap_or("NULL");
-                let current_time = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs();
-                let mut auths = (load_auth().await).unwrap_or_default();
-
-                // Check if authentication is available.
-                let mut is_exist = false;
-                for v in &auths {
-                    if v.sid == sid && current_time.abs_diff(v.time) <= AUTH_TIMEOUT {
-                        is_authed = true;
-                        is_exist = true;
-                    }
-                }
-
-                // Ask user for authentication.
-                if !is_authed {
-                    println(format!(
-                        "{}{}{}{}",
-                        t!("n_auth_1"),
-                        client.peer_addr()?,
-                        t!("n_auth_2"),
-                        sid
-                    ));
-                    print(t!("ask_auth"));
-                    let mut input = String::new();
-                    io::stdin().read_line(&mut input).unwrap();
-                    if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-                        is_authed = true;
-                        info!("{}", t!("info_auth"));
-                        if is_exist {
-                            for v in &mut auths {
-                                if v.sid == sid {
-                                    v.time = current_time;
-                                }
-                            }
-                        } else {
-                            auths.push(Auth {
-                                sid: sid.to_string(),
-                                time: current_time,
-                            });
-                        }
-                    } else {
-                        warn!("{}", t!("warn_reject_auth"));
-                    }
-                }
-
-                // Send token to client.
-                let res: String;
-                if is_authed {
-                    res = format!(
-                        "{{\"auth\":{},\"token\":\"{}\"}}\n",
-                        is_authed.clone(),
-                        token
-                    );
-                    save_auth(serde_json::to_string(&auths.clone()).unwrap().as_str()).await
-                } else {
-                    res = format!("{{\"auth\":{}}}\n", is_authed.clone());
-                }
-
-                debug!(" <<< {}", res);
-
-                client.write_all(res.as_bytes()).await?;
+                info!("{}{}", t!("info_send_config"), addr)
+            } else {
+                warn!("{}", t!("warn_reject_request"))
             }
         }
+        Operation::Sync => {
+            if session.is_authenticated && client_token == session.token {
+                println(format!("{}{}", t!("n_sync_conf"), addr));
+                print(t!("ask_sync"));
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).unwrap();
+                if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
+                    let mut c: Config = serde_json::from_str(json["config"].to_string().as_str())
+                        .unwrap_or_default();
+                    c.ip = conf.ip.clone();
+                    save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
+                } else {
+                    warn!("{}", t!("warn_reject_sync"));
+                }
+            } else {
+                warn!("{}", t!("warn_reject_request"))
+            }
+        }
+        Operation::Combined => {
+            if session.is_authenticated && client_token == session.token {
+                macros(json["macro"].clone(), conf).await?
+            } else {
+                warn!("{}", t!("warn_reject_request"))
+            }
+        }
+        Operation::Independent => {
+            if session.is_authenticated && client_token == session.token {
+                independent(json["input"].clone(), conf).await?
+            } else {
+                warn!("{}", t!("warn_reject_request"))
+            }
+        }
+        Operation::Auth => {
+            let sid = json["sid"].as_str().unwrap_or("NULL");
+            let current_time = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs();
+            let mut auths = (load_auth().await).unwrap_or_default();
+
+            // Check if authentication is available.
+            let mut is_exist = false;
+            for v in &auths {
+                if v.sid == sid && current_time.abs_diff(v.time) <= AUTH_TIMEOUT {
+                    session.is_authenticated = true;
+                    is_exist = true;
+                }
+            }
+
+            // Ask user for authentication.
+            if !session.is_authenticated {
+                println(format!(
+                    "{}{}{}{}",
+                    t!("n_auth_1"),
+                    addr,
+                    t!("n_auth_2"),
+                    sid
+                ));
+                print(t!("ask_auth"));
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).unwrap();
+                if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
+                    session.is_authenticated = true;
+                    info!("{}", t!("info_auth"));
+                    if is_exist {
+                        for v in &mut auths {
+                            if v.sid == sid {
+                                v.time = current_time;
+                            }
+                        }
+                    } else {
+                        auths.push(Auth {
+                            sid: sid.to_string(),
+                            time: current_time,
+                        });
+                    }
+                } else {
+                    warn!("{}", t!("warn_reject_auth"));
+                }
+            }
+
+            // Send token to client.
+            let res: String;
+            if session.is_authenticated {
+                res = format!(
+                    "{{\"auth\":{},\"token\":\"{}\"}}\n",
+                    session.is_authenticated, session.token
+                );
+                save_auth(serde_json::to_string(&auths.clone()).unwrap().as_str()).await
+            } else {
+                res = format!("{{\"auth\":{}}}\n", session.is_authenticated);
+            }
+
+            debug!(" <<< {}", res);
+
+            client.write_all(res.as_bytes()).await?;
+        }
     }
+    Ok(())
 }
 
 async fn load_config() -> Option<Config> {
@@ -387,13 +424,12 @@ async fn save_config(str: &str, sync: bool) {
 }
 
 async fn save_auth(str: &str) {
-    match fs::write(AUTH_PATH, str) {
-        Ok(_) => {}
-        Err(_) => error!("{}", t!("err_auth_save_failed")),
+    if let Err(e) = fs::write(AUTH_PATH, str) {
+        error!("{} {}", t!("err_auth_save_failed"), e);
     }
 }
 
-async fn macros(value: Value, conf: &Config) -> Result<()> {
+async fn macros(value: serde_json::Value, conf: &Config) -> Result<()> {
     let name = value["name"].as_str().unwrap_or("");
     let list = match value["steps"].as_array() {
         Some(s) => s,
@@ -434,7 +470,7 @@ async fn macros(value: Value, conf: &Config) -> Result<()> {
     Ok(())
 }
 
-async fn independent(value: Value, conf: &Config) -> Result<()> {
+async fn independent(value: serde_json::Value, conf: &Config) -> Result<()> {
     let step = match value["step"].as_u64() {
         Some(s) => Step::from_u64(s),
         None => {
