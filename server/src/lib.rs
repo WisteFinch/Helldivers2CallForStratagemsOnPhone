@@ -1,20 +1,22 @@
-use data::*;
+use std::io::Write;
+use std::time::{SystemTime, UNIX_EPOCH};
+use std::{fs, io};
+
 use fast_qr::qr::QRBuilder;
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::{simulate, EventType};
 use rust_i18n::{i18n, t};
 use serde_json::Value;
-use std::io::Write;
-use std::time::{SystemTime, UNIX_EPOCH};
-use std::{fs, io};
 use sys_locale::get_locale;
 use tokio::io::{AsyncReadExt, AsyncWriteExt, Result};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::{sleep, Duration};
-use tool::*;
 
 pub mod data;
 pub mod tool;
+
+use data::*;
+use tool::*;
 
 i18n!("src/locales");
 
