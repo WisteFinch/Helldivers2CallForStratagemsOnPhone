@@ -12,16 +12,12 @@ pub enum InputType {
 
 impl InputType {
     pub fn from_u64(v: u64) -> Self {
-        if v == 1 {
-            Self::Press
-        } else if v == 2 {
-            Self::Release
-        } else if v == 3 {
-            Self::Begin
-        } else if v == 4 {
-            Self::End
-        } else {
-            Self::Click
+        match v {
+            1 => Self::Press,
+            2 => Self::Release,
+            3 => Self::Begin,
+            4 => Self::End,
+            _ => Self::Click,
         }
     }
 }
@@ -30,13 +26,13 @@ pub enum KeyType {
     Keyboard = 0,
     MouseButton = 1,
     WheelUp = 2,
-    WheelDown = 3
+    WheelDown = 3,
 }
 
 pub struct InputData {
     pub key_type: KeyType,
     pub keyboard: Key,
-    pub mouse_button: Button
+    pub mouse_button: Button,
 }
 
 #[derive(Clone)]
@@ -50,16 +46,12 @@ pub enum Step {
 
 impl Step {
     pub fn from_u64(v: u64) -> Self {
-        if v == 1 {
-            Self::Up
-        } else if v == 2 {
-            Self::Down
-        } else if v == 3 {
-            Self::Left
-        } else if v == 4 {
-            Self::Right
-        } else {
-            Self::Open
+        match v {
+            1 => Self::Up,
+            2 => Self::Down,
+            3 => Self::Left,
+            4 => Self::Right,
+            _ => Self::Open,
         }
     }
 }
@@ -87,18 +79,13 @@ pub enum Operation {
 
 impl Operation {
     pub fn from_u64(v: u64) -> Self {
-        if v == 1 {
-            Self::Combined
-        } else if v == 2 {
-            Self::Independent
-        } else if v == 3 {
-            Self::Request
-        } else if v == 4 {
-            Self::Sync
-        } else if v == 5 {
-            Self::Auth
-        } else {
-            Self::Status
+        match v {
+            1 => Self::Combined,
+            2 => Self::Independent,
+            3 => Self::Request,
+            4 => Self::Sync,
+            5 => Self::Auth,
+            _ => Self::Status,
         }
     }
 }

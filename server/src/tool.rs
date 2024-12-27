@@ -4,7 +4,7 @@ use std::{
 };
 
 use colored::Colorize;
-use rdev::{Key, Button};
+use rdev::{Button, Key};
 use rust_i18n::{i18n, t};
 
 use crate::{InputData, KeyType};
@@ -20,7 +20,7 @@ impl StringToKey for String {
         let mut data: InputData = InputData {
             key_type: KeyType::Keyboard,
             keyboard: Key::Unknown(0),
-            mouse_button: Button::Unknown(0)
+            mouse_button: Button::Unknown(0),
         };
         data.keyboard = match self.as_str() {
             "alt" => Key::Alt,
@@ -143,7 +143,7 @@ impl StringToKey for String {
             data.key_type = match self.as_str() {
                 "wheel_up" => KeyType::WheelUp,
                 "wheel_down" => KeyType::WheelDown,
-                _ => KeyType::Keyboard
+                _ => KeyType::Keyboard,
             }
         }
         data
@@ -178,10 +178,9 @@ pub fn debug_log<T: Display>(str: T) {
 pub fn compare_ver(ver_a: &str, ver_b: &str) -> bool {
     let mut a_split = ver_a.split(".");
     let mut b_split = ver_b.split(".");
-    if a_split.next() == b_split.next() {
-        if a_split.next() == b_split.next() {
-            return true
-        }
+    if a_split.next() == b_split.next() && a_split.next() == b_split.next() {
+        return true;
     }
-    return false
+
+    false
 }
