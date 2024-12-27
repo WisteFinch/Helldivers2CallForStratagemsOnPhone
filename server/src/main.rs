@@ -10,6 +10,7 @@ use log::{debug, error, info, warn};
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::EventType;
 use rust_i18n::{i18n, t};
+use serde::Serialize;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::time::Duration;
@@ -39,6 +40,13 @@ struct Session {
     pub addr: SocketAddr,
     pub token: String,
     pub is_authenticated: bool,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(untagged)]
+enum Response {
+    Status { status: i32, ver: &'static str },
+    Auth { auth: bool, token: Option<String> },
 }
 
 impl Session {
@@ -163,7 +171,12 @@ async fn run() -> Result<()> {
     // Print QR
     println!();
     println(t!("n_scan_qr_code"));
-    let qrcode = QRBuilder::new(format!(r#"{{"add":"{}","port":{}}}"#, ip, conf.port)).build()?;
+
+    let qr_value = serde_json::json!({
+        "add": ip,
+        "port": conf.port,
+    });
+    let qrcode = QRBuilder::new(serde_json::to_string(&qr_value)?).build()?;
     println(qrcode.to_str());
     println(t!("n_admin"));
     println!();
@@ -244,28 +257,31 @@ async fn handle_message(
         Operation::Status => {
             // Check version.
             let ver = json["ver"].as_str().unwrap_or("NULL");
-            let res: String;
-            if compare_ver(ver, VERSION) {
+            let res = if compare_ver(ver, VERSION) {
                 // Check authentication.
                 if session.is_authenticated {
-                    res = format!("{{\"status\":{},\"ver\":{VERSION}}}\n", Status::Success);
+                    Response::Status {
+                        status: Status::Success as i32,
+                        ver: VERSION,
+                    }
                 } else {
-                    res = format!(
-                        "{{\"status\":{},\"ver\":{VERSION}}}\n",
-                        Status::Unauthorized
-                    )
+                    Response::Status {
+                        status: Status::Unauthorized as i32,
+                        ver: VERSION,
+                    }
                 }
             } else {
                 warn!("{}{ver}{}", t!("warn_ver_1"), t!("warn_ver_2"));
-                res = format!(
-                    "{{\"status\":{},\"ver\":{VERSION}}}\n",
-                    Status::VersionMismatch
-                );
-            }
+                Response::Status {
+                    status: Status::VersionMismatch as i32,
+                    ver: VERSION,
+                }
+            };
 
-            debug!(" <<< {}", res);
+            let res_data = serde_json::to_string(&res)?;
+            debug!(" <<< {}", res_data);
 
-            client.write_all(res.as_bytes()).await?;
+            client.write_all(res_data.as_bytes()).await?;
         }
         Operation::Request => {
             if session.is_authenticated && client_token == session.token {
@@ -361,20 +377,24 @@ async fn handle_message(
             }
 
             // Send token to client.
-            let res: String;
-            if session.is_authenticated {
-                res = format!(
-                    "{{\"auth\":{},\"token\":\"{}\"}}\n",
-                    session.is_authenticated, session.token
-                );
-                save_auth(serde_json::to_string(&auths.clone()).unwrap().as_str()).await
+            let res = if session.is_authenticated {
+                save_auth(serde_json::to_string(&auths).unwrap().as_str()).await;
+                Response::Auth {
+                    auth: session.is_authenticated,
+                    token: Some(session.token.clone()),
+                }
             } else {
-                res = format!("{{\"auth\":{}}}\n", session.is_authenticated);
-            }
+                Response::Auth {
+                    auth: session.is_authenticated,
+                    token: None,
+                }
+            };
 
-            debug!(" <<< {}", res);
+            let res_data = serde_json::to_string(&res)?;
 
-            client.write_all(res.as_bytes()).await?;
+            debug!(" <<< {}", res_data);
+
+            client.write_all(res_data.as_bytes()).await?;
         }
     }
     Ok(())

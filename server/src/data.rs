@@ -132,6 +132,7 @@ impl Default for Config {
     }
 }
 
+#[repr(i32)]
 pub enum Status {
     Success = 0,
     VersionMismatch = 1,
