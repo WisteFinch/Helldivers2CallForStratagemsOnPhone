@@ -18,4 +18,6 @@ pub enum I18NError {
 
     #[error("{i18n}: {0}", i18n = t!("err_bind_addr"))]
     BindAddr(std::io::Error),
+    #[error("{i18n}: {0}", i18n = t!("err_bad_request"))]
+    BadRequest(serde_json::Error),
 }

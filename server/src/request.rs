@@ -281,6 +281,6 @@ impl<'de> Deserialize<'de> for Request {
 
 impl Request {
     pub fn from_data(data: &str) -> Result<Self, I18NError> {
-        serde_json::from_str(data).map_err(I18NError::Json)
+        serde_json::from_str(data).map_err(I18NError::BadRequest)
     }
 }
