@@ -13,8 +13,8 @@ impl log::Log for Logger {
             log::Level::Error => println!("{}{}", t!("n_err").red(), record.args()),
             log::Level::Warn => println!("{}{}", t!("n_warn").yellow(), record.args()),
             log::Level::Info => println!("{}{}", t!("n_info").blue(), record.args()),
-            log::Level::Debug => print!("{}{}", t!("n_debug").magenta(), record.args()),
-            log::Level::Trace => print!("{}{}", t!("n_debug").magenta(), record.args()),
+            log::Level::Debug => println!("{}{}", t!("n_debug").magenta(), record.args()),
+            log::Level::Trace => println!("{}{}", t!("n_debug").magenta(), record.args()),
         }
     }
 

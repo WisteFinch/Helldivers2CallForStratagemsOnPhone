@@ -49,6 +49,14 @@ enum Response {
     Auth { auth: bool, token: Option<String> },
 }
 
+impl Response {
+    fn into_response(self) -> Result<String> {
+        let mut data = serde_json::to_string(&self)?;
+        data.push('\n');
+        Ok(data)
+    }
+}
+
 impl Session {
     fn new(addr: SocketAddr) -> Self {
         Self {
@@ -60,7 +68,7 @@ impl Session {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let mut debug = false;
     for arg in args {
@@ -88,7 +96,10 @@ async fn main() {
         logger::initialize(log::LevelFilter::Info);
     }
 
-    run().await.unwrap()
+    if let Err(e) = run().await {
+        error!("{}", e);
+    }
+    Ok(())
 }
 
 async fn run() -> Result<()> {
@@ -199,7 +210,7 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
         .map(char::from)
         .collect();
     session.is_authenticated = false;
-    debug!("Created session: {:?}\n", session);
+    debug!("Created session: {:?}", session);
 
     let mut buffer = vec![0; 4096];
 
@@ -219,7 +230,10 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
             }
         };
 
-        debug!(" >>> {}", &request_raw);
+        debug!(
+            " >>> {}",
+            &request_raw.strip_suffix('\n').unwrap_or(request_raw)
+        );
 
         // Remove redundant requests.
         let index = request_raw.find('\n').unwrap();
@@ -278,8 +292,12 @@ async fn handle_message(
                 }
             };
 
-            let res_data = serde_json::to_string(&res)?;
-            debug!(" <<< {}", res_data);
+            let res_data = res.into_response()?;
+
+            debug!(
+                " <<< {}",
+                res_data.strip_suffix('\n').unwrap_or(res_data.as_str())
+            );
 
             client.write_all(res_data.as_bytes()).await?;
         }
@@ -390,9 +408,12 @@ async fn handle_message(
                 }
             };
 
-            let res_data = serde_json::to_string(&res)?;
+            let res_data = res.into_response()?;
 
-            debug!(" <<< {}", res_data);
+            debug!(
+                " <<< {}",
+                res_data.strip_suffix('\n').unwrap_or(res_data.as_str())
+            );
 
             client.write_all(res_data.as_bytes()).await?;
         }
