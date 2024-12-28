@@ -32,7 +32,6 @@ err_bind_socket: Failed to bind socket
 err_json: Failed to parse JSON data
 err_bind_addr: Failed to listening on address
 err_invalid_utf8: Invalid UTF-8 data
-err_parse_opt: Failed to parse operation!
 n_free_input: 'Free input: '
 n_err: '[ERROR] '
 n_warn: '[WARNING] '

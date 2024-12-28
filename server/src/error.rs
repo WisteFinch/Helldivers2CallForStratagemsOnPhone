@@ -18,6 +18,4 @@ pub enum I18NError {
 
     #[error("{i18n}: {0}", i18n = t!("err_bind_addr"))]
     BindAddr(std::io::Error),
-    #[error("{i18n}", i18n = t!("err_parse_opt"))]
-    ParseOperation,
 }

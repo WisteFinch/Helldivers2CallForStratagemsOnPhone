@@ -79,30 +79,7 @@ impl fmt::Display for Step {
     }
 }
 
-pub enum Operation {
-    Status = 0,
-    Combined = 1,
-    Independent = 2,
-    Request = 3,
-    Sync = 4,
-    Auth = 5,
-}
-
-impl Operation {
-    pub fn from_u64(v: u64) -> Self {
-        match v {
-            1 => Self::Combined,
-            2 => Self::Independent,
-            3 => Self::Request,
-            4 => Self::Sync,
-            5 => Self::Auth,
-            _ => Self::Status,
-        }
-    }
-}
-
-// To comply with the JSON specification, ignore non_snake_case warnings.
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub port: u64,

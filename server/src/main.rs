@@ -9,6 +9,7 @@ use key::KeyFromString as _;
 use log::{debug, error, info, warn};
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::EventType;
+use request::{CombinedMacro, IndependentInput, Request};
 use rust_i18n::{i18n, t};
 use serde::Serialize;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -23,6 +24,7 @@ mod data;
 mod error;
 mod key;
 mod logger;
+mod request;
 mod tool;
 
 i18n!("src/locales");
@@ -42,6 +44,16 @@ struct Session {
     pub is_authenticated: bool,
 }
 
+impl Session {
+    fn new(addr: SocketAddr) -> Self {
+        Self {
+            addr,
+            token: "".to_string(),
+            is_authenticated: false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(untagged)]
 enum Response {
@@ -54,16 +66,6 @@ impl Response {
         let mut data = serde_json::to_string(&self)?;
         data.push('\n');
         Ok(data)
-    }
-}
-
-impl Session {
-    fn new(addr: SocketAddr) -> Self {
-        Self {
-            addr,
-            token: "".to_string(),
-            is_authenticated: false,
-        }
     }
 }
 
@@ -229,7 +231,6 @@ async fn handle_connection(mut client: TcpStream, conf: Config) -> Result<()> {
                 continue;
             }
         };
-
         debug!(
             " >>> {}",
             &request_raw.strip_suffix('\n').unwrap_or(request_raw)
@@ -258,20 +259,13 @@ async fn handle_message(
 ) -> Result<()> {
     let addr = client.peer_addr()?;
 
-    // Parsing json.
-    let json: serde_json::Value = serde_json::from_str(message)?;
-    let opt: Operation = match json["opt"].as_u64() {
-        Some(s) => Operation::from_u64(s),
-        None => return Err(I18NError::ParseOperation),
-    };
+    let request = Request::from_data(message)?;
+    debug!(" Request: {:?}", request);
 
-    // Analyse operation.
-    let client_token = json["token"].as_str().unwrap_or("NULL");
-    match opt {
-        Operation::Status => {
+    match request {
+        Request::Status { ver } => {
             // Check version.
-            let ver = json["ver"].as_str().unwrap_or("NULL");
-            let res = if compare_ver(ver, VERSION) {
+            let res = if compare_ver(&ver, VERSION) {
                 // Check authentication.
                 if session.is_authenticated {
                     Response::Status {
@@ -301,29 +295,31 @@ async fn handle_message(
 
             client.write_all(res_data.as_bytes()).await?;
         }
-        Operation::Request => {
-            if session.is_authenticated && client_token == session.token {
-                let res: String = serde_json::to_string(&conf).unwrap();
+        Request::Request => {
+            // if session.is_authenticated && client_token == session.token {
+            //     let res: String = serde_json::to_string(&conf).unwrap();
 
-                debug!(" <<< {}", res);
+            //     debug!(" <<< {}", res);
 
-                client.write_all(res.as_bytes()).await?;
-                info!("{}{}", t!("info_send_config"), addr)
-            } else {
-                warn!("{}", t!("warn_reject_request"))
-            }
+            //     client.write_all(res.as_bytes()).await?;
+            //     info!("{}{}", t!("info_send_config"), addr)
+            // } else {
+            //     warn!("{}", t!("warn_reject_request"))
+            // }
+            unimplemented!()
         }
-        Operation::Sync => {
-            if session.is_authenticated && client_token == session.token {
+        Request::Sync {
+            config: mut sync_config,
+            token,
+        } => {
+            if session.is_authenticated && token == session.token {
                 println(format!("{}{}", t!("n_sync_conf"), addr));
                 print(t!("ask_sync"));
                 let mut input = String::new();
-                io::stdin().read_line(&mut input).unwrap();
+                io::stdin().read_line(&mut input)?;
                 if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-                    let mut c: Config = serde_json::from_str(json["config"].to_string().as_str())
-                        .unwrap_or_default();
-                    c.ip = conf.ip.clone();
-                    save_config(serde_json::to_string(&c).unwrap().as_str(), true).await
+                    sync_config.ip = conf.ip.clone();
+                    save_config(serde_json::to_string(&*sync_config)?.as_str(), true).await
                 } else {
                     warn!("{}", t!("warn_reject_sync"));
                 }
@@ -331,22 +327,21 @@ async fn handle_message(
                 warn!("{}", t!("warn_reject_request"))
             }
         }
-        Operation::Combined => {
-            if session.is_authenticated && client_token == session.token {
-                macros(json["macro"].clone(), conf).await?
+        Request::Combined { r#macro, token } => {
+            if session.is_authenticated && token == session.token {
+                macros(r#macro, conf).await?
             } else {
                 warn!("{}", t!("warn_reject_request"))
             }
         }
-        Operation::Independent => {
-            if session.is_authenticated && client_token == session.token {
-                independent(json["input"].clone(), conf).await?
+        Request::Independent { input, token } => {
+            if session.is_authenticated && token == session.token {
+                independent(input, conf).await?
             } else {
                 warn!("{}", t!("warn_reject_request"))
             }
         }
-        Operation::Auth => {
-            let sid = json["sid"].as_str().unwrap_or("NULL");
+        Request::Auth { sid } => {
             let current_time = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
@@ -470,15 +465,9 @@ async fn save_auth(str: &str) {
     }
 }
 
-async fn macros(value: serde_json::Value, conf: &Config) -> Result<()> {
-    let name = value["name"].as_str().unwrap_or("");
-    let list = match value["steps"].as_array() {
-        Some(s) => s,
-        None => {
-            error!("{}", t!("err_parse_step_failed"));
-            return Ok(());
-        }
-    };
+async fn macros(macros: CombinedMacro, conf: &Config) -> Result<()> {
+    let name = macros.name;
+    let list = macros.steps;
 
     // Press open
     print(format!("{name}: "));
@@ -497,7 +486,7 @@ async fn macros(value: serde_json::Value, conf: &Config) -> Result<()> {
 
     // Click steps
     for i in list {
-        execute(Step::from_u64(i.as_u64().unwrap()), InputType::Click, conf)
+        execute(Step::from_u64(i as u64), InputType::Click, conf)
             .await
             .unwrap();
     }
@@ -511,21 +500,9 @@ async fn macros(value: serde_json::Value, conf: &Config) -> Result<()> {
     Ok(())
 }
 
-async fn independent(value: serde_json::Value, conf: &Config) -> Result<()> {
-    let step = match value["step"].as_u64() {
-        Some(s) => Step::from_u64(s),
-        None => {
-            error!("{}", t!("err_parse_step_failed"));
-            return Ok(());
-        }
-    };
-    let t = match value["type"].as_u64() {
-        Some(s) => InputType::from_u64(s),
-        None => {
-            error!("{}", t!("err_parse_input_failed"));
-            return Ok(());
-        }
-    };
+async fn independent(input: IndependentInput, conf: &Config) -> Result<()> {
+    let step = Step::from_u64(input.step as u64);
+    let t = InputType::from_u64(input.r#type as u64);
     execute(step, t, conf).await.unwrap();
 
     Ok(())
