@@ -58,7 +58,9 @@ pub enum Request {
         token: String,
     },
     // 3
-    Request,
+    Config {
+        token: String,
+    },
     // 4
     Sync {
         config: ConfigData,
@@ -88,6 +90,11 @@ impl<'de> Deserialize<'de> for Request {
         #[derive(Deserialize)]
         struct Independent {
             input: IndependentInput,
+            #[serde(default)]
+            token: String,
+        }
+        #[derive(Deserialize)]
+        struct Config {
             #[serde(default)]
             token: String,
         }
@@ -130,7 +137,8 @@ impl<'de> Deserialize<'de> for Request {
                 }
             }
             3 => {
-                unimplemented!()
+                let tmp: Config = serde_json::from_value(map).map_err(de::Error::custom)?;
+                Request::Config { token: tmp.token }
             }
             4 => {
                 let tmp: Sync = serde_json::from_value(map).map_err(de::Error::custom)?;

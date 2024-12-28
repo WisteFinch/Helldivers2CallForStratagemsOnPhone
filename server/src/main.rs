@@ -59,6 +59,7 @@ impl Session {
 enum Response {
     Status { status: i32, ver: &'static str },
     Auth { auth: bool, token: Option<String> },
+    RequestConfig(Config),
 }
 
 impl Response {
@@ -295,18 +296,21 @@ async fn handle_message(
 
             client.write_all(res_data.as_bytes()).await?;
         }
-        Request::Request => {
-            // if session.is_authenticated && client_token == session.token {
-            //     let res: String = serde_json::to_string(&conf).unwrap();
+        Request::Config { token } => {
+            if session.is_authenticated && token == session.token {
+                let res = Response::RequestConfig(conf.clone());
+                let res_data = res.into_response()?;
 
-            //     debug!(" <<< {}", res);
+                debug!(
+                    " <<< {}",
+                    res_data.strip_suffix('\n').unwrap_or(res_data.as_str())
+                );
 
-            //     client.write_all(res.as_bytes()).await?;
-            //     info!("{}{}", t!("info_send_config"), addr)
-            // } else {
-            //     warn!("{}", t!("warn_reject_request"))
-            // }
-            unimplemented!()
+                client.write_all(res_data.as_bytes()).await?;
+                info!("{}{}", t!("info_send_config"), addr)
+            } else {
+                warn!("{}", t!("warn_reject_request"))
+            }
         }
         Request::Sync {
             config: mut sync_config,
