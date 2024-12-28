@@ -9,7 +9,7 @@ use key::KeyFromString as _;
 use log::{debug, error, info, warn};
 use rand::{distributions::Alphanumeric, Rng};
 use rdev::EventType;
-use request::{CombinedMacro, IndependentInput, Request};
+use request::{CombinedMacro, IndependentInput, InputData, InputType, Request, Status, Step};
 use rust_i18n::{i18n, t};
 use serde::Serialize;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -471,7 +471,7 @@ async fn save_auth(str: &str) {
 
 async fn macros(macros: CombinedMacro, conf: &Config) -> Result<()> {
     let name = macros.name;
-    let list = macros.steps;
+    let steps = macros.steps;
 
     // Press open
     print(format!("{name}: "));
@@ -489,10 +489,8 @@ async fn macros(macros: CombinedMacro, conf: &Config) -> Result<()> {
     }
 
     // Click steps
-    for i in list {
-        execute(Step::from_u64(i as u64), InputType::Click, conf)
-            .await
-            .unwrap();
+    for step in steps {
+        execute(step, InputType::Click, conf).await.unwrap();
     }
 
     // Release open
@@ -505,9 +503,7 @@ async fn macros(macros: CombinedMacro, conf: &Config) -> Result<()> {
 }
 
 async fn independent(input: IndependentInput, conf: &Config) -> Result<()> {
-    let step = Step::from_u64(input.step as u64);
-    let t = InputType::from_u64(input.r#type as u64);
-    execute(step, t, conf).await.unwrap();
+    execute(input.step, input.r#type, conf).await.unwrap();
 
     Ok(())
 }
@@ -559,8 +555,8 @@ async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
     match t {
         // TODO: 应当在解析完成所有step无错误后再开始执行
         InputType::Click => {
-            simulate_key_event(step.clone(), 0, conf);
-            print(step.clone());
+            simulate_key_event(step, 0, conf);
+            print(step);
             let _ = io::stdout().flush();
             tokio::time::sleep(Duration::from_millis(conf.delay)).await;
             simulate_key_event(step, 1, conf);
