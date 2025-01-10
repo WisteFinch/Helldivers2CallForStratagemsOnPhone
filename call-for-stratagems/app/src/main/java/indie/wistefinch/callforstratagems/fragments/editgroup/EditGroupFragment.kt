@@ -141,7 +141,7 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList(),
+            adapter.enabledStratagem.toList(),
             preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }
@@ -157,7 +157,7 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList(),
+            adapter.enabledStratagem.toList(),
             preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }

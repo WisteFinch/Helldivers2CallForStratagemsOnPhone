@@ -69,7 +69,8 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
         // Set card view background.
         val cardView = holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView)
-        setCardViewBg(cardView, dataList[pos].id)
+        val indexText = holder.itemView.findViewById<TextView>(R.id.stratagem_edit_index)
+        setCardViewBg(cardView, dataList[pos].id, indexText)
 
         // Setup click listener, the selected status and background color will change after clicking.
         cardView.setOnClickListener {
@@ -79,7 +80,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
             else {
                 enabledStratagem.add(dataList[pos].id)
             }
-            setCardViewBg(cardView, dataList[pos].id)
+            setCardViewBg(cardView, dataList[pos].id, indexText)
         }
 
         // Set long click listener.
@@ -99,13 +100,16 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
     /**
      * Change the card view background if the stratagem is enabled.
      */
-    private fun setCardViewBg(cardView: CardView, id: Int)
+    private fun setCardViewBg(cardView: CardView, id: Int, indexText: TextView)
     {
         if (enabledStratagem.contains(id)) {
             cardView.setCardBackgroundColor(context.resources.getColor(R.color.darkBlue, context.theme))
+            val index = enabledStratagem.indexOf(id) + 1
+            indexText.findViewById<TextView>(R.id.stratagem_edit_index).text = index.toString()
         }
         else {
             cardView.setCardBackgroundColor(context.resources.getColor(R.color.colorBackground, context.theme))
+            indexText.findViewById<TextView>(R.id.stratagem_edit_index).text = null
         }
     }
 
@@ -117,8 +121,8 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      */
     @SuppressLint("NotifyDataSetChanged")
     fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String, lang: String) {
-        this.enabledStratagem = set
         this.dataList = list
+        this.enabledStratagem = set
         dbName = name
         this.lang = lang
         notifyDataSetChanged()
