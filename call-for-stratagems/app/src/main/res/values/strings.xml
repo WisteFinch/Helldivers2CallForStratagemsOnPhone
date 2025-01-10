@@ -81,6 +81,8 @@
     <!-- Control Preferences -->
     <string name="enable_simplified_mode_title">Enable Simplified Mode</string>
     <string name="enable_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
+    <string name="enable_fastboot_mode_title">Enable Fastboot Mode</string>
+    <string name="enable_fastboot_mode_desc">Click the group to start directly, long press the group to view detail</string>
     <string name="swipe_distance_threshold_title">Gesture Swipe Distance Threshold (pixel)</string>
     <string name="swipe_velocity_threshold_title">Gesture Swipe Velocity Threshold (pixel/s)</string>
     <string name="lang_stratagem_title">Language: Stratagem Name</string>

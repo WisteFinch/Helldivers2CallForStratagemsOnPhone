@@ -45,6 +45,11 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
      */
     private val adapter: StratagemThumbnailAdapter by lazy { StratagemThumbnailAdapter() }
 
+    /**
+     * Enable fastboot mode.
+     */
+    private var fastboot = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_group, parent, false))
@@ -54,8 +59,19 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
         holder.itemView.findViewById<TextView>(R.id.group_title).text = dataList[pos].title
 
         val bundle = bundleOf(Pair("currentItem", dataList[pos]))
-        holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnClickListener {
-            holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
+        if (fastboot) {
+            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnClickListener {
+                holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_playFragment, bundle)
+            }
+            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnLongClickListener {
+                holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
+                true
+            }
+        }
+        else {
+            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnClickListener {
+                holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
+            }
         }
 
         // Setup stratagem thumbnail recycler view.
@@ -87,7 +103,8 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
     /**
      * Set the adapter data.
      */
-    fun setData(list: List<GroupData>) {
+    fun setData(list: List<GroupData>, fastboot: Boolean) {
+        this.fastboot = fastboot
         // Check difference.
         val groupListDiffUtil = GroupListDiffUtil(dataList, list)
         val groupListDiffResult = DiffUtil.calculateDiff(groupListDiffUtil)

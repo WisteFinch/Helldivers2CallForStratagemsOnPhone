@@ -126,6 +126,13 @@
             app:icon="@drawable/ic_clear"
             app:summary="@string/enable_simplified_mode_desc" />
 
+        <SwitchPreference
+            app:key="enable_fastboot_mode"
+            app:title="@string/enable_fastboot_mode_title"
+            app:defaultValue="false"
+            app:icon="@drawable/ic_clear"
+            app:summary="@string/enable_fastboot_mode_desc" />
+
 
         <EditTextPreference
             app:key="swipe_distance_threshold"

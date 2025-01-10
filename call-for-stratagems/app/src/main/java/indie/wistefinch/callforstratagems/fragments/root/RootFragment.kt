@@ -176,13 +176,15 @@ class RootFragment : Fragment() {
      * Setup the group recycler view.
      */
     private fun setupRecyclerView() {
+        val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+
         val recyclerView = binding.rootRecyclerView
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
         adapter.setStratagemViewModel(stratagemViewModel)
         groupViewModel.allItems.observe(viewLifecycleOwner) { data ->
             sharedViewModel.checkIfDbIsEmpty(data)
-            adapter.setData(data)
+            adapter.setData(data, preferences.getBoolean("enable_fastboot_mode", false))
         }
     }
 }
