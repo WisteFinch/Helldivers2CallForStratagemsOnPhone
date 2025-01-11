@@ -51,15 +51,4 @@
 
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/stratagem_edit_index"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="3dp"
-        android:text="@string/default_string"
-        android:textColor="@color/textColorPrimary"
-        android:textSize="11sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
