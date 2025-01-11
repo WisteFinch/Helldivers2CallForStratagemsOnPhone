@@ -23,7 +23,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
     /**
      * All data in the adapter.
      */
-    private var dataList = emptyList<StratagemData>()
+    private var dataList = emptyList<StratagemData>().toMutableList()
 
     /**
      * Context, used to obtain external information.
@@ -71,13 +71,14 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
         // Setup click listener, the selected status and background color will change after clicking.
         cardView.setOnClickListener {
-            if (enabledStratagem.contains(dataList[pos].id)) {
-                enabledStratagem.remove(dataList[pos].id)
+            val index = holder.adapterPosition
+            if (enabledStratagem.contains(dataList[index].id)) {
+                enabledStratagem.remove(dataList[index].id)
             }
             else {
-                enabledStratagem.add(dataList[pos].id)
+                enabledStratagem.add(dataList[index].id)
             }
-            setCardViewBg(cardView, dataList[pos].id)
+            setCardViewBg(cardView, dataList[index].id)
         }
     }
 
@@ -92,7 +93,6 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
     {
         if (enabledStratagem.contains(id)) {
             cardView.setCardBackgroundColor(context.resources.getColor(R.color.darkBlue, context.theme))
-            val index = enabledStratagem.indexOf(id) + 1
         }
         else {
             cardView.setCardBackgroundColor(context.resources.getColor(R.color.colorBackground, context.theme))
@@ -107,7 +107,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      */
     @SuppressLint("NotifyDataSetChanged")
     fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String, lang: String) {
-        this.dataList = list
+        this.dataList = list.toMutableList()
         this.enabledStratagem = set
         dbName = name
         this.lang = lang
@@ -118,7 +118,9 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
         val fromPos = source.adapterPosition
         val toPos = target.adapterPosition
         if (fromPos < dataList.size && toPos < dataList.size) {
-            Collections.swap(dataList, fromPos, toPos)
+            val ori = dataList[fromPos]
+            dataList.removeAt(fromPos)
+            dataList.add(toPos, ori)
             notifyItemMoved(fromPos, toPos)
         }
         onItemClear(source)

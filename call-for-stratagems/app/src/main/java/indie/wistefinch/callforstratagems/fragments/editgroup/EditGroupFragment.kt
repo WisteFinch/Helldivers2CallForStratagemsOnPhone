@@ -195,7 +195,6 @@ class EditGroupFragment : Fragment() {
         val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
         val helper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(recyclerView)
-
     }
 
     companion object {
