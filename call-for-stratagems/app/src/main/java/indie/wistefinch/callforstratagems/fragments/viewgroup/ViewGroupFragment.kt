@@ -144,9 +144,27 @@ class ViewGroupFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(100)
         val list: Vector<StratagemData> = Vector()
-        for (i in currentItem.list) {
-            if (stratagemViewModel.isIdValid(i)) {
-                list.add(stratagemViewModel.retrieveItem(i))
+        if (currentItem.list.isEmpty()) {
+            list.add(StratagemData(0,
+                getString(R.string.default_string),
+                getString(R.string.default_string),
+                String(),
+                emptyList()
+            ))
+        }
+        else {
+            for (i in currentItem.list) {
+                if (stratagemViewModel.isIdValid(i)) {
+                    list.add(stratagemViewModel.retrieveItem(i))
+                }
+                else {
+                    list.add(StratagemData(i,
+                        "Unknown [$i]",
+                        "未知 [$i]",
+                        String(),
+                        emptyList()
+                    ))
+                }
             }
         }
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())

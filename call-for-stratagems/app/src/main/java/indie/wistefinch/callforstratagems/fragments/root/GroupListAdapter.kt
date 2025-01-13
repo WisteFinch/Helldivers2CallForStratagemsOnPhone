@@ -79,9 +79,27 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val list: Vector<StratagemData> = Vector()
-        for (i in dataList[pos].list) {
-            if (stratagemViewModel.isIdValid(i)) {
-                list.add(stratagemViewModel.retrieveItem(i))
+        if (dataList[pos].list.isEmpty()) {
+            list.add(StratagemData(0,
+                context.getString(R.string.default_string),
+                context.getString(R.string.default_string),
+                String(),
+                emptyList()
+            ))
+        }
+        else {
+            for (i in dataList[pos].list) {
+                if (stratagemViewModel.isIdValid(i)) {
+                    list.add(stratagemViewModel.retrieveItem(i))
+                }
+                else {
+                    list.add(StratagemData(i,
+                        "Unknown [$i]",
+                        "未知 [$i]",
+                        String(),
+                        emptyList()
+                    ))
+                }
             }
         }
         val preference = context.let { PreferenceManager.getDefaultSharedPreferences(it) }!!

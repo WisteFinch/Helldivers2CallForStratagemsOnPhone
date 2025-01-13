@@ -138,9 +138,7 @@ class EditGroupFragment : Fragment() {
         groupViewModel.updateItem(
             currentItem.id,
             when (binding.editGroupTitle.text.toString()) {
-                "" -> {
-                    binding.editGroupTitle.autofillHints!![0]
-                }
+                "" -> getString(R.string.editGroup_title)
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
@@ -181,7 +179,17 @@ class EditGroupFragment : Fragment() {
         }
         val orderedList: MutableList<StratagemData> = emptyList<StratagemData>().toMutableList()
         for (i in currentItem.list) {
-            orderedList.add(stratagemViewModel.retrieveItem(i))
+            if (stratagemViewModel.isIdValid(i)) {
+                orderedList.add(stratagemViewModel.retrieveItem(i))
+            }
+            else {
+                orderedList.add(StratagemData(i,
+                    "Unknown [$i]",
+                    "未知 [$i]",
+                    String(),
+                    emptyList()
+                ))
+            }
         }
         for (i in list) {
             if (!orderedList.contains(i)) {
