@@ -1,117 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorBackground"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/db_update_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:text="@string/info_db_update_title"
-        style="@style/AppTextTitle"
-        android:textSize="20sp"
-        android:visibility="visible" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="bottom"
-        android:layout_marginHorizontal="20dp">
+        android:orientation="vertical">
 
-        <RadioGroup
-            android:id="@+id/db_update_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:id="@+id/db_update_hd2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/info_db_update_channel_hd2"
-                android:textColor="@color/textColorPrimary" />
-
-            <RadioButton
-                android:id="@+id/db_update_hd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/info_db_update_channel_hd"
-                android:textColor="@color/textColorPrimary" />
-
-            <RadioButton
-                android:id="@+id/db_update_custom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/info_db_update_channel_custom"
-                android:textColor="@color/textColorPrimary" />
-
-        </RadioGroup>
-
-        <EditText
-            android:id="@+id/db_update_custom_input"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:inputType="text"
-            android:autofillHints="@string/db_hd2_url"
-            android:hint="@string/info_db_update_channel_custom_url"/>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp">
-
-        <Button
-            android:id="@+id/db_update_clear"
-            style="?attr/borderlessButtonStyle"
+        <TextView
+            android:id="@+id/db_update_title"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackground"
-            android:text="@string/info_db_update_clear"
-            android:textAllCaps="false"
-            android:textColor="@color/colorAccent"
-            android:textSize="14sp" />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/info_db_update_title"
+            style="@style/AppTextTitle"
+            android:textSize="20sp"
+            android:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:layout_marginHorizontal="20dp">
+
+            <RadioGroup
+                android:id="@+id/db_update_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/db_update_hd2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info_db_update_channel_hd2"
+                    android:textColor="@color/textColorPrimary" />
+
+                <RadioButton
+                    android:id="@+id/db_update_hd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info_db_update_channel_hd"
+                    android:textColor="@color/textColorPrimary" />
+
+                <RadioButton
+                    android:id="@+id/db_update_custom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info_db_update_channel_custom"
+                    android:textColor="@color/textColorPrimary" />
+
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/db_update_custom_input"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="text"
+                android:autofillHints="@string/db_hd2_url"
+                android:hint="@string/info_db_update_channel_custom_url"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginBottom="10dp">
 
             <Button
-                android:id="@+id/db_update_cancel"
+                android:id="@+id/db_update_clear"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="70dp"
+                android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackground"
-                android:text="@string/dialog_cancel"
+                android:text="@string/info_db_update_clear"
                 android:textAllCaps="false"
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/db_update_confirm"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="80dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackground"
-                android:text="@string/dialog_confirm"
-                android:textAllCaps="false"
-                android:textColor="@color/colorAccent"
-                android:textSize="14sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:id="@+id/db_update_cancel"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="70dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="@string/dialog_cancel"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/db_update_confirm"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="80dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="@string/dialog_confirm"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>
 
