@@ -72,6 +72,8 @@
     <!-- Control Preferences -->
     <string name="enable_simplified_mode_title">启用精简模式</string>
     <string name="enable_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
+    <string name="enable_fastboot_mode_title">启用快速启动</string>
+    <string name="enable_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
     <string name="swipe_distance_threshold_title">手势距离阈值（像素）</string>
     <string name="swipe_velocity_threshold_title">手势速度阈值（像素/秒）</string>
     <string name="lang_stratagem_title">语言：战略配备名称</string>

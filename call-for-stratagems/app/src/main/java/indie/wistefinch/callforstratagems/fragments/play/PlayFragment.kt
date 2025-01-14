@@ -211,17 +211,20 @@ class PlayFragment : Fragment() {
         }
 
         // Set screen.
-        if (!enableSimplifiedMode) {
-            // For compatibility with lower SDKs, ignore the deprecated warning.
-            @Suppress("DEPRECATION")
-            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            @Suppress("DEPRECATION")
-            oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
-            @Suppress("DEPRECATION")
-            activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        // For compatibility with lower SDKs, ignore the deprecated warning.
+        @Suppress("DEPRECATION")
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        @Suppress("DEPRECATION")
+        oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
+        @Suppress("DEPRECATION")
+        activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        activity?.requestedOrientation = if (enableSimplifiedMode) {
+             ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        }
+        else {
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
         view?.keepScreenOn = true
 
@@ -772,14 +775,12 @@ class PlayFragment : Fragment() {
 
     override fun onDestroy() {
         // Reset screen
-        if (!enableSimplifiedMode) {
-            // For compatibility with lower SDKs, ignore the deprecated warning.
-            @Suppress("DEPRECATION")
-            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            @Suppress("DEPRECATION")
-            activity?.window?.decorView?.systemUiVisibility = oriSystemUiVisibility
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
+        // For compatibility with lower SDKs, ignore the deprecated warning.
+        @Suppress("DEPRECATION")
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        @Suppress("DEPRECATION")
+        activity?.window?.decorView?.systemUiVisibility = oriSystemUiVisibility
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         view?.keepScreenOn = false
 
         // Show toolbar

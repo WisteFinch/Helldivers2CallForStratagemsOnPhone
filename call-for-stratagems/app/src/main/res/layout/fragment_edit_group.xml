@@ -6,69 +6,63 @@
     android:layout_height="match_parent"
     tools:context=".fragments.editgroup.EditGroupFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/editGroup_title_cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/editGroup_title_cardView"
+            <EditText
+                android:id="@+id/editGroup_title"
+                style="@style/AppTextTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5">
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_margin="16dp"
+                android:autofillHints="@string/editGroup_title"
+                android:gravity="center_horizontal"
+                android:hint="@string/editGroup_title_hint"
+                android:inputType="text"
+                android:text="@string/editGroup_title"
+                android:textColorHint="@color/textColorSecondary"
+                android:textSize="24sp" />
 
-                <EditText
-                    android:id="@+id/editGroup_title"
-                    style="@style/AppTextTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:layout_margin="16dp"
-                    android:autofillHints="@string/editGroup_title"
-                    android:hint="@string/editGroup_title_hint"
-                    android:textColorHint="@color/textColorSecondary"
-                    android:inputType="text"
-                    android:text="@string/editGroup_title"
-                    android:gravity="center_horizontal"
-                    android:textSize="24sp" />
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView">
 
-            <androidx.cardview.widget.CardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/editGroup_recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView">
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                android:requiresFadingEdge="vertical"
+                android:fadingEdgeLength="5dp"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/editGroup_recyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

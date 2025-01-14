@@ -2,8 +2,6 @@ package indie.wistefinch.callforstratagems.fragments.editgroup
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -14,18 +12,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
-import indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemInfoDialog
 import java.io.File
+import java.util.Collections
 
 /**
  * Adapter for the recycler view in [EditGroupFragment]
  */
-class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHolder>() {
+class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHolder>(), ItemTouchHelperAdapter {
 
     /**
      * All data in the adapter.
      */
-    private var dataList = emptyList<StratagemData>()
+    private var dataList = emptyList<StratagemData>().toMutableList()
 
     /**
      * Context, used to obtain external information.
@@ -35,7 +33,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
     /**
      * A set of all the enabled stratagems.
      */
-    lateinit var enabledStratagem: MutableSet<Int>
+    private lateinit var enabledStratagem: MutableSet<Int>
 
     private lateinit var dbName: String
 
@@ -73,22 +71,14 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
         // Setup click listener, the selected status and background color will change after clicking.
         cardView.setOnClickListener {
-            if (enabledStratagem.contains(dataList[pos].id)) {
-                enabledStratagem.remove(dataList[pos].id)
+            val index = holder.adapterPosition
+            if (enabledStratagem.contains(dataList[index].id)) {
+                enabledStratagem.remove(dataList[index].id)
             }
             else {
-                enabledStratagem.add(dataList[pos].id)
+                enabledStratagem.add(dataList[index].id)
             }
-            setCardViewBg(cardView, dataList[pos].id)
-        }
-
-        // Set long click listener.
-        holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView).setOnLongClickListener {
-            val dialog = StratagemInfoDialog(context)
-            dialog.show()
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.setData(dataList[pos], dbName, lang)
-            true
+            setCardViewBg(cardView, dataList[index].id)
         }
     }
 
@@ -117,10 +107,41 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
      */
     @SuppressLint("NotifyDataSetChanged")
     fun setData(list: List<StratagemData>, set: MutableSet<Int>, name: String, lang: String) {
+        this.dataList = list.toMutableList()
         this.enabledStratagem = set
-        this.dataList = list
         dbName = name
         this.lang = lang
         notifyDataSetChanged()
+    }
+
+    override fun onItemMove(source: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) {
+        val fromPos = source.adapterPosition
+        val toPos = target.adapterPosition
+        if (fromPos < dataList.size && toPos < dataList.size) {
+            val ori = dataList[fromPos]
+            dataList.removeAt(fromPos)
+            dataList.add(toPos, ori)
+            notifyItemMoved(fromPos, toPos)
+        }
+        onItemClear(source)
+    }
+
+    override fun onItemSelect(source: RecyclerView.ViewHolder) {
+        source.itemView.scaleX = 1.2f
+        source.itemView.scaleY = 1.2f
+    }
+
+    override fun onItemClear(source: RecyclerView.ViewHolder) {
+        source.itemView.scaleX = 1.0f
+        source.itemView.scaleY = 1.0f
+    }
+
+    fun getEnabledStratagems(): List<Int> {
+        val list: MutableSet<Int> = emptySet<Int>().toMutableSet()
+        for (i in dataList) {
+            if (enabledStratagem.contains(i.id))
+                list.add(i.id)
+        }
+        return list.toList()
     }
 }

@@ -38,6 +38,9 @@
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
+        <action
+            android:id="@+id/action_rootFragment_to_playFragment"
+            app:destination="@id/playFragment" />
     </fragment>
     <fragment
         android:id="@+id/editGroupFragment"
@@ -81,6 +84,9 @@
         <action
             android:id="@+id/action_playFragment_to_viewGroupFragment"
             app:destination="@id/viewGroupFragment" />
+        <action
+            android:id="@+id/action_playFragment_to_rootFragment"
+            app:destination="@id/rootFragment" />
     </fragment>
     <fragment
         android:id="@+id/stratagemsListFragment"

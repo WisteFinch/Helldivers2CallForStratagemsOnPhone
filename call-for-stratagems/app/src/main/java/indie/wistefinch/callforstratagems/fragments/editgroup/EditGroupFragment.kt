@@ -16,10 +16,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.data.models.GroupData
+import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
@@ -136,12 +138,10 @@ class EditGroupFragment : Fragment() {
         groupViewModel.updateItem(
             currentItem.id,
             when (binding.editGroupTitle.text.toString()) {
-                "" -> {
-                    binding.editGroupTitle.autofillHints!![0]
-                }
+                "" -> getString(R.string.editGroup_title)
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList(),
+            adapter.getEnabledStratagems(),
             preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }
@@ -157,7 +157,7 @@ class EditGroupFragment : Fragment() {
                 }
                 else -> binding.editGroupTitle.text.toString()
             },
-            adapter.enabledStratagem.sorted().toList(),
+            adapter.getEnabledStratagems(),
             preferences.getString("db_name", getString(R.string.db_hd2_name))!!
         )
     }
@@ -166,19 +166,43 @@ class EditGroupFragment : Fragment() {
      * Setup the stratagem recycler view
      */
     private fun setupRecyclerView() {
+        // Get views.
         val recyclerView = binding.editGroupRecyclerView
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(100)
+        // Init data.
         val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         var lang: String = preference.getString("lang_stratagem", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
-        adapter.setData(list,
+        val orderedList: MutableList<StratagemData> = emptyList<StratagemData>().toMutableList()
+        for (i in currentItem.list) {
+            if (stratagemViewModel.isIdValid(i)) {
+                orderedList.add(stratagemViewModel.retrieveItem(i))
+            }
+            else {
+                orderedList.add(StratagemData(i,
+                    "Unknown [$i]",
+                    "未知 [$i]",
+                    String(),
+                    emptyList()
+                ))
+            }
+        }
+        for (i in list) {
+            if (!orderedList.contains(i)) {
+                orderedList.add(i)
+            }
+        }
+        adapter.setData(orderedList,
             currentItem.list.toMutableSet(),
             preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!,
             lang)
+        val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
+        val helper = ItemTouchHelper(callback)
+        helper.attachToRecyclerView(recyclerView)
     }
 
     companion object {
