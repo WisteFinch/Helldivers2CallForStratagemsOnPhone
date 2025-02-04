@@ -55,8 +55,9 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="indie.wistefinch.callforstratagems.fragments.settings.SettingsFragment"
-        android:label="@string/fragment_settings" >
+        android:name="indie.wistefinch.callforstratagems.fragments.settings.SettingsFragment2"
+        android:label="@string/fragment_settings"
+        tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_rootFragment"
             app:destination="@id/rootFragment" />

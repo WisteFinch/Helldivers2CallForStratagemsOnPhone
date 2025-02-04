@@ -3,9 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="darkPurple">#5D2080</color>
-    <color name="purple">#6D4490</color>
-    <color name="lightPurple">#DCAEEE</color>
     <color name="yellow">#FFF17F</color>
     <color name="lightYellow">#FBF9AF</color>
     <color name="orange">#FDC363</color>
@@ -21,11 +18,30 @@
     <color name="green">#67CA50</color>
     <color name="red">#DB2D43</color>
 
-    <color name="colorPrimary">@color/purple</color>
-    <color name="colorPrimaryDark">@color/darkPurple</color>
-    <color name="colorAccent">@color/lightPurple</color>
+    <color name="colorPrimary">@color/highlight</color>
+    <color name="colorPrimaryDark">@color/stress</color>
+    <color name="colorAccent">@color/stress</color>
     <color name="windowBackground">@color/veryDarkCornflowerBlue</color>
     <color name="textColorPrimary">@color/white</color>
     <color name="textColorSecondary">@color/grey</color>
     <color name="colorBackground">@color/veryDarkBlue</color>
+
+    <color name="highlight">#ffe710</color>
+    <color name="stress">#8d874f</color>
+    <color name="transparent">#00000000</color>
+    <color name="backgroundPrimary">#080809</color>
+    <color name="backgroundSecondary">#222222</color>
+    <color name="backgroundBlur">#aa1a1a1a</color>
+    <color name="border">#cbcbcd</color>
+    <color name="borderHighlight">@color/highlight</color>
+    <color name="textPrimary">#dddddd</color>
+    <color name="textSecondary">#ababaa</color>
+    <color name="textTitle">@color/white</color>
+    <color name="textHighlight">#ffe710</color>
+    <color name="textHint">#606162</color>
+    <color name="buttonBackground">@color/backgroundPrimary</color>
+    <color name="buttonText">@color/textPrimary</color>
+    <color name="scrollbar">@color/stress</color>
+    <color name="caret">@color/highlight</color>
+
 </resources>
