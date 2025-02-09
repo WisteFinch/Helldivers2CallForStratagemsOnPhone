@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
@@ -45,10 +46,10 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
         // Set card view text.
-        holder.itemView.findViewById<TextView>(R.id.stratagem_view_title).text = when (lang) {
-            "zh-CN" -> dataList[pos].nameZh
-            else -> dataList[pos].name
-        }
+//        holder.itemView.findViewById<TextView>(R.id.stratagem_view_title).text = when (lang) {
+//            "zh-CN" -> dataList[pos].nameZh
+//            else -> dataList[pos].name
+//        }
 
         // Set icon resources.
         try {
@@ -63,7 +64,7 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
         catch (_: Exception) {}
 
         // Set long click listener.
-        holder.itemView.findViewById<CardView>(R.id.stratagem_view_cardView).setOnLongClickListener {
+        holder.itemView.findViewById<ConstraintLayout>(R.id.stratagem_view).setOnLongClickListener {
             val dialog = StratagemInfoDialog(context)
             dialog.show()
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

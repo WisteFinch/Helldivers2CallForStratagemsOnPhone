@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.preference.PreferenceManager
@@ -60,16 +60,16 @@ class GroupListAdapter: RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() 
 
         val bundle = bundleOf(Pair("currentItem", dataList[pos]))
         if (fastboot) {
-            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnClickListener {
+            holder.itemView.findViewById<ConstraintLayout>(R.id.group_cardView).setOnClickListener {
                 holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_playFragment, bundle)
             }
-            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnLongClickListener {
+            holder.itemView.findViewById<ConstraintLayout>(R.id.group_cardView).setOnLongClickListener {
                 holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
                 true
             }
         }
         else {
-            holder.itemView.findViewById<CardView>(R.id.group_cardView).setOnClickListener {
+            holder.itemView.findViewById<ConstraintLayout>(R.id.group_cardView).setOnClickListener {
                 holder.itemView.findNavController().navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
             }
         }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,25 +11,17 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/default_string"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/bg_2" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundBlur"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@color/backgroundBlur">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"
+            android:padding="10dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -173,7 +165,8 @@
                         android:drawableTop="@drawable/ic_qr_scanner"
                         android:text="@string/set_conn_scan"
                         android:theme="@style/AppButton"
-                        tools:ignore="VisualLintButtonSize" />
+                        tools:ignore="VisualLintButtonSize"
+                        android:foreground="?attr/selectableItemBackground"/>
 
                     <Space
                         android:layout_width="5dp"
@@ -188,7 +181,8 @@
                         android:drawableTop="@drawable/ic_sync"
                         android:text="@string/set_conn_test"
                         android:theme="@style/AppButton"
-                        tools:ignore="VisualLintButtonSize" />
+                        tools:ignore="VisualLintButtonSize"
+                        android:foreground="?attr/selectableItemBackground"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -540,7 +534,8 @@
                         android:gravity="start|center_vertical"
                         android:text="@string/set_sync_apply"
                         android:theme="@style/AppButton"
-                        tools:ignore="VisualLintButtonSize" />
+                        tools:ignore="VisualLintButtonSize"
+                        android:foreground="?attr/selectableItemBackground"/>
 
                 </LinearLayout>
 
@@ -961,7 +956,8 @@
                         android:gravity="start|center_vertical"
                         android:text="@string/set_info_about"
                         android:theme="@style/AppButton"
-                        tools:ignore="VisualLintButtonSize" />
+                        tools:ignore="VisualLintButtonSize"
+                        android:foreground="?attr/selectableItemBackground"/>
 
                 </LinearLayout>
 
@@ -970,4 +966,4 @@
         </LinearLayout>
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

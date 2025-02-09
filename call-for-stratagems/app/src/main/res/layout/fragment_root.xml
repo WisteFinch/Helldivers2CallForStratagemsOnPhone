@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".fragments.root.RootFragment">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/default_string"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_3"/>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +25,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintVertical_bias="0.5"
+        android:background="@color/backgroundBlur">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/root_recyclerView"
@@ -29,7 +41,7 @@
             app:layout_constraintVertical_bias="0.5" />
 
     </androidx.core.widget.NestedScrollView>
-
+    </FrameLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/root_new_group_FAB"
         android:layout_width="wrap_content"
