@@ -40,7 +40,9 @@
     <color name="textHighlight">#ffe710</color>
     <color name="textHint">#606162</color>
     <color name="buttonBackground">@color/backgroundPrimary</color>
+    <color name="buttonBackgroundPressed">@color/stress</color>
     <color name="buttonText">@color/textPrimary</color>
+    <color name="buttonTextHint">@color/textSecondary</color>
     <color name="scrollbar">@color/stress</color>
     <color name="caret">@color/highlight</color>
 

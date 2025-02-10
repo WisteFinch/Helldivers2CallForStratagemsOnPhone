@@ -22,18 +22,18 @@
         android:padding="5dp"
         android:background="@color/backgroundSecondary"/>
 
-    <TextView
+    <View
         android:layout_width="0dp"
         android:layout_height="32dp"
-        android:background="@drawable/stratagem_item_bg_top"
+        android:background="@drawable/clickable_bg_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <View
         android:layout_width="0dp"
         android:layout_height="32dp"
-        android:background="@drawable/stratagem_item_bg_bottom"
+        android:background="@drawable/clickable_bg_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
