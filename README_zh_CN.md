@@ -29,6 +29,8 @@
 2. 进入`./server`文件夹。
 3. 使用下面的命令来编译运行。
 
+服务器API请查阅[此处](./server_api_0_5.md)
+
 ``` shell
 cargo run
 ```
