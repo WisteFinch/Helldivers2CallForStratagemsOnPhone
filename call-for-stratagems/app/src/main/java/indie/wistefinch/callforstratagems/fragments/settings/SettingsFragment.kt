@@ -406,7 +406,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                     val pkgName = context?.packageName!!
                     val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
                     val curVer = pkgInfo.versionName
-                    var title: String
+                    val title: String
                     if (curVer != newVer) {
                         infoAppVersion.summary = String.format(
                             resources.getString(R.string.info_app_version_updatable_desc),
@@ -545,7 +545,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 if (url.isEmpty()) {
                     url = getString(R.string.default_string)
                 }
-                else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+                if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                     url = "$url/"
                 }
 
@@ -561,7 +561,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         preferences.edit().putString("db_version", "1").apply()
 
                         // Download index.
-                        val indexObj = JSONObject(Util.downloadToStr(url))
+                        val indexObj = JSONObject(Util.downloadToStr(url + "index.json"))
                         val date = indexObj.getString("date")
                         val dbUrl = url + indexObj.getString("db_path")
                         val iconsUrl = url + indexObj.getString("icons_path")
@@ -640,7 +640,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
                                 name
                             )
                         }
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                         withContext(Dispatchers.Main) {
                             infoDbVersion.summary = resources.getString(R.string.info_db_version_update_failed_desc)
                             infoDbVersion.isEnabled = true
@@ -705,7 +706,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 url = "$url/"
             }
 
-            val json = JSONObject(Util.downloadToStr(url))
+            val json = JSONObject(Util.downloadToStr(url + "index.json"))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {
