@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_marginVertical="5dp"
     android:clickable="true"
     android:focusable="true"
-    android:padding="16dp"
+    android:padding="10dp"
     android:background="@drawable/button_entry"
     android:id="@+id/group_cardView"
     android:foreground="?attr/selectableItemBackground" >
@@ -17,6 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/default_string"
+        android:layout_marginHorizontal="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="16sp"/>
@@ -25,7 +26,7 @@
         android:id="@+id/group_recyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/group_title" />

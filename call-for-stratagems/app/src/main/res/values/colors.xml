@@ -39,6 +39,7 @@
     <color name="textTitle">@color/white</color>
     <color name="textHighlight">#ffe710</color>
     <color name="textHint">#606162</color>
+    <color name="textStress">@color/white</color>
     <color name="buttonBackground">@color/backgroundPrimary</color>
     <color name="buttonBackgroundPressed">@color/stress</color>
     <color name="buttonText">@color/textPrimary</color>

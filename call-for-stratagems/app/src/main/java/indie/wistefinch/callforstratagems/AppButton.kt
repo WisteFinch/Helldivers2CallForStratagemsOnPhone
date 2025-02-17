@@ -66,6 +66,7 @@ class AppButton : ConstraintLayout {
                             context.theme
                         )
                     )
+                    view.performClick()
                 }
 
                 MotionEvent.ACTION_DOWN -> {
@@ -77,7 +78,6 @@ class AppButton : ConstraintLayout {
                             context.theme
                         )
                     )
-                    view.performClick()
                 }
 
                 MotionEvent.ACTION_CANCEL -> {

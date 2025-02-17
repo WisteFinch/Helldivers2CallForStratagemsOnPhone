@@ -11,12 +11,19 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/default_string"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_2" />
+        android:src="@drawable/bg_2"
+        tools:ignore="ImageContrastCheck" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlur"/>
+
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundBlur">
+        android:layout_marginTop="85dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -559,7 +566,8 @@
 
                     <Space
                         android:layout_width="5dp"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        tools:ignore="TooManyViews" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/set_ctrl_simplified_mode"
