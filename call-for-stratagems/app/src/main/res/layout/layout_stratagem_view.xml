@@ -4,8 +4,8 @@
     android:id="@+id/stratagem_view"
     android:clickable="true"
     android:focusable="true"
-    android:layout_width="85dp"
-    android:layout_height="85dp"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
     android:layout_margin="5dp"
     android:foreground="?attr/selectableItemBackground">
 

@@ -150,8 +150,8 @@
 
         <ListPreference
             app:defaultValue="auto"
-            app:entries="@array/lang_stratagem_entries"
-            app:entryValues="@array/lang_stratagem_values"
+            app:entries="@array/lang_entries"
+            app:entryValues="@array/lang_values"
             app:key="lang_stratagem"
             app:title="@string/lang_stratagem_title"
             app:icon="@drawable/ic_language"

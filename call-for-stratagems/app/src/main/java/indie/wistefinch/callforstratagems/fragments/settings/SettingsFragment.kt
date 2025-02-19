@@ -6,40 +6,36 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
+import android.view.View.VISIBLE
+import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.RadioGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
+import indie.wistefinch.callforstratagems.AppButton
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.Util
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
+import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
 import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.socket.AddressData
 import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
-import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
-import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
-import indie.wistefinch.callforstratagems.socket.ServerConfigData
-import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,16 +43,80 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
+class SettingsFragment : Fragment() {
+    // View binding.
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
 
-class SettingsFragment: PreferenceFragmentCompat() {
+    // Preference.
+    private lateinit var preferences: SharedPreferences
+
+    // Environment
+    private lateinit var sid: String
+    private lateinit var dbVer: String
+    private lateinit var dbName: String
+
+    // Arrays
+    private lateinit var inputValues: Array<String>
+    private lateinit var inputTypeValues: Array<String>
+    private lateinit var langValues: Array<String>
 
     /**
-     * The socket client.
+     * QR code scanner activity launcher
+     */
+    private val requestQRScanLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val data = result.data?.getStringExtra(CameraScan.SCAN_RESULT)
+                    try {
+                        val add = Gson().fromJson(data, AddressData::class.java)
+                        binding.setConnAddr.setText(add.add)
+                        binding.setConnPort.setText(add.port.toString())
+                        with(preferences.edit()) {
+                            putString("tcp_add", add.add)
+                            putString("tcp_port", add.port.toString())
+                            apply()
+                        }
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.tcp_scan_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (_: Exception) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.tcp_scan_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.tcp_scan_canceled),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.tcp_scan_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+    /**
+     * Socket client
      */
     private val client = Client()
 
     /**
-     * The stratagem view model.
+     * Stratagem view model
      */
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
@@ -64,328 +124,368 @@ class SettingsFragment: PreferenceFragmentCompat() {
         )
     }
 
-    // View binding.
-    // Connection preference
-    private lateinit var tcpAddress: EditTextPreference
-    private lateinit var tcpPort: EditTextPreference
-    private lateinit var tcpScanner: Preference
-    private lateinit var tcpTest: Preference
-
-    // Sync preference
-    private lateinit var serverPort: EditTextPreference
-    private lateinit var inputDelay: EditTextPreference
-    private lateinit var inputOpen: ListPreference
-    private lateinit var inputTypeOpen: ListPreference
-    private lateinit var inputUp: ListPreference
-    private lateinit var inputDown: ListPreference
-    private lateinit var inputLeft: ListPreference
-    private lateinit var inputRight: ListPreference
-    private lateinit var syncConfig: Preference
-
-    // Control preference
-    private lateinit var swipeDistance: EditTextPreference
-    private lateinit var swipeVelocity: EditTextPreference
-
-    // Info preference
-    private lateinit var infoDbVersion: Preference
-    private lateinit var infoAppVersion: Preference
-    private lateinit var infoAbout: Preference
-
-    // Environment
-    private lateinit var sid: String
-    private lateinit var dbVer: String
-    private lateinit var dbName: String
-
-    private lateinit var preferences: SharedPreferences
-
-    // Activity launcher.
-    private val requestQRScanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        when (result.resultCode) {
-            RESULT_OK -> {
-                val data = result.data?.getStringExtra(CameraScan.SCAN_RESULT)
-                try {
-                    val add = Gson().fromJson(data, AddressData::class.java)
-                    tcpAddress.text = add.add
-                    tcpPort.text = add.port.toString()
-                    Toast.makeText(requireContext(), getString(R.string.tcp_scan_success), Toast.LENGTH_SHORT).show()
-                }
-                catch (_: Exception) {
-                    Toast.makeText(requireContext(), getString(R.string.tcp_scan_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            RESULT_CANCELED -> {
-                Toast.makeText(requireContext(), getString(R.string.tcp_scan_canceled), Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                Toast.makeText(requireContext(), getString(R.string.tcp_scan_failed), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences, rootKey)
-
-        // Setup binding.
-        tcpAddress = preferenceManager.findPreference("tcp_add")!!
-        tcpPort = preferenceManager.findPreference("tcp_port")!!
-        tcpScanner = preferenceManager.findPreference("tcp_scanner")!!
-        tcpTest = preferenceManager.findPreference("tcp_test")!!
-
-        serverPort = preferenceManager.findPreference("server_port")!!
-        inputDelay = preferenceManager.findPreference("input_delay")!!
-        inputOpen = preferenceManager.findPreference("input_open")!!
-        inputTypeOpen = preferenceManager.findPreference("input_type_open")!!
-        inputUp = preferenceManager.findPreference("input_up")!!
-        inputDown = preferenceManager.findPreference("input_down")!!
-        inputLeft = preferenceManager.findPreference("input_left")!!
-        inputRight = preferenceManager.findPreference("input_right")!!
-        syncConfig = preferenceManager.findPreference("sync_config")!!
-
-        swipeDistance = preferenceManager.findPreference("swipe_distance_threshold")!!
-        swipeVelocity = preferenceManager.findPreference("swipe_velocity_threshold")!!
-
-        infoDbVersion = preferenceManager.findPreference("info_db_version")!!
-        infoAppVersion = preferenceManager.findPreference("info_app_version")!!
-        infoAbout = preferenceManager.findPreference("info_about")!!
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout for this fragment
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         sid = preferences.getString("sid", "0")!!
         dbVer = preferences.getString("db_version", "0")!!
         dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
 
-        setupFormat()
-        setupEventListener()
+        inputValues = resources.getStringArray(R.array.input_values)
+        inputTypeValues = resources.getStringArray(R.array.input_type_values)
+        langValues = resources.getStringArray(R.array.lang_values)
+
         setupContent()
+        setupEventListener()
+
+        return view
     }
 
     /**
-     * Setup the format of some preferences.
+     * Setup the content of the views
      */
-    private fun setupFormat() {
-        // Only numeric value
-        tcpPort.setOnBindEditTextListener { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-        }
-        serverPort.setOnBindEditTextListener { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-        }
-        inputDelay.setOnBindEditTextListener { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-        }
-        swipeDistance.setOnBindEditTextListener { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-        }
-        swipeVelocity.setOnBindEditTextListener { editText ->
-            editText.inputType = InputType.TYPE_CLASS_NUMBER
-        }
+    private fun setupContent() {
+        // Connection
+        binding.setConnAddr.setText(preferences.getString("tcp_add", "127.0.0.1"))
+        binding.setConnPort.setText(preferences.getString("tcp_port", "23333"))
+        binding.setConnRetry.setText(preferences.getString("tcp_retry", "5"))
+        // Sync
+        binding.setSyncPort.setText(preferences.getString("server_port", "23333"))
+        binding.setSyncDelay.setText(preferences.getString("input_delay", "50"))
+        binding.setSyncInputOpen.setSelection(
+            inputValues.indexOf(
+                preferences.getString(
+                    "input_open",
+                    "ctrl_left"
+                )
+            )
+        )
+        binding.setSyncTypeOpen.setSelection(
+            inputTypeValues.indexOf(
+                preferences.getString(
+                    "input_type_open",
+                    "hold"
+                )
+            )
+        )
+        binding.setSyncInputUp.setSelection(
+            inputValues.indexOf(
+                preferences.getString(
+                    "input_up",
+                    "w"
+                )
+            )
+        )
+        binding.setSyncInputDown.setSelection(
+            inputValues.indexOf(
+                preferences.getString(
+                    "input_down",
+                    "s"
+                )
+            )
+        )
+        binding.setSyncInputLeft.setSelection(
+            inputValues.indexOf(
+                preferences.getString(
+                    "input_left",
+                    "a"
+                )
+            )
+        )
+        binding.setSyncInputRight.setSelection(
+            inputValues.indexOf(
+                preferences.getString(
+                    "input_right",
+                    "d"
+                )
+            )
+        )
+        // Control
+        binding.setCtrlSimplifiedMode.isChecked =
+            preferences.getBoolean("enable_simplified_mode", false)
+        binding.setCtrlFastbootMode.isChecked =
+            preferences.getBoolean("enable_fastboot_mode", false)
+        binding.setCtrlGstSwpDistanceThreshold.setText(
+            preferences.getString(
+                "swipe_distance_threshold",
+                "100"
+            )
+        )
+        binding.setCtrlGstSwpVelocityThreshold.setText(
+            preferences.getString(
+                "swipe_velocity_threshold",
+                "50"
+            )
+        )
+        binding.setCtrlLangStratagem.setSelection(
+            langValues.indexOf(
+                preferences.getString(
+                    "lang_stratagem",
+                    "auto"
+                )
+            )
+        )
+        // Info
+        // Set database version
+        binding.setInfoDb.setHint(
+            String.format(
+                resources.getString(R.string.info_db_version_desc),
+                dbName,
+                when (dbVer) {
+                    "0" -> resources.getString(R.string.info_db_version_empty)
+                    "1" -> resources.getString(R.string.info_db_version_incomplete)
+                    else -> dbVer
+                }
+            )
+        )
+        // Set app version.
+        val pkgName = context?.packageName!!
+        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        binding.setInfoApp.setHint(
+            String.format(
+                getString(R.string.info_app_version_desc),
+                pkgInfo.versionName
+            )
+        )
     }
 
+
     /**
-     * Setup preference event listener.
+     * Setup event listener
      */
     private fun setupEventListener() {
-        // Scan QR Code.
-        tcpScanner.setOnPreferenceClickListener {
-            val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(requireContext(), R.anim.from_right, R.anim.to_left)
+        // Connection
+        binding.setConnAddr.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("tcp_add", text.toString())
+                apply()
+            }
+        }
+        binding.setConnPort.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("tcp_port", text.toString())
+                apply()
+            }
+        }
+        binding.setConnRetry.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("tcp_retry", text.toString())
+                apply()
+            }
+        }
+        // Sync
+        binding.setSyncPort.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("server_port", text.toString())
+                apply()
+            }
+        }
+        binding.setSyncDelay.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("input_delay", text.toString())
+                apply()
+            }
+        }
+        binding.setSyncInputOpen.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_open", inputValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+
+        binding.setSyncTypeOpen.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_type_open", inputTypeValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setSyncInputUp.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_up", inputValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setSyncInputDown.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_down", inputValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setSyncInputLeft.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_left", inputValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setSyncInputRight.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("input_right", inputValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        // Control
+        binding.setCtrlSimplifiedMode.setOnCheckedChangeListener { _, isChecked ->
+            with(preferences.edit()) {
+                putBoolean("enable_simplified_mode", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlFastbootMode.setOnCheckedChangeListener { _, isChecked ->
+            with(preferences.edit()) {
+                putBoolean("enable_fastboot_mode", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlGstSwpDistanceThreshold.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("swipe_distance_threshold", text.toString())
+                apply()
+            }
+        }
+        binding.setCtrlGstSwpVelocityThreshold.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putString("swipe_velocity_threshold", text.toString())
+                apply()
+            }
+        }
+        binding.setCtrlLangStratagem.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("lang_stratagem", langValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        // Scan QR Code
+        binding.setConnScan.setOnClickListener {
+            val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(
+                requireContext(),
+                R.anim.from_right,
+                R.anim.to_left
+            )
             val intent = Intent(requireContext(), QRCodeScanActivity::class.java)
             requestQRScanLauncher.launch(intent, optionsCompat)
-            true
         }
 
-
-        // Test connection preference.
-        tcpTest.setOnPreferenceClickListener {
-            tcpTest.summary = resources.getText(R.string.tcp_test_connecting)
-            // Disable the preference to prevent conflict.
-            tcpTest.isEnabled = false
-            syncConfig.isEnabled = false
-            // Prepare socket and data.
-            val add = tcpAddress.text!!
-            val port: Int = tcpPort.text?.toInt()!!
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-            val version = pkgInfo.versionName
-            infoAppVersion.summary = pkgInfo.versionName
-            // Launch coroutine.
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful, request server status.
-                        withContext(Dispatchers.Main) {
-                            tcpTest.summary = resources.getText(R.string.tcp_test_waiting)
-                        }
-                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                        try {
-                            val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                            // Check the server status.
-                            when (res.status) {
-                                0 -> {
-                                    withContext(Dispatchers.Main) {
-                                        tcpTest.summary =
-                                            resources.getText(R.string.tcp_test_success)
-                                    }
-                                }
-                                1 -> {
-                                    withContext(Dispatchers.Main) {
-                                        tcpTest.summary = String.format(
-                                            getString(R.string.network_status_1),
-                                            version.substring(0, version.lastIndexOf(".")),
-                                            res.ver
-                                        )
-                                    }
-                                }
-                                2 -> {
-                                    withContext(Dispatchers.Main) {
-                                        tcpTest.summary =
-                                            String.format(getString(R.string.network_auth), sid)
-                                    }
-                                    // Request authentication.
-                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                                    client.toggleTimeout(false)
-                                    val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                                    client.toggleTimeout(true)
-                                    withContext(Dispatchers.Main) {
-                                        if (auth.auth) {
-                                            tcpTest.summary =
-                                                String.format(getString(R.string.tcp_test_success))
-                                        }
-                                        else {
-                                            tcpTest.summary =
-                                                String.format(getString(R.string.network_auth_failed))
-                                        }
-                                    }
-                                }
-                                else -> {
-                                    tcpTest.summary = String.format(getString(R.string.network_status_error),
-                                        res.status
-                                    )
-                                }
-                            }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
-                                tcpTest.summary = resources.getText(R.string.network_response_error)
-                            }
-                        }
-                    }
-                    else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            tcpTest.summary = resources.getText(R.string.tcp_test_failed)
-                        }
-                    }
-                    // Disconnect.
-                    client.disconnect()
-                    // Enable the preference.
-                    withContext(Dispatchers.Main) {
-                        tcpTest.isEnabled = true
-                        syncConfig.isEnabled = true
-                    }
-                }
-            }
-            true
-        }
-
-        // Sync config preference.
-        syncConfig.setOnPreferenceClickListener {
-            syncConfig.summary = resources.getText(R.string.tcp_test_connecting)
-            // Disable the preference to prevent conflict.
-            tcpTest.isEnabled = false
-            syncConfig.isEnabled = false
-            // Prepare socket and data.
-            val config = ServerConfigData(
-                port = serverPort.text?.toInt()!!,
-                delay = inputDelay.text?.toInt()!!,
-                open = inputOpen.value!!,
-                openType = inputTypeOpen.value!!,
-                up = inputUp.value!!,
-                down = inputDown.value!!,
-                left = inputLeft.value!!,
-                right = inputRight.value!!,
-                ip = "",
-            )
-            val add = tcpAddress.text!!
-            val port: Int = tcpPort.text?.toInt()!!
-            // Launch coroutine
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful.
-                        withContext(Dispatchers.Main) {
-                            syncConfig.summary =
-                                String.format(getString(R.string.network_auth), sid)
-                        }
-                        // Request authentication.
-                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                        client.toggleTimeout(false)
-                        try {
-                            val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                            client.toggleTimeout(true)
-                            if (auth.auth) {
-                                client.send(Gson().toJson(SyncConfigPacket(config, auth.token)).toString())
-                                withContext(Dispatchers.Main) {
-                                    syncConfig.summary = resources.getText(R.string.sync_config_finished)
-                                }
-                            }
-                            else {
-                                withContext(Dispatchers.Main) {
-                                    syncConfig.summary =
-                                        String.format(getString(R.string.network_auth_failed))
-                                }
-                            }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
-                                syncConfig.summary = resources.getText(R.string.network_response_error)
-                            }
-                        }
-                    }
-                    else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            syncConfig.summary = resources.getText(R.string.tcp_test_failed)
-                        }
-                    }
-                    // Disconnect.
-                    client.disconnect()
-                    // Enable the preference.
-                    withContext(Dispatchers.Main) {
-                        tcpTest.isEnabled = true
-                        syncConfig.isEnabled = true
-                    }
-                }
-            }
-            true
-        }
-
-        // Open repository preference.
-        infoAbout.setOnPreferenceClickListener {
+        // Open about dialog
+        binding.setInfoAbout.setOnClickListener {
             val pkgName = context?.packageName!!
             val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
             val curVer = pkgInfo.versionName
-            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
-                .setTitle(String.format(
-                    resources.getString(R.string.info_about_title),
-                    curVer
-                ))
-                .setMessage(R.string.info_about_desc)
-                .setIcon(R.mipmap.ic_launcher)
-                .setPositiveButton(R.string.info_about_repo) { _, _ ->
-                    val uri = Uri.parse(resources.getString(R.string.repo_url))
-                    val internet = Intent(Intent.ACTION_VIEW, uri)
-                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                    startActivity(internet)
-                }.setNegativeButton(R.string.info_about_license) { _, _ ->
-                    val uri = Uri.parse(resources.getString(R.string.license_url))
-                    val internet = Intent(Intent.ACTION_VIEW, uri)
-                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                    startActivity(internet)
-                }.setNeutralButton(R.string.info_about_usage) { _, _ ->
-                    val uri = Uri.parse(resources.getString(R.string.usage_url))
-                    val internet = Intent(Intent.ACTION_VIEW, uri)
-                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                    startActivity(internet)
-                }.create()
+
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(view)
             dialog.show()
-            true
+
+            view.findViewById<TextView>(R.id.dialog_info_title).text = String.format(
+                resources.getString(R.string.info_about_title),
+                curVer
+            )
+            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_about_desc)
+            val button1 = view.findViewById<AppButton>(R.id.dialog_info_button1)
+            button1.setTitle(resources.getString(R.string.info_about_usage))
+            button1.setOnClickListener {
+                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val internet = Intent(Intent.ACTION_VIEW, uri)
+                internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                startActivity(internet)
+                dialog.hide()
+            }
+            val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
+            button2.setTitle(resources.getString(R.string.info_about_license))
+            button2.setOnClickListener {
+                val uri = Uri.parse(resources.getString(R.string.license_url))
+                val internet = Intent(Intent.ACTION_VIEW, uri)
+                internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                startActivity(internet)
+                dialog.hide()
+            }
+            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            button3.setTitle(resources.getString(R.string.info_about_repo))
+            button3.visibility = VISIBLE
+            button3.setOnClickListener {
+                val uri = Uri.parse(resources.getString(R.string.repo_url))
+                val internet = Intent(Intent.ACTION_VIEW, uri)
+                internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                startActivity(internet)
+                dialog.hide()
+            }
         }
 
         // Check database update.
@@ -397,33 +497,38 @@ class SettingsFragment: PreferenceFragmentCompat() {
         // Check app update.
         // Launch coroutine
         lifecycleScope.launch {
-            infoAppVersion.title = resources.getString(R.string.info_app_version_check)
+            binding.setInfoApp.setHint(resources.getString(R.string.info_app_version_check))
             try {
-                val json = JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
+                val json =
+                    JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
                     val pkgName = context?.packageName!!
-                    val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+                    val pkgInfo =
+                        context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
                     val curVer = pkgInfo.versionName
-                    var title: String
+                    val title: String
                     if (curVer != newVer) {
-                        infoAppVersion.summary = String.format(
-                            resources.getString(R.string.info_app_version_updatable_desc),
-                            pkgInfo.versionName,
-                            newVer
+                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_updatable))
+                        binding.setInfoApp.setHint(
+                            String.format(
+                                resources.getString(R.string.info_app_version_updatable_desc),
+                                pkgInfo.versionName,
+                                newVer
+                            )
                         )
-                        infoAppVersion.title = resources.getString(R.string.info_app_version_updatable)
                         title = String.format(
                             resources.getString(R.string.info_app_version_log_updatable),
                             newVer
                         )
-                    }
-                    else {
-                        infoAppVersion.title = resources.getString(R.string.info_app_version)
-                        infoAppVersion.summary = String.format(
-                            resources.getString(R.string.info_app_version_latest),
-                            pkgInfo.versionName
+                    } else {
+                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
+                        binding.setInfoApp.setHint(
+                            String.format(
+                                resources.getString(R.string.info_app_version_latest),
+                                pkgInfo.versionName
+                            )
                         )
                         title = String.format(
                             resources.getString(R.string.info_app_version_log_latest),
@@ -431,52 +536,60 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         )
                     }
                     // Open version log.
-                    infoAppVersion.setOnPreferenceClickListener {
-                        val dialog: AlertDialog = AlertDialog.Builder(requireContext())
-                            .setTitle(title)
-                            .setMessage(json.getString("body"))
-                            .setIcon(R.mipmap.ic_launcher)
-                            .setPositiveButton(R.string.dialog_download) { _, _ ->
-                                val uri = Uri.parse(resources.getString(R.string.release_url))
-                                val internet = Intent(Intent.ACTION_VIEW, uri)
-                                internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                                startActivity(internet)
-                            }.setNegativeButton(R.string.dialog_cancel) { _, _ ->
-
-                            }.create()
+                    binding.setInfoApp.setOnClickListener {
+                        // Setup dialog.
+                        val dialog = AlertDialog.Builder(requireContext()).create()
+                        val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+                        dialog.setView(view)
                         dialog.show()
-                        true
+
+                        view.findViewById<TextView>(R.id.dialog_info_title).text = title
+                        view.findViewById<TextView>(R.id.dialog_info_msg).text =
+                            json.getString("body")
+                        val button1 = view.findViewById<AppButton>(R.id.dialog_info_button1)
+                        button1.setTitle(resources.getString(R.string.dialog_download))
+                        button1.setOnClickListener {
+                            val uri = Uri.parse(resources.getString(R.string.release_url))
+                            val internet = Intent(Intent.ACTION_VIEW, uri)
+                            internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                            startActivity(internet)
+                            dialog.hide()
+                        }
+                        view.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+                            dialog.hide()
+                        }
                     }
                 }
-            }
-            catch (_: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) {
-                    infoAppVersion.title = resources.getString(R.string.info_app_version)
+                    binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
                 }
             }
         }
 
         // Show update database dialog.
-        infoDbVersion.setOnPreferenceClickListener {
+        binding.setInfoDb.setOnClickListener {
             // Setup dialog.
             val dialog = AlertDialog.Builder(requireContext()).create()
-            val view: View = View.inflate(requireContext(), R.layout.layout_db_update_channel, null)
+            val view: View = View.inflate(requireContext(), R.layout.dialog_db_update_channel, null)
             dialog.setView(view)
             dialog.show()
 
             val radioGroup = view.findViewById<RadioGroup>(R.id.db_update_group)
-            val confirm = view.findViewById<Button>(R.id.db_update_confirm)
-            val cancel = view.findViewById<Button>(R.id.db_update_cancel)
-            val clear = view.findViewById<Button>(R.id.db_update_clear)
+            val confirm = view.findViewById<AppButton>(R.id.db_update_confirm)
+            val cancel = view.findViewById<AppButton>(R.id.db_update_cancel)
+            val clear = view.findViewById<AppButton>(R.id.db_update_clear)
             val custom = view.findViewById<EditText>(R.id.db_update_custom_input)
             var channel = preferences.getInt("db_update_channel", 0)
 
-            radioGroup.check(when (channel) {
-                0 -> R.id.db_update_hd2
-                1 -> R.id.db_update_hd
-                2 -> R.id.db_update_custom
-                else -> R.id.db_update_hd2
-            })
+            radioGroup.check(
+                when (channel) {
+                    0 -> R.id.db_update_hd2
+                    1 -> R.id.db_update_hd
+                    2 -> R.id.db_update_custom
+                    else -> R.id.db_update_hd2
+                }
+            )
             custom.setText(preferences.getString("db_update_channel_custom", ""))
             custom.isEnabled = channel == 2
 
@@ -492,34 +605,48 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
             // Set custom url.
             custom.addTextChangedListener {
-                preferences.edit().putString("db_update_channel_custom", custom.text.toString()).apply()
+                preferences.edit().putString("db_update_channel_custom", custom.text.toString())
+                    .apply()
             }
 
             // Clear cache.
+            clear.setAlert(true)
             clear.setOnClickListener {
-                val clearDialog = AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.info_db_update_clear)
-                    .setMessage(R.string.info_db_update_clear_desc)
-                    .setIcon(R.drawable.ic_info)
-                    .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                        val path = context?.filesDir?.path + "/icons"
-                        File(path).deleteRecursively()
-                        preferences.edit().putString("db_version", "0").apply()
-                        preferences.edit().putString("db_name", getString(R.string.default_string)).apply()
-                        preferences.edit().putInt("db_update_channel", 0).apply()
-                        channel = 0
-                        radioGroup.check(R.id.db_update_hd2)
-                        stratagemViewModel.deleteAll()
-
-                        Toast.makeText(context, getString(R.string.toast_complete), Toast.LENGTH_SHORT).show()
-
-                        lifecycleScope.launch {
-                            checkDBUpdate()
-                        }
-                    }.setNegativeButton(R.string.dialog_cancel) { _, _ ->
-
-                    }.create()
+                // Setup dialog.
+                val clearDialog = AlertDialog.Builder(requireContext()).create()
+                val clearView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+                clearDialog.setView(clearView)
                 clearDialog.show()
+
+                clearView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.info_db_update_clear)
+                clearView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_db_update_clear_desc)
+                val button1 = clearView.findViewById<AppButton>(R.id.dialog_info_button1)
+                button1.setAlert(true)
+                button1.setOnClickListener {
+                    val path = context?.filesDir?.path + "/icons"
+                    File(path).deleteRecursively()
+                    preferences.edit().putString("db_version", "0").apply()
+                    preferences.edit().putString("db_name", getString(R.string.default_string))
+                        .apply()
+                    preferences.edit().putInt("db_update_channel", 0).apply()
+                    channel = 0
+                    radioGroup.check(R.id.db_update_hd2)
+                    stratagemViewModel.deleteAll()
+
+                    Toast.makeText(
+                        context,
+                        getString(R.string.toast_complete),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    lifecycleScope.launch {
+                        checkDBUpdate()
+                    }
+                    clearDialog.hide()
+                }
+                clearView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+                    clearDialog.hide()
+                }
             }
 
             // Cancel update.
@@ -532,9 +659,11 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 dialog.hide()
                 preferences.edit().putInt("db_update_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!
-                dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+                dbName =
+                    preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
 
-                preferences.edit().putString("db_name", resources.getString(R.string.default_string)).apply()
+                preferences.edit()
+                    .putString("db_name", resources.getString(R.string.default_string)).apply()
 
                 var url: String = when (preferences.getInt("db_update_channel", 0)) {
                     0 -> getString(R.string.db_hd2_url)
@@ -544,17 +673,16 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 }
                 if (url.isEmpty()) {
                     url = getString(R.string.default_string)
-                }
-                else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+                } else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                     url = "$url/"
                 }
 
                 // Download database.
                 lifecycleScope.launch {
-                    infoDbVersion.isEnabled = false
+                    binding.setInfoDb.isEnabled = false
                     withContext(Dispatchers.Main) {
-                        infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
-                        infoDbVersion.summary = resources.getString(R.string.info_db_version_updating_index_desc)
+                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
+                        binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_updating_index_desc))
                     }
 
                     try {
@@ -574,11 +702,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         if (date == dbVer && name == dbName) {
                             // Database is latest, no need to update.
                             withContext(Dispatchers.Main) {
-                                infoDbVersion.summary = String.format(
-                                    resources.getString(R.string.info_db_version_update_latest),
-                                    name
+                                binding.setInfoDb.setHint(
+                                    String.format(
+                                        resources.getString(R.string.info_db_version_update_latest),
+                                        name
+                                    )
                                 )
-                                infoDbVersion.title = resources.getString(R.string.info_db_version)
+                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
                             }
                             preferences.edit().putString("db_version", date).apply()
                             return@launch
@@ -586,11 +716,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
                         // Download database.
                         withContext(Dispatchers.Main) {
-                            infoDbVersion.summary = String.format(
-                                resources.getString(R.string.info_db_version_updating_db_desc),
-                                name
+                            binding.setInfoDb.setHint(
+                                String.format(
+                                    resources.getString(R.string.info_db_version_updating_db_desc),
+                                    name
+                                )
                             )
-                            infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
+                            binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
                         }
                         val dbObj = JSONObject(Util.downloadToStr(dbUrl))
                         // Regenerate database.
@@ -619,15 +751,18 @@ class SettingsFragment: PreferenceFragmentCompat() {
                         // Download icons.
                         for (i in 0 until iconsList.size) {
                             withContext(Dispatchers.Main) {
-                                infoDbVersion.summary = String.format(
-                                    resources.getString(R.string.info_db_version_updating_icons_desc),
-                                    name,
-                                    i,
-                                    iconsList.size
+                                binding.setInfoDb.setHint(
+                                    String.format(
+                                        resources.getString(R.string.info_db_version_updating_icons_desc),
+                                        name,
+                                        i,
+                                        iconsList.size
+                                    )
                                 )
-                                infoDbVersion.title = resources.getString(R.string.info_db_version_updating)
+                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
                             }
-                            Util.download(iconsUrl + iconsList[i] + ".svg",
+                            Util.download(
+                                iconsUrl + iconsList[i] + ".svg",
                                 iconsPath + iconsList[i] + ".svg",
                                 false
                             )
@@ -635,62 +770,33 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
                         preferences.edit().putString("db_version", date).apply()
                         withContext(Dispatchers.Main) {
-                            infoDbVersion.summary = String.format(
-                                resources.getString(R.string.info_db_version_update_complete_desc),
-                                name
+                            binding.setInfoDb.setHint(
+                                String.format(
+                                    resources.getString(R.string.info_db_version_update_complete_desc),
+                                    name
+                                )
                             )
                         }
                     } catch (_: Exception) {
                         withContext(Dispatchers.Main) {
-                            infoDbVersion.summary = resources.getString(R.string.info_db_version_update_failed_desc)
-                            infoDbVersion.isEnabled = true
+                            binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_update_failed_desc))
+                            binding.setInfoDb.isEnabled = true
                         }
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
                     withContext(Dispatchers.Main) {
-                        infoDbVersion.title = resources.getString(R.string.info_db_version)
+                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
                     }
                 }
             }
-
-            true
         }
     }
 
     /**
-     * Setup the content of some preference
-     */
-    private fun setupContent() {
-        // Set database version
-        infoDbVersion.summary = String.format(
-            resources.getString(R.string.info_db_version_desc),
-            dbName,
-            when (dbVer) {
-                "0" -> resources.getString(R.string.info_db_version_empty)
-                "1" -> resources.getString(R.string.info_db_version_incomplete)
-                else -> dbVer
-            }
-        )
-
-        // Set app version.
-        val pkgName = context?.packageName!!
-        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-        infoAppVersion.summary = String.format(
-            getString(R.string.info_app_version_desc),
-            pkgInfo.versionName
-        )
-    }
-
-    override fun onDestroy() {
-        client.disconnect()
-        super.onDestroy()
-    }
-
-    /**
-     * Check if the database is updatable.
+     * Check if the database is updatable
      */
     private suspend fun checkDBUpdate() {
-        infoDbVersion.title = resources.getString(R.string.info_db_version_check)
+        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_check))
         try {
             var url: String = when (preferences.getInt("db_update_channel", 0)) {
                 0 -> getString(R.string.db_hd2_url)
@@ -700,8 +806,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
             }
             if (url.isEmpty()) {
                 url = getString(R.string.default_string)
-            }
-            else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+            } else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                 url = "$url/"
             }
 
@@ -710,8 +815,9 @@ class SettingsFragment: PreferenceFragmentCompat() {
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {
                 if (dbVer != newVer) {
-                    infoDbVersion.summary =
-                        String.format(resources.getString(R.string.info_db_version_updatable_desc),
+                    binding.setInfoDb.setHint(
+                        String.format(
+                            resources.getString(R.string.info_db_version_updatable_desc),
                             preferences.getString("db_name", getString(R.string.db_hd2_name)),
                             when (dbVer) {
                                 "0" -> resources.getString(R.string.info_db_version_empty)
@@ -721,13 +827,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
                             json.getString("name"),
                             newVer
                         )
-                    infoDbVersion.title =
-                        resources.getString(R.string.info_db_version_updatable)
-                }
-                else {
-                    infoDbVersion.title = resources.getString(R.string.info_db_version)
-                    infoDbVersion.summary =
-                        String.format(resources.getString(R.string.info_db_version_latest),
+                    )
+                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updatable))
+                } else {
+                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                    binding.setInfoDb.setHint(
+                        String.format(
+                            resources.getString(R.string.info_db_version_latest),
                             preferences.getString("db_name", getString(R.string.db_hd2_name)),
                             when (dbVer) {
                                 "0" -> resources.getString(R.string.info_db_version_empty)
@@ -735,14 +841,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
                                 else -> dbVer
                             }
                         )
+                    )
                 }
             }
-        }
-        catch (_: Exception) {
+        } catch (_: Exception) {
             withContext(Dispatchers.Main) {
-                infoDbVersion.title = resources.getString(R.string.info_db_version)
+                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
             }
         }
     }
-
 }

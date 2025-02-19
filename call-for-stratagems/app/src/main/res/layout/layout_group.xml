@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     android:padding="10dp"
-    android:background="@drawable/button_entry"
+    android:background="@drawable/entry_bg"
     android:id="@+id/group_cardView"
     android:foreground="?attr/selectableItemBackground" >
 

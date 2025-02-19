@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class AppButton : ConstraintLayout {
-    private var textView: TextView
+    private var titleView: TextView
     private var hintView: TextView
     private var iconView: ImageView
     private var borderTopView: View
@@ -26,7 +26,7 @@ class AppButton : ConstraintLayout {
         defStyleAttr
     ) {
         val views = LayoutInflater.from(context).inflate(R.layout.layout_app_button, this, true)
-        textView = views.findViewById(R.id.app_button_text)
+        titleView = views.findViewById(R.id.app_button_text)
         hintView = views.findViewById(R.id.app_button_hint)
         iconView = views.findViewById(R.id.app_button_icon)
         borderTopView = views.findViewById(R.id.app_button_border_top)
@@ -35,7 +35,7 @@ class AppButton : ConstraintLayout {
 
         val attrs = context.obtainStyledAttributes(attributeSet, R.styleable.AppButton)
         if (attrs.hasValue(R.styleable.AppButton_text)) {
-            textView.text = attrs.getString(R.styleable.AppButton_text)!!
+            titleView.text = attrs.getString(R.styleable.AppButton_text)!!
         }
         if (attrs.hasValue(R.styleable.AppButton_hint)) {
             hintView.visibility = VISIBLE
@@ -44,7 +44,7 @@ class AppButton : ConstraintLayout {
         if (attrs.hasValue(R.styleable.AppButton_icon)) {
             iconView.visibility = VISIBLE
             iconView.setImageDrawable(attrs.getDrawable(R.styleable.AppButton_icon))
-            textView.textAlignment = TEXT_ALIGNMENT_CENTER
+            titleView.textAlignment = TEXT_ALIGNMENT_CENTER
             hintView.textAlignment = TEXT_ALIGNMENT_CENTER
         }
         if (attrs.hasValue(R.styleable.AppButton_iconWidth)) {
@@ -98,5 +98,19 @@ class AppButton : ConstraintLayout {
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return true
+    }
+
+    fun setTitle(txt: String) {
+        titleView.text = txt
+    }
+
+    fun setHint(txt: String) {
+        hintView.text = txt
+    }
+
+    fun setAlert(flag: Boolean) {
+        if (flag) {
+            titleView.setTextColor(resources.getColor(R.color.buttonTextAlert, context.theme))
+        }
     }
 }

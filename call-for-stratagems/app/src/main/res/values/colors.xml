@@ -31,8 +31,8 @@
     <color name="transparent">#00000000</color>
     <color name="backgroundPrimary">#080809</color>
     <color name="backgroundSecondary">#222222</color>
-    <color name="backgroundBlur">#aa1a1a1a</color>
-    <color name="border">#cbcbcd</color>
+    <color name="backgroundBlur">#cc1a1a1a</color>
+    <color name="border">#676767</color>
     <color name="borderHighlight">@color/highlight</color>
     <color name="textPrimary">#dddddd</color>
     <color name="textSecondary">#ababaa</color>
@@ -43,6 +43,7 @@
     <color name="buttonBackground">@color/backgroundPrimary</color>
     <color name="buttonBackgroundPressed">@color/stress</color>
     <color name="buttonText">@color/textPrimary</color>
+    <color name="buttonTextAlert">@color/textHighlight</color>
     <color name="buttonTextHint">@color/textSecondary</color>
     <color name="scrollbar">@color/stress</color>
     <color name="caret">@color/highlight</color>

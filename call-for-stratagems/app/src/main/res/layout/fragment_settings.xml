@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.settings.SettingsFragment2">
+    tools:context=".fragments.settings.SettingsFragment">
 
     <ImageView
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundBlur"/>
+        android:background="@color/backgroundBlur" />
 
 
     <ScrollView
@@ -28,8 +28,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -73,8 +73,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -125,37 +125,74 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/backgroundPrimary"
+                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:gravity="center">
+                    android:padding="5dp">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/set_conn_retry"
+                        android:theme="@style/AppText" />
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent" />
+
+                    <EditText
+                        android:id="@+id/set_conn_retry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:width="100dp"
+                        android:autofillHints="5"
+                        android:background="@color/backgroundSecondary"
+                        android:inputType="number"
+                        android:theme="@style/AppEditText"
+                        tools:ignore="TouchTargetSizeCheck,TextContrastCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
                     <indie.wistefinch.callforstratagems.AppButton
+                        android:id="@+id/set_conn_scan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:text="@string/set_conn_scan"
-                        app:icon="@drawable/ic_qr_scanner"/>
+                        app:icon="@drawable/ic_qr_scanner"
+                        app:text="@string/set_conn_scan" />
 
                     <Space
                         android:layout_width="5dp"
                         android:layout_height="match_parent" />
 
                     <indie.wistefinch.callforstratagems.AppButton
+                        android:id="@+id/set_conn_test"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:text="@string/set_conn_test"
-                        app:icon="@drawable/ic_sync"/>
+                        app:icon="@drawable/ic_sync"
+                        app:text="@string/set_conn_test" />
 
                 </LinearLayout>
-
 
 
             </LinearLayout>
 
             <Space
                 android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                 />
+                android:layout_height="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -199,8 +236,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -236,8 +273,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -283,8 +320,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -309,6 +346,7 @@
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
@@ -317,8 +355,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -352,8 +390,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -378,6 +416,7 @@
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
@@ -386,8 +425,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -412,6 +451,7 @@
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
@@ -420,8 +460,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -446,6 +486,7 @@
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
@@ -454,8 +495,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -487,15 +528,16 @@
 
 
                 <indie.wistefinch.callforstratagems.AppButton
+                    android:id="@+id/set_sync_apply"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/set_sync_apply"/>
+                    app:text="@string/set_sync_apply" />
 
             </LinearLayout>
+
             <Space
                 android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                />
+                android:layout_height="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -527,7 +569,8 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="TooManyViews" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -540,8 +583,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -587,8 +630,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -633,8 +676,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -665,7 +708,7 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/set_unit_pixel"
                         android:theme="@style/AppTextHint" />
@@ -679,8 +722,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -711,7 +754,7 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/set_unit_pixel_s"
                         android:theme="@style/AppTextHint"
@@ -726,8 +769,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/backgroundPrimary"
-                    android:orientation="horizontal"
                     android:gravity="center"
+                    android:orientation="horizontal"
                     android:padding="5dp">
 
 
@@ -747,11 +790,12 @@
                         android:layout_width="125dp"
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
-                        android:entries="@array/lang_stratagem_entries"
+                        android:entries="@array/lang_entries"
                         android:spinnerMode="dialog"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
@@ -803,33 +847,41 @@
                     tools:ignore="TooManyViews" />
 
                 <indie.wistefinch.callforstratagems.AppButton
+                    android:id="@+id/set_info_db"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/set_info_db"
-                    app:hint="@string/default_string"/>
+                    app:hint="@string/default_string"
+                    app:text="@string/set_info_db" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
                 <indie.wistefinch.callforstratagems.AppButton
+                    android:id="@+id/set_info_app"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/set_info_app"
-                    app:hint="@string/default_string"/>
+                    app:hint="@string/default_string"
+                    app:text="@string/set_info_app" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
                 <indie.wistefinch.callforstratagems.AppButton
+                    android:id="@+id/set_info_about"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/set_info_about"/>
-
+                    app:text="@string/set_info_about" />
 
             </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="5dp" />
+
         </LinearLayout>
+
     </ScrollView>
 
 </FrameLayout>

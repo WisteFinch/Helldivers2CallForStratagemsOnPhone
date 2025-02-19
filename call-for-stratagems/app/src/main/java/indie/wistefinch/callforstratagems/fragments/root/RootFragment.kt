@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.root
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +10,11 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuHost
@@ -20,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import indie.wistefinch.callforstratagems.AppButton
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
@@ -72,15 +78,24 @@ class RootFragment : Fragment() {
         val dbVer = preferences.getString("db_version", "0")!!
         val ignoreDbCheck = preferences.getBoolean("hint_db_incomplete", false)
         if ((dbVer == "0" || dbVer == "1") && !ignoreDbCheck) {
-            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
-                .setTitle(R.string.hint_db_incomplete)
-                .setMessage(R.string.hint_db_incomplete_desc)
-                .setIcon(R.drawable.ic_info)
-                .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                }.setNeutralButton(R.string.dialog_no_ask) { _, _ ->
-                    preferences.edit().putBoolean("hint_db_incomplete", true).apply()
-                }.create()
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(view)
             dialog.show()
+
+            view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_db_incomplete)
+            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_db_incomplete_desc)
+            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+                dialog.hide()
+            }
+            val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
+            button2.setTitle(resources.getString(R.string.dialog_no_ask))
+            button2.setAlert(true)
+            button2.setOnClickListener {
+                preferences.edit().putBoolean("hint_db_incomplete", true).apply()
+                dialog.hide()
+            }
         }
 
         // Check and show welcome.
@@ -89,22 +104,34 @@ class RootFragment : Fragment() {
         val ver = pkgInfo.versionName
         val ignoreWelcome = preferences.getBoolean("hint_welcome_$ver", false)
         if (!ignoreWelcome) {
-            val dialog: AlertDialog = AlertDialog.Builder(requireContext())
-                .setTitle(String.format(resources.getString(R.string.hint_welcome), ver))
-                .setMessage(R.string.hint_welcome_desc)
-                .setIcon(R.mipmap.ic_launcher)
-                .setOnDismissListener {
-                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
-                }.setPositiveButton(R.string.dialog_confirm) { _, _ ->
-                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
-                }.setNeutralButton(R.string.hint_welcome_usage) { _, _ ->
-                    preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
-                    val uri = Uri.parse(resources.getString(R.string.usage_url))
-                    val internet = Intent(Intent.ACTION_VIEW, uri)
-                    internet.addCategory(Intent.CATEGORY_BROWSABLE)
-                    startActivity(internet)
-                }.create()
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(view)
+            dialog.setOnDismissListener {
+                preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+            }
             dialog.show()
+
+            view.findViewById<TextView>(R.id.dialog_info_title).text = String.format(resources.getString(R.string.hint_welcome), ver)
+            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_welcome_desc)
+            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+                preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+                dialog.hide()
+            }
+            @SuppressLint("CutPasteId")
+            view.findViewById<AppButton>(R.id.dialog_info_button2).visibility = GONE
+            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            button3.visibility = VISIBLE
+            button3.setTitle(resources.getString(R.string.hint_welcome_usage))
+            button3.setOnClickListener {
+                preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
+                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val internet = Intent(Intent.ACTION_VIEW, uri)
+                internet.addCategory(Intent.CATEGORY_BROWSABLE)
+                startActivity(internet)
+                dialog.hide()
+            }
         }
     }
 
@@ -163,12 +190,12 @@ class RootFragment : Fragment() {
      */
     private fun showEmptyDbViews(empty: Boolean) {
         if (empty) {
-            binding.noGroupTextView.visibility = View.VISIBLE
-            binding.noGroupImageView.visibility = View.VISIBLE
+            binding.noGroupTextView.visibility = VISIBLE
+            binding.noGroupImageView.visibility = VISIBLE
         }
         else {
-            binding.noGroupTextView.visibility = View.INVISIBLE
-            binding.noGroupImageView.visibility = View.INVISIBLE
+            binding.noGroupTextView.visibility = INVISIBLE
+            binding.noGroupImageView.visibility = INVISIBLE
         }
     }
 

@@ -56,7 +56,7 @@ class StratagemsListFragment : Fragment() {
 
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter
-        recyclerView.autoFitColumns(100)
+        recyclerView.autoFitColumns(90)
         adapter.setData(stratagemViewModel.getAllItems(), dbName, lang)
 
         return view
