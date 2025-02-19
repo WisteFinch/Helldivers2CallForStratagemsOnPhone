@@ -27,7 +27,7 @@ import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
-import indie.wistefinch.callforstratagems.Util
+import indie.wistefinch.callforstratagems.utils.Util
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory

@@ -1,13 +1,7 @@
 package indie.wistefinch.callforstratagems
 
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.appcompat.widget.Toolbar
@@ -16,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
+import indie.wistefinch.callforstratagems.utils.Util
 
 class MainActivity : AppCompatActivity() {
 

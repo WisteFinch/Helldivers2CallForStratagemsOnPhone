@@ -1,4 +1,4 @@
-package indie.wistefinch.callforstratagems
+package indie.wistefinch.callforstratagems.utils
 
 import android.content.Context
 import android.util.AttributeSet
@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import indie.wistefinch.callforstratagems.R
 
 class AppButton : ConstraintLayout {
     private var titleView: TextView
@@ -18,7 +19,6 @@ class AppButton : ConstraintLayout {
     private var borderBottomView: View
     private var bgView: LinearLayout
 
-    constructor(context: Context) : this(context, null)
     constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0)
     constructor(context: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         context,

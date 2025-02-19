@@ -12,6 +12,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -25,10 +26,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
-import indie.wistefinch.callforstratagems.AppButton
+import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.R
-import indie.wistefinch.callforstratagems.Util
+import indie.wistefinch.callforstratagems.utils.Util
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
@@ -60,6 +61,14 @@ class SettingsFragment : Fragment() {
     private lateinit var inputValues: Array<String>
     private lateinit var inputTypeValues: Array<String>
     private lateinit var langValues: Array<String>
+
+    // Dialogs
+    private lateinit var dbDialog: AlertDialog
+    private lateinit var appDialog: AlertDialog
+    private lateinit var aboutDialog: AlertDialog
+    private lateinit var dbView: View
+    private lateinit var appView: View
+    private lateinit var aboutView: View
 
     /**
      * QR code scanner activity launcher
@@ -140,6 +149,18 @@ class SettingsFragment : Fragment() {
         inputValues = resources.getStringArray(R.array.input_values)
         inputTypeValues = resources.getStringArray(R.array.input_type_values)
         langValues = resources.getStringArray(R.array.lang_values)
+
+        // Setup dialogs
+        dbDialog = AlertDialog.Builder(requireContext()).create()
+        dbView = View.inflate(requireContext(), R.layout.dialog_db_update_channel, null)
+        dbDialog.setView(dbView)
+        appDialog = AlertDialog.Builder(requireContext()).create()
+        appView = View.inflate(requireContext(), R.layout.dialog_info, null)
+        appDialog.setView(appView)
+        aboutDialog = AlertDialog.Builder(requireContext()).create()
+        aboutView = View.inflate(requireContext(), R.layout.dialog_info, null)
+        aboutDialog.setView(aboutView)
+
 
         setupContent()
         setupEventListener()
@@ -443,40 +464,41 @@ class SettingsFragment : Fragment() {
 
         // Open about dialog
         binding.setInfoAbout.setOnClickListener {
+            if (aboutDialog.isShowing) {
+                return@setOnClickListener
+            }
+            aboutDialog.show()
+
             val pkgName = context?.packageName!!
             val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
             val curVer = pkgInfo.versionName
 
-            // Setup dialog.
-            val dialog = AlertDialog.Builder(requireContext()).create()
-            val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
-            dialog.setView(view)
-            dialog.show()
-
-            view.findViewById<TextView>(R.id.dialog_info_title).text = String.format(
+            aboutView.findViewById<TextView>(R.id.dialog_info_title).text = String.format(
                 resources.getString(R.string.info_about_title),
                 curVer
             )
-            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_about_desc)
-            val button1 = view.findViewById<AppButton>(R.id.dialog_info_button1)
+            aboutView.findViewById<ImageView>(R.id.dialog_info_icon)
+                .setImageResource(R.drawable.ic_launcher_foreground)
+            aboutView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_about_desc)
+            val button1 = aboutView.findViewById<AppButton>(R.id.dialog_info_button1)
             button1.setTitle(resources.getString(R.string.info_about_usage))
             button1.setOnClickListener {
                 val uri = Uri.parse(resources.getString(R.string.usage_url))
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
-                dialog.hide()
+                aboutDialog.hide()
             }
-            val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
+            val button2 = aboutView.findViewById<AppButton>(R.id.dialog_info_button2)
             button2.setTitle(resources.getString(R.string.info_about_license))
             button2.setOnClickListener {
                 val uri = Uri.parse(resources.getString(R.string.license_url))
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
-                dialog.hide()
+                aboutDialog.hide()
             }
-            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            val button3 = aboutView.findViewById<AppButton>(R.id.dialog_info_button3)
             button3.setTitle(resources.getString(R.string.info_about_repo))
             button3.visibility = VISIBLE
             button3.setOnClickListener {
@@ -484,7 +506,7 @@ class SettingsFragment : Fragment() {
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
-                dialog.hide()
+                aboutDialog.hide()
             }
         }
 
@@ -537,27 +559,29 @@ class SettingsFragment : Fragment() {
                     }
                     // Open version log.
                     binding.setInfoApp.setOnClickListener {
-                        // Setup dialog.
-                        val dialog = AlertDialog.Builder(requireContext()).create()
-                        val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
-                        dialog.setView(view)
-                        dialog.show()
+                        if (appDialog.isShowing) {
+                            return@setOnClickListener
+                        }
+                        appDialog.show()
 
-                        view.findViewById<TextView>(R.id.dialog_info_title).text = title
-                        view.findViewById<TextView>(R.id.dialog_info_msg).text =
+                        appView.findViewById<TextView>(R.id.dialog_info_title).text = title
+                        appView.findViewById<ImageView>(R.id.dialog_info_icon)
+                            .setImageResource(R.drawable.ic_launcher_foreground)
+                        appView.findViewById<TextView>(R.id.dialog_info_msg).text =
                             json.getString("body")
-                        val button1 = view.findViewById<AppButton>(R.id.dialog_info_button1)
+                        val button1 = appView.findViewById<AppButton>(R.id.dialog_info_button1)
                         button1.setTitle(resources.getString(R.string.dialog_download))
                         button1.setOnClickListener {
                             val uri = Uri.parse(resources.getString(R.string.release_url))
                             val internet = Intent(Intent.ACTION_VIEW, uri)
                             internet.addCategory(Intent.CATEGORY_BROWSABLE)
                             startActivity(internet)
-                            dialog.hide()
+                            appDialog.hide()
                         }
-                        view.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
-                            dialog.hide()
-                        }
+                        appView.findViewById<AppButton>(R.id.dialog_info_button2)
+                            .setOnClickListener {
+                                appDialog.hide()
+                            }
                     }
                 }
             } catch (_: Exception) {
@@ -569,17 +593,20 @@ class SettingsFragment : Fragment() {
 
         // Show update database dialog.
         binding.setInfoDb.setOnClickListener {
-            // Setup dialog.
-            val dialog = AlertDialog.Builder(requireContext()).create()
-            val view: View = View.inflate(requireContext(), R.layout.dialog_db_update_channel, null)
-            dialog.setView(view)
-            dialog.show()
+            if (dbDialog.isShowing) {
+                return@setOnClickListener
+            }
+            dbDialog.show()
 
-            val radioGroup = view.findViewById<RadioGroup>(R.id.db_update_group)
-            val confirm = view.findViewById<AppButton>(R.id.db_update_confirm)
-            val cancel = view.findViewById<AppButton>(R.id.db_update_cancel)
-            val clear = view.findViewById<AppButton>(R.id.db_update_clear)
-            val custom = view.findViewById<EditText>(R.id.db_update_custom_input)
+            val clearDialog = AlertDialog.Builder(requireContext()).create()
+            val clearView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            clearDialog.setView(clearView)
+
+            val radioGroup = dbView.findViewById<RadioGroup>(R.id.db_update_group)
+            val confirm = dbView.findViewById<AppButton>(R.id.db_update_confirm)
+            val cancel = dbView.findViewById<AppButton>(R.id.db_update_cancel)
+            val clear = dbView.findViewById<AppButton>(R.id.db_update_clear)
+            val custom = dbView.findViewById<EditText>(R.id.db_update_custom_input)
             var channel = preferences.getInt("db_update_channel", 0)
 
             radioGroup.check(
@@ -612,51 +639,51 @@ class SettingsFragment : Fragment() {
             // Clear cache.
             clear.setAlert(true)
             clear.setOnClickListener {
-                // Setup dialog.
-                val clearDialog = AlertDialog.Builder(requireContext()).create()
-                val clearView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
-                clearDialog.setView(clearView)
-                clearDialog.show()
+                if (!clearDialog.isShowing) {
+                    clearDialog.show()
 
-                clearView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.info_db_update_clear)
-                clearView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_db_update_clear_desc)
-                val button1 = clearView.findViewById<AppButton>(R.id.dialog_info_button1)
-                button1.setAlert(true)
-                button1.setOnClickListener {
-                    val path = context?.filesDir?.path + "/icons"
-                    File(path).deleteRecursively()
-                    preferences.edit().putString("db_version", "0").apply()
-                    preferences.edit().putString("db_name", getString(R.string.default_string))
-                        .apply()
-                    preferences.edit().putInt("db_update_channel", 0).apply()
-                    channel = 0
-                    radioGroup.check(R.id.db_update_hd2)
-                    stratagemViewModel.deleteAll()
+                    val title = clearView.findViewById<TextView>(R.id.dialog_info_title)
+                    title.setText(R.string.info_db_update_clear)
+                    clearView.findViewById<TextView>(R.id.dialog_info_msg)
+                        .setText(R.string.info_db_update_clear_desc)
+                    val button1 = clearView.findViewById<AppButton>(R.id.dialog_info_button1)
+                    button1.setAlert(true)
+                    button1.setOnClickListener {
+                        val path = context?.filesDir?.path + "/icons"
+                        File(path).deleteRecursively()
+                        preferences.edit().putString("db_version", "0").apply()
+                        preferences.edit().putString("db_name", getString(R.string.default_string))
+                            .apply()
+                        preferences.edit().putInt("db_update_channel", 0).apply()
+                        channel = 0
+                        radioGroup.check(R.id.db_update_hd2)
+                        stratagemViewModel.deleteAll()
 
-                    Toast.makeText(
-                        context,
-                        getString(R.string.toast_complete),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.makeText(
+                            context,
+                            getString(R.string.toast_complete),
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                    lifecycleScope.launch {
-                        checkDBUpdate()
+                        lifecycleScope.launch {
+                            checkDBUpdate()
+                        }
+                        clearDialog.hide()
                     }
-                    clearDialog.hide()
-                }
-                clearView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
-                    clearDialog.hide()
+                    clearView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+                        clearDialog.hide()
+                    }
                 }
             }
 
             // Cancel update.
             cancel.setOnClickListener {
-                dialog.hide()
+                dbDialog.hide()
             }
 
             // Update database.
             confirm.setOnClickListener {
-                dialog.hide()
+                dbDialog.hide()
                 preferences.edit().putInt("db_update_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!
                 dbName =

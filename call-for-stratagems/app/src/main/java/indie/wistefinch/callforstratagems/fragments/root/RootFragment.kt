@@ -25,7 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import indie.wistefinch.callforstratagems.AppButton
+import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
@@ -85,7 +85,8 @@ class RootFragment : Fragment() {
             dialog.show()
 
             view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_db_incomplete)
-            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_db_incomplete_desc)
+            view.findViewById<TextView>(R.id.dialog_info_msg)
+                .setText(R.string.hint_db_incomplete_desc)
             view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
                 dialog.hide()
             }
@@ -113,7 +114,8 @@ class RootFragment : Fragment() {
             }
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).text = String.format(resources.getString(R.string.hint_welcome), ver)
+            view.findViewById<TextView>(R.id.dialog_info_title).text =
+                String.format(resources.getString(R.string.hint_welcome), ver)
             view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_welcome_desc)
             view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
@@ -175,10 +177,12 @@ class RootFragment : Fragment() {
                         findNavController().navigate(R.id.action_rootFragment_to_settingsFragment)
                         true
                     }
+
                     R.id.root_menu_stratagemsList -> {
                         findNavController().navigate(R.id.action_rootFragment_to_stratagemsListFragment)
                         true
                     }
+
                     else -> false
                 }
             }
@@ -192,8 +196,7 @@ class RootFragment : Fragment() {
         if (empty) {
             binding.noGroupTextView.visibility = VISIBLE
             binding.noGroupImageView.visibility = VISIBLE
-        }
-        else {
+        } else {
             binding.noGroupTextView.visibility = INVISIBLE
             binding.noGroupImageView.visibility = INVISIBLE
         }

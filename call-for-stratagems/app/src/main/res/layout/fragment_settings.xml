@@ -165,7 +165,7 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <indie.wistefinch.callforstratagems.AppButton
+                    <indie.wistefinch.callforstratagems.utils.AppButton
                         android:id="@+id/set_conn_scan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
                         android:layout_width="5dp"
                         android:layout_height="match_parent" />
 
-                    <indie.wistefinch.callforstratagems.AppButton
+                    <indie.wistefinch.callforstratagems.utils.AppButton
                         android:id="@+id/set_conn_test"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -527,10 +527,10 @@
                     android:layout_height="5dp" />
 
 
-                <indie.wistefinch.callforstratagems.AppButton
+                <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_sync_apply"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     app:text="@string/set_sync_apply" />
 
             </LinearLayout>
@@ -846,7 +846,7 @@
                     android:layout_height="5dp"
                     tools:ignore="TooManyViews" />
 
-                <indie.wistefinch.callforstratagems.AppButton
+                <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_info_db"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -857,7 +857,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
-                <indie.wistefinch.callforstratagems.AppButton
+                <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_info_app"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -868,10 +868,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
-                <indie.wistefinch.callforstratagems.AppButton
+                <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_info_about"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     app:text="@string/set_info_about" />
 
             </LinearLayout>

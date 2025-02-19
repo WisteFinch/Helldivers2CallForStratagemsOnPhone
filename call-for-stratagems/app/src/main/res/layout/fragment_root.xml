@@ -60,7 +60,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <indie.wistefinch.callforstratagems.AppButton
+        <indie.wistefinch.callforstratagems.utils.AppButton
             android:id="@+id/root_new_group_FAB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
