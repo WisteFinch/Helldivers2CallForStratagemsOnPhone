@@ -94,10 +94,13 @@
                 android:id="@+id/viewGroup_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
                 android:layout_marginBottom="10dp"
                 android:fadeScrollbars="false"
                 android:gravity="center"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+                android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+                android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
             <TextView

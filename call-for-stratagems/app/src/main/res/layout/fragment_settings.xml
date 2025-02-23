@@ -52,7 +52,11 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="85dp">
+        android:layout_marginTop="85dp"
+        android:fadeScrollbars="false"
+        android:scrollbarSize="4dp"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+        android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track">
 
         <LinearLayout
             android:layout_width="match_parent"

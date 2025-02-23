@@ -53,32 +53,24 @@
 
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/root_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="85dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:fadeScrollbars="false"
+        android:gravity="center"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+        android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/root_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
-
-    </androidx.core.widget.NestedScrollView>
+        app:layout_constraintVertical_bias="0.5" />
 
     <indie.wistefinch.callforstratagems.utils.AppButton
         android:id="@+id/root_new_group_FAB"

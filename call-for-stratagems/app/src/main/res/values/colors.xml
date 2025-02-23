@@ -45,7 +45,7 @@
     <color name="buttonText">@color/textPrimary</color>
     <color name="buttonTextAlert">@color/textHighlight</color>
     <color name="buttonTextHint">@color/textSecondary</color>
-    <color name="scrollbar">@color/stress</color>
     <color name="caret">@color/highlight</color>
+    <color name="scrollbarTrack">#606162</color>
 
 </resources>
