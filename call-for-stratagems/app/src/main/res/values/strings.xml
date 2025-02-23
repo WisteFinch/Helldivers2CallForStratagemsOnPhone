@@ -64,7 +64,7 @@
     <string name="tcp_test_connecting">Connecting…</string>
     <string name="tcp_test_waiting">Waiting for response…</string>
     <string name="tcp_test_success">Success</string>
-    <string name="tcp_test_failed">Connection failed, please check the network settings</string>
+    <string name="tcp_test_failed">Connect failed, please check the network settings</string>
 
     <!-- Sync Preferences -->
     <string name="server_port_title">Port</string>
@@ -158,6 +158,7 @@
     <string name="dialog_download">Download</string>
     <string name="dialog_ignore">Ignore</string>
     <string name="dialog_no_ask">Don\'t ask again</string>
+    <string name="dialog_progress">Please Wait Democratically</string>
 
     <!-- Toast -->
     <string name="toast_complete">Complete</string>
@@ -175,6 +176,7 @@
     <string name="set_conn_server">Server</string>
     <string name="set_conn_retry">Retry Times</string>
     <string name="set_conn_test">Test Connection</string>
+    <string name="set_conn_test_title">Test Connection to Server</string>
     <string name="set_conn_addr">Address</string>
     <string name="set_conn_port">Port</string>
     <string name="set_conn_scan">Scan QR Code</string>

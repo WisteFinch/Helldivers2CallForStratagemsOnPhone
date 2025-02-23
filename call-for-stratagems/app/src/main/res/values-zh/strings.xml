@@ -148,6 +148,7 @@
     <string name="dialog_download">前往下载</string>
     <string name="dialog_ignore">忽略</string>
     <string name="dialog_no_ask">不再询问</string>
+    <string name="dialog_progress">请民主地等待</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>
@@ -165,6 +166,7 @@
     <string name="set_conn_server">服务器</string>
     <string name="set_conn_retry">重试次数</string>
     <string name="set_conn_test">测试连接</string>
+    <string name="set_conn_test_title">测试到服务器的连接</string>
     <string name="set_conn_addr">地址</string>
     <string name="set_conn_port">端口</string>
     <string name="set_conn_scan">扫描二维码</string>
@@ -173,29 +175,29 @@
     <string name="set_sync_port">端口</string>
     <string name="set_sync_delay">输入延迟</string>
     <string name="set_sync_input_open">输入：打开战略配备列表</string>
-    <string name="set_sync_apply">Apply Configuration to Server</string>
+    <string name="set_sync_apply">应用配置至服务器</string>
     <string name="set_unit_ms">毫秒</string>
     <string name="set_sync_type_open">类型：打开战略配备列表</string>
-    <string name="set_sync_input_up">Input: Up</string>
-    <string name="set_sync_input_down">Input: Down</string>
-    <string name="set_sync_input_left">Input: Left</string>
-    <string name="set_sync_input_right">Input: Right</string>
-    <string name="set_ctrl_hdr">Control</string>
-    <string name="set_ctrl_simplified_mode">Enable Simplified Mode</string>
-    <string name="set_ctrl_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
-    <string name="set_ctrl_lang_stratagem">Language: Stratagem Name</string>
-    <string name="set_ctrl_gst_swp_distance_threshold">Gesture Swipe Distance Threshold</string>
-    <string name="set_ctrl_gst_swp_velocity_threshold">Gesture Swipe Velocity Threshold</string>
-    <string name="set_unit_pixel">pixel</string>
-    <string name="set_unit_pixel_s">pixel/s</string>
-    <string name="set_ctrl_fastboot_mode">Enable Fastboot Mode</string>
-    <string name="set_ctrl_fastboot_mode_desc">Click the group to start directly, long press the group to view details</string>
-    <string name="set_info_hdr">Info</string>
-    <string name="set_info_db">Database Version</string>
-    <string name="set_info_chk_updt">Check Update</string>
-    <string name="set_info_latest">Latest</string>
-    <string name="set_info_updatable">Updatable</string>
-    <string name="set_info_app">App Version</string>
-    <string name="set_info_about">About</string>
+    <string name="set_sync_input_up">输入：上</string>
+    <string name="set_sync_input_down">输入：下</string>
+    <string name="set_sync_input_left">输入：左</string>
+    <string name="set_sync_input_right">输入：右</string>
+    <string name="set_ctrl_hdr">控制</string>
+    <string name="set_ctrl_simplified_mode">启用精简模式</string>
+    <string name="set_ctrl_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
+    <string name="set_ctrl_lang_stratagem">语言：战略配备名称</string>
+    <string name="set_ctrl_gst_swp_distance_threshold">手势距离阈值</string>
+    <string name="set_ctrl_gst_swp_velocity_threshold">手势速度阈值</string>
+    <string name="set_unit_pixel">像素</string>
+    <string name="set_unit_pixel_s">像素/秒</string>
+    <string name="set_ctrl_fastboot_mode">启用快速启动</string>
+    <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
+    <string name="set_info_hdr">信息</string>
+    <string name="set_info_db">数据库版本</string>
+    <string name="set_info_chk_updt">检查更新</string>
+    <string name="set_info_latest">已是最新</string>
+    <string name="set_info_updatable">可更新</string>
+    <string name="set_info_app">软件版本</string>
+    <string name="set_info_about">关于</string>
 
 </resources>

@@ -22,15 +22,15 @@
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
-                android:id="@+id/dialog_info_icon"
+                android:id="@+id/dialog_conn_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_info"
+                android:src="@drawable/ic_cable"
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/dialog_info_title"
+                android:id="@+id/dialog_conn_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -62,55 +62,47 @@
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
-            <ScrollView
+            <LinearLayout
+                android:id="@+id/dialog_conn_progress"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:ignore="UselessParent">
+                android:layout_height="wrap_content">
+
+                <indie.wistefinch.callforstratagems.utils.AppLoading
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
 
                 <TextView
-                    android:id="@+id/dialog_info_msg"
                     android:theme="@style/AppText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/default_string"/>
+                    android:textAlignment="center"
+                    android:text="@string/dialog_progress"/>
 
-            </ScrollView>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dialog_conn_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/default_string"
+                android:theme="@style/AppText"
+                android:visibility="gone" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start"
+            android:gravity="end"
             android:layout_marginHorizontal="10dp"
             android:layout_marginBottom="5dp">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/dialog_info_button3"
+                android:id="@+id/dialog_conn_button"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:visibility="gone"
-                app:text="@string/dialog_ignore" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end">
-
-                <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:layout_marginEnd="5dp"
-                    app:text="@string/dialog_cancel"/>
-
-                <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    app:text="@string/dialog_confirm"/>
-
-            </LinearLayout>
+                app:text="@string/dialog_confirm" />
 
         </LinearLayout>
 

@@ -8,11 +8,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -38,6 +40,12 @@ import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
 import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.socket.AddressData
 import indie.wistefinch.callforstratagems.socket.Client
+import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
+import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
+import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
+import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
+import indie.wistefinch.callforstratagems.socket.ServerConfigData
+import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,9 +75,11 @@ class SettingsFragment : Fragment() {
     private lateinit var dbDialog: AlertDialog
     private lateinit var appDialog: AlertDialog
     private lateinit var aboutDialog: AlertDialog
+    private lateinit var connDialog: AlertDialog
     private lateinit var dbView: View
     private lateinit var appView: View
     private lateinit var aboutView: View
+    private lateinit var connView: View
 
     /**
      * QR code scanner activity launcher
@@ -166,6 +176,9 @@ class SettingsFragment : Fragment() {
         aboutDialog = AlertDialog.Builder(requireContext()).create()
         aboutView = View.inflate(requireContext(), R.layout.dialog_info, null)
         aboutDialog.setView(aboutView)
+        connDialog = AlertDialog.Builder(requireContext()).create()
+        connView = View.inflate(requireContext(), R.layout.dialog_connect, null)
+        connDialog.setView(connView)
 
 
         setupContent()
@@ -184,7 +197,7 @@ class SettingsFragment : Fragment() {
         binding.setConnRetry.setText(preferences.getString("tcp_retry", "5"))
         // Sync
         binding.setSyncPort.setText(preferences.getString("server_port", "23333"))
-        binding.setSyncDelay.setText(preferences.getString("input_delay", "50"))
+        binding.setSyncDelay.setText(preferences.getString("input_delay", "25"))
         binding.setSyncInputOpen.setSelection(
             inputValues.indexOf(
                 preferences.getString(
@@ -457,6 +470,7 @@ class SettingsFragment : Fragment() {
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
+
         // Scan QR Code
         binding.setConnScan.setOnClickListener {
             val optionsCompat = ActivityOptionsCompat.makeCustomAnimation(
@@ -466,6 +480,219 @@ class SettingsFragment : Fragment() {
             )
             val intent = Intent(requireContext(), QRCodeScanActivity::class.java)
             requestQRScanLauncher.launch(intent, optionsCompat)
+        }
+
+        // Test Connection
+        binding.setConnTest.setOnClickListener {
+            if (connDialog.isShowing) {
+                return@setOnClickListener
+            }
+            connDialog.show()
+            connView.findViewById<TextView>(R.id.dialog_conn_title).text =
+                resources.getString(R.string.set_conn_test_title)
+            val progress = connView.findViewById<LinearLayout>(R.id.dialog_conn_progress)
+            val msg = connView.findViewById<TextView>(R.id.dialog_conn_msg)
+            progress.visibility = VISIBLE
+            msg.visibility = GONE
+            val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
+            button.setTitle(resources.getString(R.string.dialog_cancel))
+            button.invalidate()
+            val connFinish = { str: String ->
+                progress.visibility = GONE
+                msg.visibility = VISIBLE
+                msg.text = str
+                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.invalidate()
+            }
+
+            // Prepare socket and data.
+            val add = binding.setConnAddr.text.toString()
+            val port: Int = binding.setConnPort.text.toString().toInt()
+            val pkgName = context?.packageName!!
+            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+            val version = pkgInfo.versionName
+            // Launch coroutine.
+            val job = lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    // Connect to the server.
+                    val connected = client.connect(add, port)
+                    if (connected) { // Connection successful, request server status.
+                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
+                        try {
+                            val res: ReceiveStatusData =
+                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+                            // Check the server status.
+                            when (res.status) {
+                                0 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            resources.getText(R.string.tcp_test_success).toString()
+                                        )
+                                    }
+                                }
+
+                                1 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(
+                                                getString(R.string.network_status_1),
+                                                version.substring(0, version.lastIndexOf(".")),
+                                                res.ver
+                                            )
+                                        )
+                                    }
+                                }
+
+                                2 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(getString(R.string.network_auth), sid)
+                                        )
+                                    }
+                                    // Request authentication.
+                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                                    client.toggleTimeout(false)
+                                    val auth = Gson().fromJson(
+                                        client.receive(),
+                                        ReceiveAuthData::class.java
+                                    )
+                                    client.toggleTimeout(true)
+                                    withContext(Dispatchers.Main) {
+                                        if (auth.auth) {
+                                            connFinish(
+                                                String.format(getString(R.string.tcp_test_success))
+                                            )
+                                        } else {
+                                            connFinish(
+                                                String.format(getString(R.string.network_auth_failed))
+                                            )
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    connFinish(
+                                        String.format(
+                                            getString(R.string.network_status_error),
+                                            res.status
+                                        )
+                                    )
+                                }
+                            }
+                        } catch (_: Exception) { // Json convert error & timeout.
+                            withContext(Dispatchers.Main) {
+                                connFinish(
+                                    resources.getText(R.string.network_response_error).toString()
+                                )
+                            }
+                        }
+                    } else { // Connection failed.
+                        withContext(Dispatchers.Main) {
+                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+                        }
+                    }
+                    // Disconnect.
+                    client.disconnect()
+                }
+            }
+            button.setOnClickListener {
+                job.cancel()
+                connDialog.hide()
+            }
+        }
+
+        // Apply config
+        binding.setSyncApply.setOnClickListener {
+            if (connDialog.isShowing) {
+                return@setOnClickListener
+            }
+            connDialog.show()
+            connView.findViewById<TextView>(R.id.dialog_conn_title).text =
+                resources.getString(R.string.set_sync_apply)
+            val progress = connView.findViewById<LinearLayout>(R.id.dialog_conn_progress)
+            val msg = connView.findViewById<TextView>(R.id.dialog_conn_msg)
+            progress.visibility = VISIBLE
+            msg.visibility = GONE
+            val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
+            button.setTitle(resources.getString(R.string.dialog_cancel))
+            button.invalidate()
+            val connFinish = { str: String ->
+                progress.visibility = GONE
+                msg.visibility = VISIBLE
+                msg.text = str
+                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.invalidate()
+            }
+
+            // Prepare socket and data.
+            val config = ServerConfigData(
+                port = preferences.getString("server_port", "23333")!!.toInt(),
+                delay = preferences.getString("input_delay", "25")!!.toInt(),
+                open = preferences.getString("input_open", "ctrl_left")!!,
+                openType = preferences.getString("input_type_open", "hold")!!,
+                up = preferences.getString("input_up", "w")!!,
+                down = preferences.getString("input_down", "s")!!,
+                left = preferences.getString("input_left", "a")!!,
+                right = preferences.getString("input_right", "d")!!,
+                ip = "",
+            )
+            val add = binding.setConnAddr.text.toString()
+            val port: Int = binding.setConnPort.text.toString().toInt()
+            // Launch coroutine
+            val job = lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    // Connect to the server.
+                    val connected = client.connect(add, port)
+                    if (connected) { // Connection successful.
+                        withContext(Dispatchers.Main) {
+                            connFinish(
+                                String.format(getString(R.string.network_auth), sid)
+                            )
+                        }
+                        // Request authentication.
+                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                        client.toggleTimeout(false)
+                        try {
+                            val auth =
+                                Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
+                            client.toggleTimeout(true)
+                            if (auth.auth) {
+                                client.send(
+                                    Gson().toJson(SyncConfigPacket(config, auth.token)).toString()
+                                )
+                                withContext(Dispatchers.Main) {
+                                    connFinish(
+                                        resources.getText(R.string.sync_config_finished).toString()
+                                    )
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    connFinish(
+                                        String.format(getString(R.string.network_auth_failed))
+                                    )
+                                }
+                            }
+                        } catch (_: Exception) { // Json convert error & timeout.
+                            withContext(Dispatchers.Main) {
+                                connFinish(
+                                    resources.getText(R.string.network_response_error).toString()
+                                )
+                            }
+                        }
+                    } else { // Connection failed.
+                        withContext(Dispatchers.Main) {
+                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+                        }
+                    }
+                    // Disconnect.
+                    client.disconnect()
+                }
+            }
+
+            button.setOnClickListener {
+                job.cancel()
+                connDialog.hide()
+            }
         }
 
         // Open about dialog
