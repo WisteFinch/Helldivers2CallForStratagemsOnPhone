@@ -4,17 +4,11 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -79,6 +73,20 @@ class ViewGroupFragment : Fragment() {
         currentItem = arguments?.getParcelable("currentItem")!!
         binding.viewGroupTitle.text = currentItem.title
 
+        // Init menu.
+        binding.viewGroupMenuEdit.setOnClickListener {
+            val bundle = bundleOf(Pair("currentItem", currentItem), Pair("isEdit", true))
+            findNavController().navigate(R.id.action_viewGroupFragment_to_editGroupFragment, bundle)
+        }
+        binding.viewGroupMenuDelete.setOnClickListener {
+            groupViewModel.deleteItem(currentItem)
+            findNavController().popBackStack(R.id.rootFragment, false)
+        }
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+
         // Add FAB.
         binding.viewGroupPlayFAB.setOnClickListener {
             val bundle = bundleOf(Pair("currentItem", currentItem))
@@ -108,41 +116,13 @@ class ViewGroupFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Setup menu.
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
-                menuInflater.inflate(R.menu.view_group_fragment_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Handle the menu selection
-                return when (menuItem.itemId) {
-                    R.id.viewGroup_menu_edit-> {
-                        val bundle = bundleOf(Pair("currentItem", currentItem), Pair("isEdit", true))
-                        findNavController().navigate(R.id.action_viewGroupFragment_to_editGroupFragment, bundle)
-                        true
-                    }
-                    R.id.viewGroup_menu_delete-> {
-                        groupViewModel.deleteItem(currentItem)
-                        findNavController().popBackStack(R.id.rootFragment, false)
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
     /**
      * Setup the stratagem recycler view
      */
     private fun setupRecyclerView() {
         val recyclerView = binding.viewGroupRecyclerView
         recyclerView.adapter = adapter
-        recyclerView.autoFitColumns(100)
+        recyclerView.autoFitColumns(90)
         val list: Vector<StratagemData> = Vector()
         if (currentItem.list.isEmpty()) {
             list.add(StratagemData(0,

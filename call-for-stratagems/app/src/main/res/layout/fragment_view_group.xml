@@ -1,48 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".fragments.viewgroup.ViewGroupFragment">
 
-
-    <TextView
-        android:id="@+id/viewGroup_title"
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_margin="16dp"
-        android:text="@string/default_string"
-        android:textColor="@color/textColorPrimary"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:contentDescription="@string/default_string"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_3"
+        tools:ignore="ImageContrastCheck" />
 
-
-    <ScrollView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlur" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/viewGroup_recyclerView"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/round_button"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_back"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_viewGroup"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:theme="@style/AppTextTitle" />
+
+        <indie.wistefinch.callforstratagems.utils.AppButton
+            android:id="@+id/viewGroup_menu_delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/viewGroup_menu_delete_title"
+            app:icon="@drawable/ic_delete" />
+
+        <indie.wistefinch.callforstratagems.utils.AppButton
+            android:id="@+id/viewGroup_menu_edit"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/viewGroup_menu_edit_title"
+            app:icon="@drawable/ic_edit" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="85dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/viewGroup_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
-    </ScrollView>
+            android:layout_height="48dp"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/default_string"
+            android:textAlignment="center"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:ignore="TextSizeCheck" />
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/viewGroup_recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="10dp"
+                android:fadeScrollbars="false"
+                android:gravity="center"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/line" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <indie.wistefinch.callforstratagems.utils.AppButton
         android:id="@+id/viewGroup_play_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:contentDescription="@string/viewGroup_play_FAB"
-        android:elevation="8dp"
-        android:src="@drawable/ic_play"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="50dp"
+        app:icon="@drawable/ic_play" />
 
-</LinearLayout>
+</FrameLayout>

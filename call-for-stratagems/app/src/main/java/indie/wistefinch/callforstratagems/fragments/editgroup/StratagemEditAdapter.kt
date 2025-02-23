@@ -6,14 +6,12 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import java.io.File
-import java.util.Collections
 
 /**
  * Adapter for the recycler view in [EditGroupFragment]
@@ -43,34 +41,50 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_edit, parent, false))
+        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        // Set card view text.
-        holder.itemView.findViewById<TextView>(R.id.stratagem_edit_title).text = when (lang) {
-            "zh-CN" -> dataList[pos].nameZh
-            else -> dataList[pos].name
-        }
+        val borderTopView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_top)
+        val borderBottomView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_bottom)
+        val imageView = holder.itemView.findViewById<SVGImageView>(R.id.stratagem_item_image)
 
         // Set icon resources.
         try {
-            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_edit_imageView)
-                .setImageURI(
-                    Uri.fromFile(
-                        File(context.filesDir.path +
-                                context.resources.getString(R.string.icons_path) +
-                                "$dbName/" +
-                                dataList[pos].icon + ".svg")))
+            imageView.setImageURI(
+                Uri.fromFile(
+                    File(context.filesDir.path +
+                            context.resources.getString(R.string.icons_path) +
+                            "$dbName/" +
+                            dataList[pos].icon + ".svg")))
         }
         catch (_: Exception) {}
 
-        // Set card view background.
-        val cardView = holder.itemView.findViewById<CardView>(R.id.stratagem_edit_cardView)
-        setCardViewBg(cardView, dataList[pos].id)
+        // Set view background.
+        val setViewBg = {
+            if (enabledStratagem.contains(dataList[pos].id)) {
+                borderTopView.setBackgroundResource(R.drawable.clickable_bg_top_pressed)
+                borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom_pressed)
+                imageView.setBackgroundColor(
+                    context.getColor(
+                        R.color.buttonBackgroundPressed
+                    )
+                )
+            }
+            else {
+                borderTopView.setBackgroundResource(R.drawable.clickable_bg_top)
+                borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom)
+                imageView.setBackgroundColor(
+                    context.getColor(
+                        R.color.buttonBackground
+                    )
+                )
+            }
+        }
+        setViewBg()
 
         // Setup click listener, the selected status and background color will change after clicking.
-        cardView.setOnClickListener {
+        holder.itemView.setOnClickListener {
             val index = holder.adapterPosition
             if (enabledStratagem.contains(dataList[index].id)) {
                 enabledStratagem.remove(dataList[index].id)
@@ -78,25 +92,12 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
             else {
                 enabledStratagem.add(dataList[index].id)
             }
-            setCardViewBg(cardView, dataList[index].id)
+            setViewBg()
         }
     }
 
     override fun getItemCount(): Int {
         return dataList.size
-    }
-
-    /**
-     * Change the card view background if the stratagem is enabled.
-     */
-    private fun setCardViewBg(cardView: CardView, id: Int)
-    {
-        if (enabledStratagem.contains(id)) {
-            cardView.setCardBackgroundColor(context.resources.getColor(R.color.darkBlue, context.theme))
-        }
-        else {
-            cardView.setCardBackgroundColor(context.resources.getColor(R.color.colorBackground, context.theme))
-        }
     }
 
     /**

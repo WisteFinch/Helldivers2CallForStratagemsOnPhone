@@ -17,8 +17,38 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundBlur"/>
+        android:background="@color/backgroundBlur" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/round_button"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_back"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_stratagemsList"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:theme="@style/AppTextTitle" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,9 +60,9 @@
             android:id="@+id/stratagemsList_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
             android:layout_margin="5dp"
             android:text="@string/default_string"
+            android:textAlignment="center"
             android:textColor="@color/textColorPrimary"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -52,11 +82,12 @@
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
             <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/line"
-            />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/line" />
 
         </FrameLayout>
+
     </LinearLayout>
+
 </FrameLayout>

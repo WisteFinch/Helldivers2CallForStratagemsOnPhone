@@ -9,7 +9,7 @@
     android:layout_margin="5dp">
 
     <com.caverock.androidsvg.SVGImageView
-        android:id="@+id/stratagem_view_image"
+        android:id="@+id/stratagem_item_image"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:contentDescription="@string/default_string"
@@ -22,7 +22,7 @@
         android:background="@color/backgroundPrimary"/>
 
     <View
-        android:id="@+id/stratagem_view_border_top"
+        android:id="@+id/stratagem_item_border_top"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:background="@drawable/clickable_bg_top"
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:id="@+id/stratagem_view_border_bottom"
+        android:id="@+id/stratagem_item_border_bottom"
         android:layout_width="0dp"
         android:layout_height="32dp"
         android:background="@drawable/clickable_bg_bottom"

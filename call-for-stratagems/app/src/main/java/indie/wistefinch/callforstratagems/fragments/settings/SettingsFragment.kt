@@ -23,6 +23,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
@@ -140,6 +141,11 @@ class SettingsFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        // Init menu
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         sid = preferences.getString("sid", "0")!!
@@ -519,7 +525,7 @@ class SettingsFragment : Fragment() {
         // Check app update.
         // Launch coroutine
         lifecycleScope.launch {
-            binding.setInfoApp.setHint(resources.getString(R.string.info_app_version_check))
+            binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_check))
             try {
                 val json =
                     JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))

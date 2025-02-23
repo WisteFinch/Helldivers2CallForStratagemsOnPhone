@@ -42,13 +42,13 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
         dialog = StratagemInfoDialog(context)
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_view, parent, false))
+        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        val borderTopView = holder.itemView.findViewById<View>(R.id.stratagem_view_border_top)
-        val borderBottomView = holder.itemView.findViewById<View>(R.id.stratagem_view_border_bottom)
-        val imageView = holder.itemView.findViewById<SVGImageView>(R.id.stratagem_view_image)
+        val borderTopView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_top)
+        val borderBottomView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_bottom)
+        val imageView = holder.itemView.findViewById<SVGImageView>(R.id.stratagem_item_image)
 
         // Set icon resources.
         try {

@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">呼叫战略配备</string>
     <string name="usage_url">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/usage_zh_CN.md</string>
+    <string name="back">返回</string>
 
     <!-- Fragment Root -->
     <string name="fragment_root">呼叫战略配备</string>
@@ -159,5 +160,42 @@
     <string name="hint_welcome_desc">现在可以调整战备顺序了</string>
     <string name="hint_group_db_not_match">数据库不相符</string>
     <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误</string>
+
+    <!-- Fragment Settings -->
+    <string name="set_conn_server">服务器</string>
+    <string name="set_conn_retry">重试次数</string>
+    <string name="set_conn_test">测试连接</string>
+    <string name="set_conn_addr">地址</string>
+    <string name="set_conn_port">端口</string>
+    <string name="set_conn_scan">扫描二维码</string>
+    <string name="set_conn_hdr">连接</string>
+    <string name="set_sync_hdr">同步</string>
+    <string name="set_sync_port">端口</string>
+    <string name="set_sync_delay">输入延迟</string>
+    <string name="set_sync_input_open">输入：打开战略配备列表</string>
+    <string name="set_sync_apply">Apply Configuration to Server</string>
+    <string name="set_unit_ms">毫秒</string>
+    <string name="set_sync_type_open">类型：打开战略配备列表</string>
+    <string name="set_sync_input_up">Input: Up</string>
+    <string name="set_sync_input_down">Input: Down</string>
+    <string name="set_sync_input_left">Input: Left</string>
+    <string name="set_sync_input_right">Input: Right</string>
+    <string name="set_ctrl_hdr">Control</string>
+    <string name="set_ctrl_simplified_mode">Enable Simplified Mode</string>
+    <string name="set_ctrl_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
+    <string name="set_ctrl_lang_stratagem">Language: Stratagem Name</string>
+    <string name="set_ctrl_gst_swp_distance_threshold">Gesture Swipe Distance Threshold</string>
+    <string name="set_ctrl_gst_swp_velocity_threshold">Gesture Swipe Velocity Threshold</string>
+    <string name="set_unit_pixel">pixel</string>
+    <string name="set_unit_pixel_s">pixel/s</string>
+    <string name="set_ctrl_fastboot_mode">Enable Fastboot Mode</string>
+    <string name="set_ctrl_fastboot_mode_desc">Click the group to start directly, long press the group to view details</string>
+    <string name="set_info_hdr">Info</string>
+    <string name="set_info_db">Database Version</string>
+    <string name="set_info_chk_updt">Check Update</string>
+    <string name="set_info_latest">Latest</string>
+    <string name="set_info_updatable">Updatable</string>
+    <string name="set_info_app">App Version</string>
+    <string name="set_info_about">About</string>
 
 </resources>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +44,11 @@ class StratagemsListFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentStratagemsListBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        // Init menu
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())

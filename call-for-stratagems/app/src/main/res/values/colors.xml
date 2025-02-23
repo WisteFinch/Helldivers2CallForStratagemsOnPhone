@@ -29,8 +29,8 @@
     <color name="highlight">#ffe710</color>
     <color name="stress">#8d874f</color>
     <color name="transparent">#00000000</color>
-    <color name="backgroundPrimary">#080809</color>
-    <color name="backgroundSecondary">#222222</color>
+    <color name="backgroundPrimary">#dd080809</color>
+    <color name="backgroundSecondary">#dd222222</color>
     <color name="backgroundBlur">#cc1a1a1a</color>
     <color name="border">#676767</color>
     <color name="borderHighlight">@color/highlight</color>

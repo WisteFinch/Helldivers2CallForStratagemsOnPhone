@@ -6,9 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.INVISIBLE
@@ -17,11 +14,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -146,6 +140,14 @@ class RootFragment : Fragment() {
         _binding = FragmentRootBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        // Init menu.
+        binding.rootMenuList.setOnClickListener {
+            findNavController().navigate(R.id.action_rootFragment_to_stratagemsListFragment)
+        }
+        binding.rootMenuSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_rootFragment_to_settingsFragment)
+        }
+
         // Add FAB.
         binding.rootNewGroupFAB.setOnClickListener {
             val bundle = bundleOf(Pair("isEdit", false))
@@ -160,33 +162,6 @@ class RootFragment : Fragment() {
         }
 
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Setup menu.
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.root_fragment_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Handle the menu selection
-                return when (menuItem.itemId) {
-                    R.id.root_menu_preferences -> {
-                        findNavController().navigate(R.id.action_rootFragment_to_settingsFragment)
-                        true
-                    }
-
-                    R.id.root_menu_stratagemsList -> {
-                        findNavController().navigate(R.id.action_rootFragment_to_stratagemsListFragment)
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     /**
