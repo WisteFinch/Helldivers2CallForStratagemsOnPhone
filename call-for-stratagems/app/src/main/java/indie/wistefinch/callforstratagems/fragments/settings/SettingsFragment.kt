@@ -184,6 +184,20 @@ class SettingsFragment : Fragment() {
         setupContent()
         setupEventListener()
 
+        // Jump to specific entries
+        if (arguments != null && arguments?.containsKey("jump_to_entry")!!) {
+            val id: Int = arguments?.getInt("jump_to_entry")!!
+            val entry: View = view.findViewById(id)
+            binding.setScrollView.post {
+                val location = intArrayOf(0, 0)
+                entry.getLocationInWindow(location)
+                binding.setScrollView.smoothScrollTo(0, location[1])
+            }
+            binding.setScrollView.postDelayed({
+                view.findViewById<View>(id).performClick()
+            }, 300)
+        }
+
         return view
     }
 
@@ -251,6 +265,10 @@ class SettingsFragment : Fragment() {
             preferences.getBoolean("enable_simplified_mode", false)
         binding.setCtrlFastbootMode.isChecked =
             preferences.getBoolean("enable_fastboot_mode", false)
+        binding.setCtrlSfx.isChecked =
+            preferences.getBoolean("enable_sfx", false)
+        binding.setCtrlVibrator.isChecked =
+            preferences.getBoolean("enable_vibrator", false)
         binding.setCtrlGstSwpDistanceThreshold.setText(
             preferences.getString(
                 "swipe_distance_threshold",
@@ -442,6 +460,18 @@ class SettingsFragment : Fragment() {
                 apply()
             }
         }
+        binding.setCtrlSfx.setOnCheckedChangeListener { _, isChecked ->
+            with(preferences.edit()) {
+                putBoolean("enable_sfx", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlVibrator.setOnCheckedChangeListener { _, isChecked ->
+            with(preferences.edit()) {
+                putBoolean("enable_vibrator", isChecked)
+                apply()
+            }
+        }
         binding.setCtrlGstSwpDistanceThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
                 putString("swipe_distance_threshold", text.toString())
@@ -496,13 +526,11 @@ class SettingsFragment : Fragment() {
             msg.visibility = GONE
             val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
             button.setTitle(resources.getString(R.string.dialog_cancel))
-            button.invalidate()
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
                 button.setTitle(resources.getString(R.string.dialog_confirm))
-                button.invalidate()
             }
 
             // Prepare socket and data.
@@ -571,12 +599,14 @@ class SettingsFragment : Fragment() {
                                 }
 
                                 else -> {
-                                    connFinish(
-                                        String.format(
-                                            getString(R.string.network_status_error),
-                                            res.status
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(
+                                                getString(R.string.network_status_error),
+                                                res.status
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
                         } catch (_: Exception) { // Json convert error & timeout.
@@ -615,13 +645,13 @@ class SettingsFragment : Fragment() {
             msg.visibility = GONE
             val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
             button.setTitle(resources.getString(R.string.dialog_cancel))
-            button.invalidate()
+            button.requestLayout()
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
                 button.setTitle(resources.getString(R.string.dialog_confirm))
-                button.invalidate()
+                button.requestLayout()
             }
 
             // Prepare socket and data.
@@ -638,38 +668,84 @@ class SettingsFragment : Fragment() {
             )
             val add = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
-            // Launch coroutine
+            val pkgName = context?.packageName!!
+            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+            val version = pkgInfo.versionName
+            // Launch coroutine.
             val job = lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     // Connect to the server.
                     val connected = client.connect(add, port)
-                    if (connected) { // Connection successful.
-                        withContext(Dispatchers.Main) {
-                            connFinish(
-                                String.format(getString(R.string.network_auth), sid)
-                            )
-                        }
-                        // Request authentication.
-                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                        client.toggleTimeout(false)
+                    if (connected) { // Connection successful, request server status.
+                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
                         try {
-                            val auth =
-                                Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                            client.toggleTimeout(true)
-                            if (auth.auth) {
-                                client.send(
-                                    Gson().toJson(SyncConfigPacket(config, auth.token)).toString()
-                                )
-                                withContext(Dispatchers.Main) {
-                                    connFinish(
-                                        resources.getText(R.string.sync_config_finished).toString()
-                                    )
+                            val res: ReceiveStatusData =
+                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+                            // Check the server status.
+                            when (res.status) {
+                                0 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            resources.getText(R.string.tcp_test_success).toString()
+                                        )
+                                    }
                                 }
-                            } else {
-                                withContext(Dispatchers.Main) {
-                                    connFinish(
-                                        String.format(getString(R.string.network_auth_failed))
+
+                                1 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(
+                                                getString(R.string.network_status_1),
+                                                version.substring(0, version.lastIndexOf(".")),
+                                                res.ver
+                                            )
+                                        )
+                                    }
+                                }
+
+                                2 -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(getString(R.string.network_auth), sid)
+                                        )
+                                    }
+                                    // Request authentication.
+                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                                    client.toggleTimeout(false)
+                                    val auth = Gson().fromJson(
+                                        client.receive(),
+                                        ReceiveAuthData::class.java
                                     )
+                                    client.toggleTimeout(true)
+                                    if (auth.auth) {
+                                        client.send(
+                                            Gson().toJson(SyncConfigPacket(config, auth.token))
+                                                .toString()
+                                        )
+                                        withContext(Dispatchers.Main) {
+                                            connFinish(
+                                                resources.getText(R.string.sync_config_finished)
+                                                    .toString()
+                                            )
+                                        }
+                                    } else {
+                                        withContext(Dispatchers.Main) {
+                                            connFinish(
+                                                String.format(getString(R.string.network_auth_failed))
+                                            )
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    withContext(Dispatchers.Main) {
+                                        connFinish(
+                                            String.format(
+                                                getString(R.string.network_status_error),
+                                                res.status
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         } catch (_: Exception) { // Json convert error & timeout.
@@ -949,7 +1025,7 @@ class SettingsFragment : Fragment() {
                         preferences.edit().putString("db_version", "1").apply()
 
                         // Download index.
-                        val indexObj = JSONObject(Util.downloadToStr(url))
+                        val indexObj = JSONObject(Util.downloadToStr(url + "index.json"))
                         val date = indexObj.getString("date")
                         val dbUrl = url + indexObj.getString("db_path")
                         val iconsUrl = url + indexObj.getString("icons_path")

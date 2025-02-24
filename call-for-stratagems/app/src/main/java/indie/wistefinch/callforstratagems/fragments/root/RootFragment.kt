@@ -85,9 +85,17 @@ class RootFragment : Fragment() {
                 dialog.hide()
             }
             val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.dialog_no_ask))
-            button2.setAlert(true)
+            button2.setTitle(resources.getString(R.string.dialog_settings))
             button2.setOnClickListener {
+                val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
+                findNavController().navigate(R.id.settingsFragment, bundle)
+                dialog.hide()
+            }
+            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            button3.visibility = VISIBLE
+            button3.setTitle(resources.getString(R.string.dialog_ignore))
+            button3.setAlert(true)
+            button3.setOnClickListener {
                 preferences.edit().putBoolean("hint_db_incomplete", true).apply()
                 dialog.hide()
             }

@@ -50,6 +50,7 @@
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/set_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="85dp"
@@ -664,7 +665,6 @@
                     android:orientation="horizontal"
                     android:padding="5dp">
 
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -682,6 +682,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/set_ctrl_fastboot_mode_desc"
                             android:theme="@style/AppTextHint" />
+
                     </LinearLayout>
 
                     <Space
@@ -695,6 +696,95 @@
                         app:trackTint="@color/switch_color"
                         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/backgroundPrimary"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/set_ctrl_sfx"
+                            android:theme="@style/AppText" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/set_ctrl_sfx_desc"
+                            android:theme="@style/AppTextHint" />
+
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/set_ctrl_sfx"
+                        android:layout_width="100dp"
+                        android:layout_height="35dp"
+                        app:trackTint="@color/switch_color"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/backgroundPrimary"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/set_ctrl_vibrator"
+                            android:theme="@style/AppText" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/set_ctrl_vibrator_desc"
+                            android:theme="@style/AppTextHint" />
+
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/set_ctrl_vibrator"
+                        android:layout_width="100dp"
+                        android:layout_height="35dp"
+                        app:trackTint="@color/switch_color"
+                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
                 </LinearLayout>
 
@@ -735,7 +825,7 @@
 
                     <Space
                         android:layout_width="5dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -781,7 +871,7 @@
 
                     <Space
                         android:layout_width="5dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent" />
 
                     <TextView
                         android:layout_width="wrap_content"

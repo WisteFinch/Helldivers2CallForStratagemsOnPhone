@@ -149,18 +149,21 @@
     <string name="dialog_ignore">忽略</string>
     <string name="dialog_no_ask">不再询问</string>
     <string name="dialog_progress">请民主地等待</string>
+    <string name="dialog_settings">前往设置</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>
 
     <!-- Hints -->
     <string name="hint_db_incomplete">数据库不完整</string>
-    <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息”更新数据库</string>
+    <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息>数据库版本”更新数据库</string>
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
     <string name="hint_welcome_desc">现在可以调整战备顺序了</string>
     <string name="hint_group_db_not_match">数据库不相符</string>
-    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误</string>
+    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。请前往“设置>信息>数据库版本”切换数据库</string>
+    <string name="hint_delete">删除</string>
+    <string name="hint_delete_desc">确认要删除“%1$s”吗？</string>
 
     <!-- Fragment Settings -->
     <string name="set_conn_server">服务器</string>
@@ -192,6 +195,10 @@
     <string name="set_unit_pixel_s">像素/秒</string>
     <string name="set_ctrl_fastboot_mode">启用快速启动</string>
     <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
+    <string name="set_ctrl_sfx">启用音效</string>
+    <string name="set_ctrl_sfx_desc">启用按键输入和战备激活的音效</string>
+    <string name="set_ctrl_vibrator">启用震动</string>
+    <string name="set_ctrl_vibrator_desc">启用按键输入和战备激活的震动</string>
     <string name="set_info_hdr">信息</string>
     <string name="set_info_db">数据库版本</string>
     <string name="set_info_chk_updt">检查更新</string>

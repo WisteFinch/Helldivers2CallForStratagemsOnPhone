@@ -1,8 +1,15 @@
 package indie.wistefinch.callforstratagems.fragments.play
 
+import android.app.Service
 import android.content.pm.ActivityInfo
 import android.graphics.Rect
+import android.media.AudioAttributes
+import android.media.AudioAttributes.USAGE_GAME
+import android.media.SoundPool
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.VibrationEffect.DEFAULT_AMPLITUDE
+import android.os.Vibrator
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -137,6 +144,16 @@ class PlayFragment : Fragment() {
      */
     private var enableSimplifiedMode = false
 
+    /**
+     * Enable sound effects.
+     */
+    private var enableSfx: Boolean = false
+
+    /**
+     * Enable vibrator.
+     */
+    private var enableVibrator: Boolean = false
+
     // Runtime variables for socket.
     /**
      * The socket client.
@@ -188,9 +205,35 @@ class PlayFragment : Fragment() {
     private var token: String = "NULL"
 
     /**
-     * Language of stratagem name
+     * Language of stratagem name.
      */
     private var lang: String = "auto"
+
+    // Sound effects and vibrator.
+    /**
+     * Step input sfx id.
+     */
+    private var sfxStep: Int = 0
+
+    /**
+     * Input failed sfx id.
+     */
+    private var sfxFail: Int = 1
+
+    /**
+     * Stratagem activation sfx id.
+     */
+    private var sfxActivation: Int = 2
+
+    /**
+     * Vibrator.
+     */
+    private lateinit var vibrator: Vibrator
+
+    /***
+     * Sound effects pool.
+     */
+    private lateinit var sfxPool: SoundPool
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -201,6 +244,8 @@ class PlayFragment : Fragment() {
         distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
         velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
         enableSimplifiedMode = preferences.getBoolean("enable_simplified_mode", false)
+        enableSfx = preferences.getBoolean("enable_sfx", false)
+        enableVibrator = preferences.getBoolean("enable_vibrator", false)
         address = preferences.getString("tcp_add", "127.0.0.1")!!
         port = preferences.getString("tcp_port", "23333")?.toInt()!!
         retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
@@ -221,9 +266,8 @@ class PlayFragment : Fragment() {
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         activity?.requestedOrientation = if (enableSimplifiedMode) {
-             ActivityInfo.SCREEN_ORIENTATION_SENSOR
-        }
-        else {
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        } else {
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
         view?.keepScreenOn = true
@@ -265,6 +309,22 @@ class PlayFragment : Fragment() {
         val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
         version = pkgInfo.versionName
 
+        // Setup sfx & vibrator.
+        val spb = SoundPool.Builder()
+        spb.setMaxStreams(16)
+        spb.setAudioAttributes(AudioAttributes.Builder().setFlags(USAGE_GAME).build())
+        sfxPool = spb.build()
+        sfxStep = sfxPool.load(requireContext(), R.raw.step, 1)
+        sfxFail = sfxPool.load(requireContext(), R.raw.fail, 1)
+        sfxActivation = sfxPool.load(requireContext(), R.raw.activation, 1)
+        // For compatibility with lower SDKs, ignore the deprecated warning.
+        @Suppress("DEPRECATION")
+        vibrator = requireContext().getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
+        if (!vibrator.hasVibrator()) {
+            enableVibrator = false
+        }
+
+        // Setup view.
         setupRecyclerView()
         setupEventListener()
 
@@ -298,8 +358,13 @@ class PlayFragment : Fragment() {
                     list.add(stratagemViewModel.retrieveItem(i))
                 }
             }
-            stratagemSimplifiedAdapter.setData(list.toList(),
-                preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
+            stratagemSimplifiedAdapter.setData(
+                list.toList(),
+                preference.getString(
+                    "db_name",
+                    context?.resources?.getString(R.string.db_hd2_name)
+                )!!
+            )
             // Setup click listener.
             stratagemSimplifiedAdapter.onItemClick = { data ->
                 // Activate stratagem
@@ -307,8 +372,7 @@ class PlayFragment : Fragment() {
                     activateStratagem(data)
                 }
             }
-        }
-        else {
+        } else {
             // Setup stratagem recycler view.
             val stratagemView = binding.playStratagemRecyclerView
             stratagemView.adapter = stratagemAdapter
@@ -320,8 +384,13 @@ class PlayFragment : Fragment() {
                     list.add(stratagemViewModel.retrieveItem(i))
                 }
             }
-            stratagemAdapter.setData(list.toList(),
-                preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!)
+            stratagemAdapter.setData(
+                list.toList(),
+                preference.getString(
+                    "db_name",
+                    context?.resources?.getString(R.string.db_hd2_name)
+                )!!
+            )
             // Setup click listener.
             stratagemAdapter.onItemClick = { data ->
                 onStratagemClicked(data)
@@ -366,38 +435,32 @@ class PlayFragment : Fragment() {
                     val diffX = -(e1?.x?.minus(e2.x) ?: 0.0).toDouble()
                     val diffY = -(e1?.y?.minus(e2.y) ?: 0.0).toDouble()
                     // Calculate direction.
-                    if (abs(diffX) > abs(diffY))
-                    {
+                    if (abs(diffX) > abs(diffY)) {
                         // left or right swipe.
                         if (abs(diffX) > distanceThreshold && abs(velocityX) > velocityThreshold) {
                             if (diffX >= 0) {
                                 // right.
                                 onInputting(4)
-                            }
-                            else {
+                            } else {
                                 // left.
                                 onInputting(3)
                             }
                             return true
-                        }
-                        else {
+                        } else {
                             return super.onFling(e1, e2, velocityX, velocityY)
                         }
-                    }
-                    else {
+                    } else {
                         // top or bottom swipe.
                         if (abs(diffY) > distanceThreshold && abs(velocityY) > velocityThreshold) {
                             if (diffY >= 0) {
                                 // bottom.
                                 onInputting(2)
-                            }
-                            else {
+                            } else {
                                 // top.
                                 onInputting(1)
                             }
                             return true
-                        }
-                        else {
+                        } else {
                             return super.onFling(e1, e2, velocityX, velocityY)
                         }
                     }
@@ -423,8 +486,7 @@ class PlayFragment : Fragment() {
         if (!isFreeInput) {
             if (itemSelected && currentItem == data) {
                 resetUi()
-            }
-            else {
+            } else {
                 itemSelected = true
                 currentItem = data
                 stepAdapter.clear()
@@ -458,8 +520,7 @@ class PlayFragment : Fragment() {
                     activateStep(0, 3)
                 }
             }
-        }
-        else {
+        } else {
             binding.playStratagemScrollView.visibility = View.VISIBLE
             binding.playBlank.visibility = View.VISIBLE
             binding.playStratagemTitle.visibility = View.INVISIBLE
@@ -484,12 +545,27 @@ class PlayFragment : Fragment() {
             lifecycleScope.launch {
                 activateStep(dir, 0)
             }
-        }
-        else if (itemSelected){ // In normal mode, record input.
+        } else if (itemSelected) { // In normal mode, record input.
             if (dir == stepsList[currentStepPos]) {
                 stepsList[currentStepPos] += 4
                 currentStepPos++
                 stepAdapter.setData(stepsList)
+                // Play sfx
+                if (enableSfx) {
+                    sfxPool.play(sfxStep, 1f, 1f, 0, 0, 1f)
+                }
+                if (enableVibrator) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(1
+                        , DEFAULT_AMPLITUDE))
+                }
+            } else {
+                // Play sfx
+                if (enableSfx) {
+                    sfxPool.play(sfxFail, 1f, 1f, 0, 0, 1f)
+                }
+                if (enableVibrator) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
+                }
             }
             // If the input is complete , activate the stratagem.
             if (currentStepPos >= stepsList.size) {
@@ -526,26 +602,27 @@ class PlayFragment : Fragment() {
      * Called when swiping a stratagem item, activate it immediately (like macro).
      */
     private fun swipeToActivate(recyclerView: RecyclerView) {
-        val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // Restore recycle view.
-                recyclerView.adapter?.notifyItemChanged(viewHolder.adapterPosition)
-                // Activate stratagem.
-                val item = stratagemAdapter.dataList[viewHolder.adapterPosition]
-                lifecycleScope.launch {
-                    activateStratagem(item)
+        val callback =
+            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
                 }
-                resetUi()
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    // Restore recycle view.
+                    recyclerView.adapter?.notifyItemChanged(viewHolder.adapterPosition)
+                    // Activate stratagem.
+                    val item = stratagemAdapter.dataList[viewHolder.adapterPosition]
+                    lifecycleScope.launch {
+                        activateStratagem(item)
+                    }
+                    resetUi()
+                }
             }
-        }
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
@@ -565,7 +642,12 @@ class PlayFragment : Fragment() {
                     address,
                     port
                 )
-                binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.orange, context?.theme))
+                binding.playConnectStatus.drawable.setTintList(
+                    context?.resources?.getColorStateList(
+                        R.color.orange,
+                        context?.theme
+                    )
+                )
             }
             networkLock.withLock {
                 isConnected = client.connect(address, port)
@@ -615,16 +697,25 @@ class PlayFragment : Fragment() {
                         address,
                         port
                     )
-                    binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.green, context?.theme))
-                }
-                else {
+                    binding.playConnectStatus.drawable.setTintList(
+                        context?.resources?.getColorStateList(
+                            R.color.green,
+                            context?.theme
+                        )
+                    )
+                } else {
                     binding.playConnectTitle.text = String.format(
                         getString(R.string.network_add_suffix),
                         String.format(getString(R.string.network_failed)),
                         address,
                         port
                     )
-                    binding.playConnectStatus.drawable.setTintList(context?.resources?.getColorStateList(R.color.red, context?.theme))
+                    binding.playConnectStatus.drawable.setTintList(
+                        context?.resources?.getColorStateList(
+                            R.color.red,
+                            context?.theme
+                        )
+                    )
                 }
             }
         }
@@ -644,7 +735,8 @@ class PlayFragment : Fragment() {
                 // Send status request.
                 client.send(Gson().toJson(RequestStatusPacket(version)).toString())
                 // Receive status.
-                val res: ReceiveStatusData = Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+                val res: ReceiveStatusData =
+                    Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
                 // Check the server status.
                 when (res.status) {
                     0 -> flag = true
@@ -666,11 +758,11 @@ class PlayFragment : Fragment() {
                         if (auth.auth) {
                             token = auth.token
                             flag = true
-                        }
-                        else {
+                        } else {
                             flag = false
                         }
                     }
+
                     else -> flag = false
                 }
             } catch (_: Exception) { // Json convert error & socket timeout.
@@ -699,6 +791,13 @@ class PlayFragment : Fragment() {
      * Activate stratagem, send stratagem data to the server.
      */
     private suspend fun activateStratagem(stratagemData: StratagemData) {
+        // Play sfx
+        if (enableSfx) {
+            sfxPool.play(sfxActivation, 1f, 1f, 0, 0, 1f)
+        }
+        if (enableVibrator) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, DEFAULT_AMPLITUDE))
+        }
         // Check and restart the client
         if (!isConnected) {
             if (connectingLock.isLocked) {
@@ -722,11 +821,10 @@ class PlayFragment : Fragment() {
                 token
             )
 
-            if(networkLock.tryLock()) {
+            if (networkLock.tryLock()) {
                 try {
                     client.send(Gson().toJson(packet).toString())
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
                     }
@@ -740,6 +838,13 @@ class PlayFragment : Fragment() {
      * Activate step, send step data to the server.
      */
     private suspend fun activateStep(step: Int, type: Int) {
+        // Play sfx
+        if (enableSfx) {
+            sfxPool.play(sfxStep, 1f, 1f, 0, 0, 1f)
+        }
+        if (enableVibrator) {
+            vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
+        }
         // Check and restart the client
         if (!isConnected) {
             if (connectingLock.isLocked) {
@@ -750,7 +855,7 @@ class PlayFragment : Fragment() {
                 return
             }
         }
-        // send step data
+        // Send step data
         withContext(Dispatchers.IO) {
             val packet = StratagemInputPacket(
                 StratagemInputData(
@@ -762,8 +867,7 @@ class PlayFragment : Fragment() {
             if (networkLock.tryLock()) {
                 try {
                     client.send(Gson().toJson(packet).toString())
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
                     }
@@ -783,14 +887,10 @@ class PlayFragment : Fragment() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         view?.keepScreenOn = false
 
-        // Show toolbar
-        (activity as MainActivity).supportActionBar?.show()
-
         // Close client
         if (connectingLock.isLocked) {
             client.forceClose()
-        }
-        else {
+        } else {
             client.disconnect()
         }
 
@@ -803,7 +903,8 @@ class PlayFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }

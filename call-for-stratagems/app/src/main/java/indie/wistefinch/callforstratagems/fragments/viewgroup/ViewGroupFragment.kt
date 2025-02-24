@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
@@ -22,6 +23,7 @@ import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentViewGroupBinding
+import indie.wistefinch.callforstratagems.utils.AppButton
 import java.util.Vector
 
 class ViewGroupFragment : Fragment() {
@@ -79,8 +81,27 @@ class ViewGroupFragment : Fragment() {
             findNavController().navigate(R.id.action_viewGroupFragment_to_editGroupFragment, bundle)
         }
         binding.viewGroupMenuDelete.setOnClickListener {
-            groupViewModel.deleteItem(currentItem)
-            findNavController().popBackStack(R.id.rootFragment, false)
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val dialogView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(dialogView)
+            dialog.show()
+
+            dialogView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_delete)
+            dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
+                getString(R.string.hint_delete_desc),
+                currentItem.title
+            )
+            val button1 = dialogView.findViewById<AppButton>(R.id.dialog_info_button1)
+            button1.setAlert(true)
+            button1.setOnClickListener {
+                groupViewModel.deleteItem(currentItem)
+                findNavController().popBackStack(R.id.rootFragment, false)
+                dialog.hide()
+            }
+            dialogView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+                dialog.hide()
+            }
         }
         binding.back.setOnClickListener {
             findNavController().popBackStack()
@@ -97,18 +118,29 @@ class ViewGroupFragment : Fragment() {
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         val dbName = preferences.getString("db_name", getString(R.string.db_hd2_name))
         if (currentItem.dbName != "0" && currentItem.dbName != dbName) {
-            val dialog = AlertDialog.Builder(requireContext())
-                .setTitle(R.string.hint_group_db_not_match)
-                .setMessage(String.format(
-                    getString(R.string.hint_group_db_not_match_desc),
-                    currentItem.dbName,
-                    dbName
-                ))
-                .setIcon(R.drawable.ic_info)
-                .setPositiveButton(R.string.dialog_confirm) { _, _ ->
-
-                }.create()
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val dialogView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(dialogView)
             dialog.show()
+
+            dialogView.findViewById<TextView>(R.id.dialog_info_title)
+                .setText(R.string.hint_group_db_not_match)
+            dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
+                getString(R.string.hint_group_db_not_match_desc),
+                currentItem.dbName,
+                dbName
+            )
+            dialogView.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+                dialog.hide()
+            }
+            val button2 = dialogView.findViewById<AppButton>(R.id.dialog_info_button2)
+            button2.setTitle(resources.getString(R.string.dialog_settings))
+            button2.setOnClickListener {
+                val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
+                findNavController().navigate(R.id.settingsFragment, bundle)
+                dialog.hide()
+            }
         }
 
         setupRecyclerView()
@@ -125,25 +157,29 @@ class ViewGroupFragment : Fragment() {
         recyclerView.autoFitColumns(90)
         val list: Vector<StratagemData> = Vector()
         if (currentItem.list.isEmpty()) {
-            list.add(StratagemData(0,
-                getString(R.string.default_string),
-                getString(R.string.default_string),
-                String(),
-                emptyList()
-            ))
-        }
-        else {
+            list.add(
+                StratagemData(
+                    0,
+                    getString(R.string.default_string),
+                    getString(R.string.default_string),
+                    String(),
+                    emptyList()
+                )
+            )
+        } else {
             for (i in currentItem.list) {
                 if (stratagemViewModel.isIdValid(i)) {
                     list.add(stratagemViewModel.retrieveItem(i))
-                }
-                else {
-                    list.add(StratagemData(i,
-                        "Unknown [$i]",
-                        "未知 [$i]",
-                        String(),
-                        emptyList()
-                    ))
+                } else {
+                    list.add(
+                        StratagemData(
+                            i,
+                            "Unknown [$i]",
+                            "未知 [$i]",
+                            String(),
+                            emptyList()
+                        )
+                    )
                 }
             }
         }
@@ -152,9 +188,13 @@ class ViewGroupFragment : Fragment() {
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
-        adapter.setData(list.toList(), preference.getString("db_name",
-            context?.resources?.getString(R.string.db_hd2_name))!!,
-            lang)
+        adapter.setData(
+            list.toList(), preference.getString(
+                "db_name",
+                context?.resources?.getString(R.string.db_hd2_name)
+            )!!,
+            lang
+        )
     }
 
     companion object {
@@ -163,7 +203,8 @@ class ViewGroupFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }
