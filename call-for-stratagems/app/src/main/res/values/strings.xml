@@ -24,6 +24,7 @@
     <string name="root_new_group_FAB">New Stratagems Group</string>
     <string name="root_no_group">The Galactic War Awaits</string>
     <string name="root_no_group_img">No stratagems group</string>
+    <string name="root_group_overflow" translatable="false">... +%1$s</string>
 
     <!-- Fragment Edit Group -->
     <string name="editGroup_title">New Stratagems Group</string>

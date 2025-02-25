@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -87,6 +88,7 @@ class ViewGroupFragment : Fragment() {
             dialog.setView(dialogView)
             dialog.show()
 
+            dialogView.findViewById<ImageView>(R.id.dialog_info_icon).setImageResource(R.drawable.ic_alert)
             dialogView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_delete)
             dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
                 getString(R.string.hint_delete_desc),

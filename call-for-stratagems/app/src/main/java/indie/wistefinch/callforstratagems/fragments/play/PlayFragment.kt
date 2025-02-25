@@ -289,13 +289,16 @@ class PlayFragment : Fragment() {
 
         // Check simplified mode
         if (enableSimplifiedMode) {
-            binding.playBlank.visibility = View.INVISIBLE
-            binding.playBanner.visibility = View.INVISIBLE
-            binding.playMode.visibility = View.INVISIBLE
-            binding.playExit.visibility = View.INVISIBLE
-            binding.playStratagemScrollView.visibility = View.INVISIBLE
-            binding.playGesture.visibility = View.INVISIBLE
+            binding.playBlank.visibility = View.GONE
+            binding.playBanner.visibility = View.GONE
+            binding.playMode.visibility = View.GONE
+            binding.playExit.visibility = View.GONE
+            binding.playStratagemScrollView.visibility = View.GONE
+            binding.playGesture.visibility = View.GONE
+            binding.playBgCross.visibility = View.GONE
+            binding.playBgMask.visibility = View.GONE
             binding.playSimplifiedScrollView.visibility = View.VISIBLE
+            view.setBackgroundColor(resources.getColor(R.color.colorBackground, context?.theme))
         }
 
         // Init runtime.
@@ -555,7 +558,7 @@ class PlayFragment : Fragment() {
                     sfxPool.play(sfxStep, 1f, 1f, 0, 0, 1f)
                 }
                 if (enableVibrator) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(1
+                    vibrator.vibrate(VibrationEffect.createOneShot(100
                         , DEFAULT_AMPLITUDE))
                 }
             } else {
@@ -642,12 +645,8 @@ class PlayFragment : Fragment() {
                     address,
                     port
                 )
-                binding.playConnectStatus.drawable.setTintList(
-                    context?.resources?.getColorStateList(
-                        R.color.orange,
-                        context?.theme
-                    )
-                )
+                binding.playConnectStatus1.visibility = View.VISIBLE
+                binding.playConnectStatus2.visibility = View.GONE
             }
             networkLock.withLock {
                 isConnected = client.connect(address, port)
@@ -697,7 +696,10 @@ class PlayFragment : Fragment() {
                         address,
                         port
                     )
-                    binding.playConnectStatus.drawable.setTintList(
+                    binding.playConnectStatus1.visibility = View.GONE
+                    binding.playConnectStatus2.visibility = View.VISIBLE
+                    binding.playConnectStatus2.setImageResource(R.drawable.ic_circle)
+                    binding.playConnectStatus2.drawable.setTintList(
                         context?.resources?.getColorStateList(
                             R.color.green,
                             context?.theme
@@ -710,12 +712,9 @@ class PlayFragment : Fragment() {
                         address,
                         port
                     )
-                    binding.playConnectStatus.drawable.setTintList(
-                        context?.resources?.getColorStateList(
-                            R.color.red,
-                            context?.theme
-                        )
-                    )
+                    binding.playConnectStatus1.visibility = View.GONE
+                    binding.playConnectStatus2.visibility = View.VISIBLE
+                    binding.playConnectStatus2.setImageResource(R.drawable.ic_alert)
                 }
             }
         }

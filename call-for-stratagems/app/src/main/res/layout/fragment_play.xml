@@ -4,30 +4,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    tools:context=".fragments.play.PlayFragment"
-    android:keepScreenOn="true" >
+    android:background="#42859c"
+    android:keepScreenOn="true"
+    tools:context=".fragments.play.PlayFragment">
 
     <ImageView
-        android:id="@+id/play_connect_status"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:contentDescription="@string/play_network_status"
-        android:src="@drawable/ic_circle"
+        android:id="@+id/play_bg_cross"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cross_bg"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#3fff" />
 
-    <TextView
-        android:id="@+id/play_connect_title"
+    <ImageView
+        android:id="@+id/play_bg_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/play_bg_mask"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/textColorSecondary"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="1dp"
-        android:text="@string/default_string"
+        android:layout_margin="1dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/play_connect_status"
-        tools:ignore="TextContrastCheck,VisualLintOverlap" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <indie.wistefinch.callforstratagems.utils.AppLoading
+            android:id="@+id/play_connect_status_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <ImageView
+            android:id="@+id/play_connect_status_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/play_network_status"
+            android:src="@drawable/ic_circle"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/play_connect_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/default_string"
+            android:textColor="@color/textColorSecondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/play_connect_status"
+            tools:ignore="TextContrastCheck,VisualLintOverlap" />
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/play_banner"
@@ -42,7 +82,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#8fb2bb" />
 
     <TextView
         android:id="@+id/play_blank"
@@ -65,10 +106,10 @@
         android:layout_height="64sp"
         android:gravity="center"
         android:text="@string/play_freeInput"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_banner"
-        android:visibility="invisible" />
+        app:layout_constraintTop_toBottomOf="@+id/play_banner" />
 
     <TextView
         android:id="@+id/play_stratagem_title"
@@ -77,10 +118,10 @@
         android:layout_height="64dp"
         android:gravity="center"
         android:text="@string/default_string"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_banner"
-        android:visibility="invisible" />
+        app:layout_constraintTop_toBottomOf="@+id/play_banner" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/play_steps_scrollView"
@@ -218,12 +259,12 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
         android:contentDescription="@string/play_exit"
+        android:focusable="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_exit"
-        android:clickable="true"
-        android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
