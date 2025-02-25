@@ -1009,7 +1009,8 @@ class SettingsFragment : Fragment() {
                 }
                 if (url.isEmpty()) {
                     url = getString(R.string.default_string)
-                } else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+                }
+                if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                     url = "$url/"
                 }
 
@@ -1113,7 +1114,8 @@ class SettingsFragment : Fragment() {
                                 )
                             )
                         }
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                         withContext(Dispatchers.Main) {
                             binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_update_failed_desc))
                             binding.setInfoDb.isEnabled = true
@@ -1142,11 +1144,12 @@ class SettingsFragment : Fragment() {
             }
             if (url.isEmpty()) {
                 url = getString(R.string.default_string)
-            } else if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
+            } 
+            if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                 url = "$url/"
             }
 
-            val json = JSONObject(Util.downloadToStr(url))
+            val json = JSONObject(Util.downloadToStr(url + "index.json"))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {

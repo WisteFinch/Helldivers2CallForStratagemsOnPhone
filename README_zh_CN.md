@@ -33,6 +33,8 @@
 cargo run
 ```
 
+服务器API请查阅[此处](./server_api_0_5.md)
+
 ### 客户端
 
 1. 需要安装Android Studio。
