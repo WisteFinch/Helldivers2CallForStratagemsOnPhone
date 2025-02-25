@@ -236,13 +236,13 @@
         <item>double_tap</item>
     </string-array>
 
-    <string-array name="lang_stratagem_entries">
+    <string-array name="lang_entries">
         <item>System Language</item>
         <item>English</item>
         <item>Simplified Chinese(简体中文)</item>
     </string-array>
 
-    <string-array name="lang_stratagem_values">
+    <string-array name="lang_values">
         <item>auto</item>
         <item>en</item>
         <item>zh-CN</item>

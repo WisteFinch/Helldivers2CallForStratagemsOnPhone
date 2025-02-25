@@ -21,7 +21,7 @@ class StratagemInfoDialog(context: Context) : Dialog(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_stratagem_info)
+        setContentView(R.layout.dialog_stratagem_info)
     }
 
     fun setData(data: StratagemData, dbName: String, lang: String)

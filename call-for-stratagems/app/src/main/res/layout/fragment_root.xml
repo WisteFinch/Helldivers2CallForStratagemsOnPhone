@@ -1,72 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.root.RootFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/default_string"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_1"
+        tools:ignore="ImageContrastCheck" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlur" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/app_name"
+            android:textSize="24sp"
+            android:theme="@style/AppTextTitle" />
+
+        <indie.wistefinch.callforstratagems.utils.AppButton
+            android:id="@+id/root_menu_list"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            app:icon="@drawable/ic_list" />
+
+        <indie.wistefinch.callforstratagems.utils.AppButton
+            android:id="@+id/root_menu_settings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            app:icon="@drawable/ic_settings" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/root_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="85dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:fadeScrollbars="false"
+        android:gravity="center"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+        android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintVertical_bias="0.5" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/root_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="12dp"
+    <indie.wistefinch.callforstratagems.utils.AppButton
+        android:id="@+id/root_new_group_FAB"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="50dp"
+        app:icon="@drawable/ic_add" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/no_group_imageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:contentDescription="@string/root_no_group_img"
+            android:src="@drawable/ic_super_earth"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintVertical_bias="0.35"
+            app:tint="@color/grey"
+            tools:ignore="ImageContrastCheck" />
 
-    </androidx.core.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/no_group_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/root_no_group"
+            android:textColor="@color/grey"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/no_group_imageView" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/root_new_group_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:contentDescription="@string/root_new_group_FAB"
-        android:elevation="8dp"
-        android:src="@drawable/ic_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/no_group_imageView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:contentDescription="@string/root_no_group_img"
-        android:src="@drawable/ic_super_earth"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3"
-        app:tint="@color/grey"
-        tools:ignore="ImageContrastCheck" />
-
-    <TextView
-        android:id="@+id/no_group_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/root_no_group"
-        android:textColor="@color/grey"
-        android:textSize="16sp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/no_group_imageView" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

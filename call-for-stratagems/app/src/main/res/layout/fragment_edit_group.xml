@@ -1,68 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.editgroup.EditGroupFragment">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/default_string"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_3"
+        tools:ignore="ImageContrastCheck" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlur" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/round_button"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_back"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_editGroup"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:theme="@style/AppTextTitle" />
+
+        <indie.wistefinch.callforstratagems.utils.AppButton
+            android:id="@+id/editGroup_menu_save"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/editGroup_menu_save_title"
+            app:icon="@drawable/ic_save" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="85dp"
+        android:orientation="vertical">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/editGroup_title_cardView"
+        <EditText
+            android:id="@+id/editGroup_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5">
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="5dp"
+            android:autofillHints="@string/editGroup_title"
+            android:background="@color/backgroundSecondary"
+            android:gravity="center"
+            android:hint="@string/editGroup_title_hint"
+            android:inputType="text"
+            android:text="@string/editGroup_title"
+            android:textSize="24sp"
+            android:theme="@style/AppEditText"
+            tools:ignore="VisualLintTextFieldSize,TextSizeCheck" />
 
-            <EditText
-                android:id="@+id/editGroup_title"
-                style="@style/AppTextTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_margin="16dp"
-                android:autofillHints="@string/editGroup_title"
-                android:gravity="center_horizontal"
-                android:hint="@string/editGroup_title_hint"
-                android:inputType="text"
-                android:text="@string/editGroup_title"
-                android:textColorHint="@color/textColorSecondary"
-                android:textSize="24sp" />
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editGroup_title_cardView">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/editGroup_recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:requiresFadingEdge="vertical"
-                android:fadingEdgeLength="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:fadeScrollbars="false"
+                android:gravity="center"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+                android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+                android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
-        </androidx.cardview.widget.CardView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/line" />
+
+        </FrameLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

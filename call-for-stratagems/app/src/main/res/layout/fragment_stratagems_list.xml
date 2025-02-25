@@ -1,61 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.stratagemslist.StratagemsListFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        android:contentDescription="@string/default_string"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_3"
+        tools:ignore="ImageContrastCheck" />
 
-        <LinearLayout
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundBlur" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/round_button"
+            android:contentDescription="@string/back"
+            android:src="@drawable/ic_back"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_stratagemsList"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:theme="@style/AppTextTitle" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="85dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/stratagemsList_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_margin="5dp"
+            android:text="@string/default_string"
+            android:textAlignment="center"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/stratagemsList_title_cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/stratagemsList_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:layout_margin="16dp"
-                    android:text="@string/default_string"
-                    android:textColor="@color/textColorPrimary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/stratagemsList_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginBottom="10dp"
+                android:fadeScrollbars="false"
+                android:gravity="center"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+                android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+                android:scrollbars="vertical"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/stratagemsList_recyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/line" />
 
-            </androidx.cardview.widget.CardView>
+        </FrameLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

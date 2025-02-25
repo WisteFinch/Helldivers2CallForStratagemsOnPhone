@@ -4,15 +4,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -79,6 +73,21 @@ class EditGroupFragment : Fragment() {
         _binding = FragmentEditGroupBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        // Init menu
+        binding.editGroupMenuSave.setOnClickListener {
+            // Save data to database
+            if (isEdit) {
+                updateDataToDb()
+            }
+            else {
+                insertDataToDb()
+            }
+            findNavController().popBackStack(R.id.rootFragment, false)
+        }
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
 
         // Setup view with arguments.
@@ -103,38 +112,10 @@ class EditGroupFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Setup menu.
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.edit_group_fragment_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Handle the menu selection.
-                return when (menuItem.itemId) {
-                    R.id.editGroup_menu_save -> {
-                        // Save data to database
-                        if (isEdit) {
-                            updateDataToDb()
-                        }
-                        else {
-                            insertDataToDb()
-                        }
-                        findNavController().popBackStack(R.id.rootFragment, false)
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
     /**
      * In edit mode: update the existing entry in the database.
      */
-    fun updateDataToDb() {
+    private fun updateDataToDb() {
         groupViewModel.updateItem(
             currentItem.id,
             when (binding.editGroupTitle.text.toString()) {
@@ -149,7 +130,7 @@ class EditGroupFragment : Fragment() {
     /**
      * Not in edit mode: Add a new entry to the database.
      */
-    fun insertDataToDb() {
+    private fun insertDataToDb() {
         groupViewModel.addItem(
             when (binding.editGroupTitle.text.toString()) {
                 "" -> { // User did not name the item, use the default name.
@@ -169,7 +150,7 @@ class EditGroupFragment : Fragment() {
         // Get views.
         val recyclerView = binding.editGroupRecyclerView
         recyclerView.adapter = adapter
-        recyclerView.autoFitColumns(100)
+        recyclerView.autoFitColumns(90)
         // Init data.
         val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())

@@ -1,14 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.CallForStratagems" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <item name="colorPrimary">@color/highlight</item>
+        <item name="colorPrimaryDark">@color/stress</item>
+        <item name="colorAccent">@color/stress</item>
+        <item name="android:fitsSystemWindows">false</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
         <item name="alertDialogTheme">@style/AppAlertDialog</item>
         <item name="cardViewStyle">@style/AppCardView</item>
         <item name="floatingActionButtonStyle">@style/AppFAB</item>
@@ -45,7 +43,7 @@
     </style>
 
     <style name="AppText">
-        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColor">@color/textPrimary</item>
     </style>
 
     <style name="AppPlayText">
@@ -68,6 +66,26 @@
     <style name="FABRoundedStyle" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="AppTitle">
+        <item name="android:textColor">@color/textTitle</item>
+    </style>
+
+    <style name="AppEditText">
+        <item name="android:textColorHint">@color/textHint</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textCursorDrawable">@color/highlight</item>
+    </style>
+
+    <style name="AppButton">
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">@color/buttonText</item>
+        <item name="android:fontFamily">@font/hc_sinclair_medium</item>
+    </style>
+
+    <style name="AppTextHint">
+        <item name="android:textColor">@color/textSecondary</item>
     </style>
 
 </resources>

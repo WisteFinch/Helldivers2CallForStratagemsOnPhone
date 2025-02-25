@@ -1,52 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/group_cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="5dp"
+    android:background="@drawable/entry_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:padding="10dp">
 
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/group_cardView"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/group_title"
+        style="@style/AppTextTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginHorizontal="5dp"
+        android:text="@string/default_string"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp">
+    <LinearLayout
+        android:id="@+id/group_stratagem_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/group_title" />
 
-
-            <TextView
-                android:id="@+id/group_title"
-                style="@style/AppTextTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/default_string"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textSize="16sp"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/group_recyclerView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/group_title" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/group_overflow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/default_string"
+        android:theme="@style/AppText"
+        android:visibility="gone"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/group_stratagem_list"
+        app:layout_constraintStart_toEndOf="@+id/group_stratagem_list"
+        app:layout_constraintTop_toTopOf="@+id/group_stratagem_list" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

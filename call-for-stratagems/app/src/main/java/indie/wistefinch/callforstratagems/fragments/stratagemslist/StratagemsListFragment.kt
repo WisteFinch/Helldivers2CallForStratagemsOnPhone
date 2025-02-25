@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +45,11 @@ class StratagemsListFragment : Fragment() {
         _binding = FragmentStratagemsListBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        // Init menu
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val dbName = preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
@@ -56,7 +62,7 @@ class StratagemsListFragment : Fragment() {
 
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter
-        recyclerView.autoFitColumns(100)
+        recyclerView.autoFitColumns(90)
         adapter.setData(stratagemViewModel.getAllItems(), dbName, lang)
 
         return view

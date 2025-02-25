@@ -6,10 +6,9 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.R
@@ -36,24 +35,24 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
 
     private var lang: String = "auto"
 
+    private lateinit var dialog: StratagemInfoDialog
+
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_view, parent, false))
+        dialog = StratagemInfoDialog(context)
+        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
-        // Set card view text.
-        holder.itemView.findViewById<TextView>(R.id.stratagem_view_title).text = when (lang) {
-            "zh-CN" -> dataList[pos].nameZh
-            else -> dataList[pos].name
-        }
+        val borderTopView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_top)
+        val borderBottomView = holder.itemView.findViewById<View>(R.id.stratagem_item_border_bottom)
+        val imageView = holder.itemView.findViewById<SVGImageView>(R.id.stratagem_item_image)
 
         // Set icon resources.
         try {
-            holder.itemView.findViewById<SVGImageView>(R.id.stratagem_view_imageView)
-                .setImageURI(
+            imageView.setImageURI(
                     Uri.fromFile(
                         File(context.filesDir.path +
                             context.resources.getString(R.string.icons_path) +
@@ -63,12 +62,47 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
         catch (_: Exception) {}
 
         // Set long click listener.
-        holder.itemView.findViewById<CardView>(R.id.stratagem_view_cardView).setOnLongClickListener {
-            val dialog = StratagemInfoDialog(context)
-            dialog.show()
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.setData(dataList[pos], dbName, lang)
+        holder.itemView.setOnTouchListener { view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_UP -> {
+                    borderTopView.setBackgroundResource(R.drawable.clickable_bg_top)
+                    borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom)
+                    imageView.setBackgroundColor(
+                        context.getColor(
+                            R.color.buttonBackground
+                        )
+                    )
+                    view.performClick()
+                }
+
+                MotionEvent.ACTION_DOWN -> {
+                    borderTopView.setBackgroundResource(R.drawable.clickable_bg_top_pressed)
+                    borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom_pressed)
+                    imageView.setBackgroundColor(
+                        context.getColor(
+                            R.color.buttonBackgroundPressed
+                        )
+                    )
+                }
+
+                MotionEvent.ACTION_CANCEL -> {
+                    borderTopView.setBackgroundResource(R.drawable.clickable_bg_top)
+                    borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom)
+                    imageView.setBackgroundColor(
+                        context.getColor(
+                            R.color.buttonBackground
+                        )
+                    )
+                }
+            }
             true
+        }
+        holder.itemView.setOnClickListener {
+            if (!dialog.isShowing) {
+                dialog.show()
+                dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                dialog.setData(dataList[pos], dbName, lang)
+            }
         }
     }
 

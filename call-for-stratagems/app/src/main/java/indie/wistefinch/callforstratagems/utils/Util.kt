@@ -1,8 +1,7 @@
-package indie.wistefinch.callforstratagems
+package indie.wistefinch.callforstratagems.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.io.File
 import java.net.URL
 import java.util.Random
