@@ -126,6 +126,9 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                         context.resources.getString(R.string.root_group_overflow),
                         (dataList[pos].list.size - maxCount).toString()
                     )
+                } else {
+                    holder.itemView.findViewById<TextView>(R.id.group_overflow).visibility =
+                        View.GONE
                 }
             }
         }

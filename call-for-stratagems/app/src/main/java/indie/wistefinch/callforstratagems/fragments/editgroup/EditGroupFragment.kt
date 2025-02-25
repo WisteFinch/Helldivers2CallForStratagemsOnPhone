@@ -150,6 +150,7 @@ class EditGroupFragment : Fragment() {
         // Get views.
         val recyclerView = binding.editGroupRecyclerView
         recyclerView.adapter = adapter
+        recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.autoFitColumns(90)
         // Init data.
         val list = stratagemViewModel.getAllItems()

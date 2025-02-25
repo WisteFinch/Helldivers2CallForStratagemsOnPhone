@@ -15,7 +15,8 @@ import java.io.File
 /**
  * Adapter for the recycler view in [EditGroupFragment]
  */
-class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHolder>(), ItemTouchHelperAdapter {
+class StratagemEditAdapter : RecyclerView.Adapter<StratagemEditAdapter.ListViewHolder>(),
+    ItemTouchHelperAdapter {
 
     /**
      * All data in the adapter.
@@ -36,11 +37,14 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
 
     private var lang: String = "auto"
 
-    class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
+    class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_item, parent, false))
+        return ListViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.layout_stratagem_item, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, pos: Int) {
@@ -52,16 +56,20 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
         try {
             imageView.setImageURI(
                 Uri.fromFile(
-                    File(context.filesDir.path +
-                            context.resources.getString(R.string.icons_path) +
-                            "$dbName/" +
-                            dataList[pos].icon + ".svg")))
+                    File(
+                        context.filesDir.path +
+                                context.resources.getString(R.string.icons_path) +
+                                "$dbName/" +
+                                dataList[pos].icon + ".svg"
+                    )
+                )
+            )
+        } catch (_: Exception) {
         }
-        catch (_: Exception) {}
 
         // Set view background.
-        val setViewBg = {
-            if (enabledStratagem.contains(dataList[pos].id)) {
+        val setViewBg = { id: Int ->
+            if (enabledStratagem.contains(id)) {
                 borderTopView.setBackgroundResource(R.drawable.clickable_bg_top_pressed)
                 borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom_pressed)
                 imageView.setBackgroundColor(
@@ -69,8 +77,7 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
                         R.color.buttonBackgroundPressed
                     )
                 )
-            }
-            else {
+            } else {
                 borderTopView.setBackgroundResource(R.drawable.clickable_bg_top)
                 borderBottomView.setBackgroundResource(R.drawable.clickable_bg_bottom)
                 imageView.setBackgroundColor(
@@ -80,18 +87,17 @@ class StratagemEditAdapter: RecyclerView.Adapter<StratagemEditAdapter.ListViewHo
                 )
             }
         }
-        setViewBg()
+        setViewBg(dataList[holder.adapterPosition].id)
 
         // Setup click listener, the selected status and background color will change after clicking.
         holder.itemView.setOnClickListener {
             val index = holder.adapterPosition
             if (enabledStratagem.contains(dataList[index].id)) {
                 enabledStratagem.remove(dataList[index].id)
-            }
-            else {
+            } else {
                 enabledStratagem.add(dataList[index].id)
             }
-            setViewBg()
+            setViewBg(dataList[index].id)
         }
     }
 

@@ -193,6 +193,7 @@ class RootFragment : Fragment() {
 
         val recyclerView = binding.rootRecyclerView
         recyclerView.adapter = adapter
+        recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         adapter.setStratagemViewModel(stratagemViewModel)
         groupViewModel.allItems.observe(viewLifecycleOwner) { data ->
