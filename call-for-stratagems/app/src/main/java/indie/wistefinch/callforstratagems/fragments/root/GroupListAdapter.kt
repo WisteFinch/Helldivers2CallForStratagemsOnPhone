@@ -80,6 +80,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
 
         // Setup stratagem thumbnail view.
         val layout = holder.itemView.findViewById<LinearLayout>(R.id.group_stratagem_list)
+        layout.removeAllViews()
         layout.post {
             val preference = context.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
             val dbName =
@@ -120,9 +121,10 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                     msg.visibility = View.VISIBLE
                     msg.text = String.format(
                         context.resources.getString(R.string.root_group_overflow),
-                        (dataList[pos].list.size - 5).toString()
+                        (dataList[pos].list.size - maxCount).toString()
                     )
                 }
+                println(maxCount)
             }
         }
     }

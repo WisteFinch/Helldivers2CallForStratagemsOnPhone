@@ -159,7 +159,7 @@
     <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息>数据库版本”更新数据库</string>
     <string name="hint_welcome">欢迎使用 v%1$s</string>
     <string name="hint_welcome_usage">用法</string>
-    <string name="hint_welcome_desc">现在可以调整战备顺序了</string>
+    <string name="hint_welcome_desc">本次更新加入了音效和震动功能，您可以前往“设置>控制”开启</string>
     <string name="hint_group_db_not_match">数据库不相符</string>
     <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。请前往“设置>信息>数据库版本”切换数据库</string>
     <string name="hint_delete">删除</string>
