@@ -87,6 +87,9 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                 preference.getString("db_name", context.resources.getString(R.string.db_hd2_name))!!
             val maxCount =
                 (holder.itemView.width / (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT) - 50) / 34
+            if (dataList.size <= pos) {
+                return@post
+            }
             if (dataList[pos].list.isEmpty()) {
                 layout.addView(
                     LayoutInflater.from(context)
@@ -124,7 +127,6 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                         (dataList[pos].list.size - maxCount).toString()
                     )
                 }
-                println(maxCount)
             }
         }
     }
