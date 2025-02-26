@@ -24,7 +24,6 @@
         android:theme="?attr/actionBarTheme"
         android:visibility="gone"
         app:buttonGravity="center_vertical"
-        app:popupTheme="@style/AppPopupMenu"
         app:titleTextColor="@color/textStress" />
 
 </FrameLayout>

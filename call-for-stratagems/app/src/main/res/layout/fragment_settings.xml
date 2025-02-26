@@ -374,7 +374,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -409,7 +409,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_type_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -444,7 +444,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -479,7 +479,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -514,7 +514,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -549,7 +549,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/input_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
@@ -911,7 +911,7 @@
                         android:layout_height="35dp"
                         android:background="@color/backgroundSecondary"
                         android:entries="@array/lang_entries"
-                        android:spinnerMode="dialog"
+                        android:spinnerMode="dropdown"
                         tools:ignore="TouchTargetSizeCheck" />
 
                 </LinearLayout>
