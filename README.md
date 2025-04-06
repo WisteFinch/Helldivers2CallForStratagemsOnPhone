@@ -33,6 +33,53 @@ You can check the usage [here](./usage.md)
 cargo run
 ```
 
+You can add the following command line arguments:
+- `--debug`: Enable debug mode, which will print more logs
+- `--disable-auth`: Disable SID authentication, client will be auto-authenticated
+- `-h`, `--help`: Show help message
+- `-V`, `--version`: Show version information
+
+``` shell
+cargo run -- --disable-auth  # Run without SID authentication
+cargo run -- --debug  # Run with debug mode
+cargo run -- --debug --disable-auth  # Run with both debug mode and without SID authentication
+cargo run -- --help  # Show help message
+```
+
+### Configuration
+
+The configuration file has been changed from JSON to TOML format in version 0.6.0. When you first run the server, it will detect old configuration files and ask if you want to migrate them to the new format. **Migration is required** to continue using the server with new version. Upon confirmation, the old configuration and authentication records will be automatically migrated to the new format and old files will be deleted.
+
+Example of the new configuration file (config.toml):
+
+```toml
+[server]
+port = 23333
+ip = ""
+
+[auth]
+enabled = true
+timeout_days = 3
+
+[input]
+delay = 25
+open = "ctrl_left"
+open_type = "hold"
+up = "w"
+down = "s"
+left = "a"
+right = "d"
+
+# Authentication records
+[[auth_records]]
+sid = "client_identification_1"
+time = 1712345678
+
+[[auth_records]]
+sid = "client_identification_2"
+time = 1712345679
+```
+
 ### Client
 
 1. Android Studio is required.
