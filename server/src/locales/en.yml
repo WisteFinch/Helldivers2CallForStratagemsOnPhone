@@ -1,50 +1,72 @@
-err_parse_json_failed: Failed to parse request data!
-err_parse_opt_failed: Failed to parse operation!
-info_close: 'Connection closed by client: '
-title_1: '=== Call for stratagem server v'
-title_2: ' ==='
-info_listening: 'Listening: '
-info_connect: 'Established connection to: '
-warn_force_close: 'Close Connection: '
-warn_ver_1: 'Client version is '
-warn_ver_2: ', may not work properly.'
-info_send_config: 'Sended configuration to: '
-warn_reject_request: Authentication failed, reject request!
-ask_sync: 'Do you want to synchronize this configuration? (Y/N): '
-n_sync_conf: 'Synchronization request from '
-n_scan_qr_code: Scan this QR code to obtain the connection configuration faster.
-warn_conf_load_failed: Failed to load configuration, loading default configuration!
-warn_conf_network_temp: Using temporary network configuration
-info_conf_loaded: Configuration loaded
-warn_reject_sync: Synchronization request rejected!
-n_auth_2: ', sid: '
-n_auth_1: 'Authentication request from '
-ask_auth: 'Do you want to authenticate this client? (Y/N): '
-info_auth: Client authenticated
-warn_reject_auth: Client authentication rejected!
-info_sync_complete: Configuration synchronized, need to restart the server
-info_conf_saved: Configuration saved
-err_sync_failed: Failed to synchronize configuration!
-err_conf_save_failed: Failed to save configuration!
-err_auth_save_failed: Failed to save authentication data!
-err_parse_step_failed: Failed to parse steps!
-err_parse_input_failed: Failed to parse input type!
-n_free_input: 'Free input: '
-n_err: '[ERROR] '
-n_warn: '[WARNING] '
-n_info: '[INFO] '
-n_debug: '[DEBUG] '
-debug_mode: 'Debug mode enabled'
-d_remove_redundant: 'Redundant requests removed: '
-d_specific_ip: 'IP address specified: '
-n_conf_title: 'Current configuration:'
-n_conf_input: 'Input'
-n_conf_input_delay: 'Input Interval Time: '
-n_conf_input_open: 'Open Stratagem List: '
-n_conf_input_up: 'Up: '
-n_conf_input_down: 'Down: '
-n_conf_input_left: 'Left: '
-n_conf_input_right: 'Right: '
-n_conf_type: 'Type'
-n_conf_type_open: 'Open Stratagem List: '
-n_admin: 'If there is no response in the game, you can try restart the server as an administrator'
+err_parse_json_failed: "Failed to parse request data!"
+err_parse_opt_failed: "Failed to parse operation!"
+info_close: "Connection closed by client: "
+title_1: "=== Call for stratagem server v"
+title_2: " ==="
+info_listening: "Listening: "
+info_connect: "Established connection to: "
+warn_force_close: "Close Connection: "
+warn_ver_1: "Client version is "
+warn_ver_2: ", may not work properly."
+info_send_config: "Sended configuration to: "
+warn_reject_request: "Authentication failed, reject request!"
+ask_sync: "Do you want to synchronize this configuration? (Y/N): "
+n_sync_conf: "Synchronization request from "
+n_scan_qr_code: "Scan this QR code to obtain the connection configuration faster."
+warn_conf_load_failed: "Failed to load configuration, loading default configuration!"
+warn_conf_network_temp: "Using temporary network configuration"
+info_conf_loaded: "Configuration loaded"
+info_conf_migrated: "Successfully migrated old configuration to new format"
+err_conf_serialize_failed: "Failed to serialize configuration"
+warn_reject_sync: "Synchronization request rejected!"
+n_auth_2: ", sid: "
+n_auth_1: "Authentication request from "
+ask_auth: "Do you want to authenticate this client? (Y/N): "
+info_auth: "Client authenticated"
+warn_reject_auth: "Client authentication rejected!"
+info_sync_complete: "Configuration synchronized, need to restart the server"
+info_conf_saved: "Configuration saved"
+err_sync_failed: "Failed to synchronize configuration!"
+err_conf_save_failed: "Failed to save configuration!"
+err_auth_save_failed: "Failed to save authentication data!"
+err_old_auth_remove_failed: "Failed to remove old authentication file!"
+err_old_conf_remove_failed: "Failed to remove old configuration file!"
+ask_migrate_title: "Found old configuration file, migrate to new format?"
+ask_migrate: "Do you want to migrate configuration to new format? Default yes (Y/N):"
+migrate_cancelled: "Migration cancelled, continue using old configuration"
+migrate_required: "Migration to new config format is required to continue, exiting"
+old_config_info: "Old configuration information"
+auth_records_info: "Number of authentication records"
+config_port: "Port"
+config_ip: "IP Address"
+config_ip_auto: "Auto detect"
+config_delay: "Input delay"
+config_open: "Open key"
+config_open_type: "Open method"
+config_key_up: "Up key"
+config_key_down: "Down key"
+config_key_left: "Left key"
+config_key_right: "Right key"
+err_parse_step_failed: "Failed to parse steps!"
+err_parse_input_failed: "Failed to parse input type!"
+n_free_input: "Free input: "
+n_err: "[ERROR] "
+n_warn: "[WARNING] "
+n_info: "[INFO] "
+n_debug: "[DEBUG] "
+debug_mode: "Debug mode enabled"
+auth_disabled: "SID authentication disabled"
+info_auth_disabled: "Authentication disabled, client auto-authenticated"
+d_remove_redundant: "Redundant requests removed: "
+d_specific_ip: "IP address specified: "
+n_conf_title: "Current configuration:"
+n_conf_input: "Input"
+n_conf_input_delay: "Input Interval Time: "
+n_conf_input_open: "Open Stratagem List: "
+n_conf_input_up: "Up: "
+n_conf_input_down: "Down: "
+n_conf_input_left: "Left: "
+n_conf_input_right: "Right: "
+n_conf_type: "Type"
+n_conf_type_open: "Open Stratagem List: "
+n_admin: "If there is no response in the game, you can try restart the server as an administrator"

@@ -32,3 +32,4 @@ call-for-stratagems/app/src/main/assets/database/stratagem_db.db-shm
 call-for-stratagems/.idea/misc.xml
 call-for-stratagems/.idea/deploymentTargetSelector.xml
 call-for-stratagems/.idea/gradle.xml
+config.toml

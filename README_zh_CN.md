@@ -33,6 +33,53 @@
 cargo run
 ```
 
+您可以添加以下命令行参数：
+- `--debug`：启用调试模式，将打印更多日志
+- `--disable-auth`：禁用SID认证，客户端将自动通过认证
+- `-h`, `--help`：显示帮助信息
+- `-V`, `--version`：显示版本信息
+
+``` shell
+cargo run -- --disable-auth  # 无需SID认证运行
+cargo run -- --debug  # 使用调试模式运行
+cargo run -- --debug --disable-auth  # 同时启用调试模式和禁用SID认证
+cargo run -- --help  # 显示帮助信息
+```
+
+### 配置文件
+
+配置文件格式在0.6.0版本中已从JSON更改为TOML格式。当您首次运行服务器时，程序将检测旧的配置文件并询问您是否要迁移到新格式。**迁移是必须的**，新版本必须使用新格式配置才能继续运行。确认后，旧的配置和认证记录将自动迁移到新格式，并删除旧文件。
+
+新配置文件示例(config.toml)：
+
+```toml
+[server]
+port = 23333
+ip = ""
+
+[auth]
+enabled = true
+timeout_days = 3
+
+[input]
+delay = 25
+open = "ctrl_left"
+open_type = "hold"
+up = "w"
+down = "s"
+left = "a"
+right = "d"
+
+# 认证记录
+[[auth_records]]
+sid = "client_identification_1"
+time = 1712345678
+
+[[auth_records]]
+sid = "client_identification_2"
+time = 1712345679
+```
+
 服务器API请查阅[此处](./server_api_0_5.md)
 
 ### 客户端
