@@ -11,7 +11,7 @@ use crate::tool::*;
 use rust_i18n::t;
 
 /// 处理宏命令
-pub async fn macros(value: Value, conf: &Config) -> Result<()> {
+pub async fn macros(value: Value, conf: &AppConfig) -> Result<()> {
     let name = value["name"].as_str().unwrap_or("");
     let list = match value["steps"].as_array() {
         Some(s) => s,
@@ -23,13 +23,13 @@ pub async fn macros(value: Value, conf: &Config) -> Result<()> {
 
     // 按下打开键
     print(format!("{name}: "));
-    if conf.openType == "hold" {
+    if conf.input.open_type == "hold" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
-    } else if conf.openType == "long_press" {
+    } else if conf.input.open_type == "long_press" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
         sleep(Duration::from_millis(400)).await;
         execute(Step::Open, InputType::Release, conf).await.unwrap();
-    } else if conf.openType == "double_tap" {
+    } else if conf.input.open_type == "double_tap" {
         execute(Step::Open, InputType::Click, conf).await.unwrap();
         execute(Step::Open, InputType::Click, conf).await.unwrap();
     } else {
@@ -44,7 +44,7 @@ pub async fn macros(value: Value, conf: &Config) -> Result<()> {
     }
 
     // 释放打开键
-    if conf.openType == "hold" {
+    if conf.input.open_type == "hold" {
         execute(Step::Open, InputType::Release, conf).await.unwrap();
     }
     println!();
@@ -53,7 +53,7 @@ pub async fn macros(value: Value, conf: &Config) -> Result<()> {
 }
 
 /// 处理独立输入
-pub async fn independent(value: Value, conf: &Config) -> Result<()> {
+pub async fn independent(value: Value, conf: &AppConfig) -> Result<()> {
     let step = match value["step"].as_u64() {
         Some(s) => Step::from_u64(s),
         None => {
@@ -74,13 +74,13 @@ pub async fn independent(value: Value, conf: &Config) -> Result<()> {
 }
 
 /// 模拟按键事件
-fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
+fn simulate_key_event(step: Step, event_type: u32, conf: &AppConfig) {
     let data = match step {
-        Step::Open => conf.open.clone().to_key(),
-        Step::Up => conf.up.clone().to_key(),
-        Step::Down => conf.down.clone().to_key(),
-        Step::Left => conf.left.clone().to_key(),
-        Step::Right => conf.right.clone().to_key(),
+        Step::Open => conf.input.open.clone().to_key(),
+        Step::Up => conf.input.up.clone().to_key(),
+        Step::Down => conf.input.down.clone().to_key(),
+        Step::Left => conf.input.left.clone().to_key(),
+        Step::Right => conf.input.right.clone().to_key(),
     };
     if event_type == 0 {
         match data.key_type {
@@ -108,13 +108,13 @@ fn simulate_key_event(step: Step, event_type: u32, conf: &Config) {
 }
 
 /// 执行输入操作
-pub async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
+pub async fn execute(step: Step, t: InputType, conf: &AppConfig) -> Result<()> {
     match t {
         InputType::Click => {
             simulate_key_event(step.clone(), 0, conf);
             print(step.clone());
             let _ = io::stdout().flush();
-            sleep(Duration::from_millis(conf.delay)).await;
+            sleep(Duration::from_millis(conf.input.delay)).await;
             simulate_key_event(step, 1, conf);
         }
         InputType::Press => {
@@ -130,7 +130,7 @@ pub async fn execute(step: Step, t: InputType, conf: &Config) -> Result<()> {
             println!();
         }
     }
-    sleep(Duration::from_millis(conf.delay)).await;
+    sleep(Duration::from_millis(conf.input.delay)).await;
 
     Ok(())
 }

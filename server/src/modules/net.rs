@@ -20,6 +20,8 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 const BUFFER_SIZE: usize = 4096;
 /// 错误消息键
 const ERR_INVALID_REQUEST: &str = "err_invalid_request";
+/// 服务器API版本
+const SERVER_API_VERSION: u64 = 6;
 
 /// 启动服务器
 pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
@@ -43,7 +45,7 @@ pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
     }
 
     // 加载配置
-    let conf: Config = match load_config().await {
+    let conf: AppConfig = match load_config().await {
         Some(s) => {
             info(t!("info_conf_loaded"));
             s
@@ -51,8 +53,8 @@ pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
         None => {
             warning(t!("warn_conf_load_failed"));
             let app_config = AppConfig::default();
-            save_config(toml::to_string_pretty(&app_config).unwrap().as_str(), false).await;
-            Config::from(app_config)
+            save_config(&app_config, false).await;
+            app_config
         }
     };
 
@@ -76,17 +78,17 @@ pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
     save_auth(&filtered).await;
 
     // 获取IP地址
-    let mut ip: String = if conf.ip.is_empty() {
+    let mut ip: String = if conf.server.ip.is_empty() {
         local_ipaddress::get().unwrap()
     } else {
         if debug {
-            warning(format!("{}{}", t!("d_specific_ip"), conf.ip.clone()));
+            warning(format!("{}{}", t!("d_specific_ip"), conf.server.ip.clone()));
         }
-        conf.ip.clone()
+        conf.server.ip.clone()
     };
 
     // 监听端口
-    let listener = match TcpListener::bind(format!("{}:{}", ip, conf.port)).await {
+    let listener = match TcpListener::bind(format!("{}:{}", ip, conf.server.port)).await {
         Ok(ok) => ok,
         Err(err) => {
             error(err);
@@ -102,7 +104,7 @@ pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
     ));
 
     // 显示二维码
-    display_qr_code(&ip, conf.port);
+    display_qr_code(&ip, conf.server.port);
 
     // 处理连接
     loop {
@@ -112,27 +114,20 @@ pub async fn run(debug: bool, disable_auth: bool) -> Result<()> {
 }
 
 /// 显示配置信息
-fn display_config(conf: &Config) {
-    info(format!(
-        "{}\n  {}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n    {}{}\n  {}\n    {}{}",
-        t!("n_conf_title"),
-        t!("n_conf_input"),
-        t!("n_conf_input_delay"),
-        conf.delay.clone(),
-        t!("n_conf_input_open"),
-        conf.open,
-        t!("n_conf_input_up"),
-        conf.up,
-        t!("n_conf_input_down"),
-        conf.down,
-        t!("n_conf_input_left"),
-        conf.left,
-        t!("n_conf_input_right"),
-        conf.right,
-        t!("n_conf_type"),
-        t!("n_conf_type_open"),
-        conf.openType,
-    ));
+fn display_config(conf: &AppConfig) {
+    info(t!("n_conf_title"));
+    if !conf.server.ip.is_empty() {
+        println!(" {}{}", t!("n_conf_ip"), conf.server.ip);
+    }
+    println!(" {}", t!("n_conf_input"));
+    println!("  ├─{}{}", t!("n_conf_input_open"), conf.input.open);
+    println!("  ├─{}{}", t!("n_conf_input_up"), conf.input.up);
+    println!("  ├─{}{}", t!("n_conf_input_down"), conf.input.down);
+    println!("  ├─{}{}", t!("n_conf_input_left"), conf.input.left);
+    println!("  └─{}{}", t!("n_conf_input_right"), conf.input.right);
+    println!(" {}", t!("n_conf_type"));
+    println!("  └─{}{}", t!("n_conf_type_open"), conf.input.open_type);
+    println!(" {}{}", t!("n_conf_input_delay"), conf.input.delay);
 }
 
 /// 显示QR码
@@ -148,7 +143,7 @@ fn display_qr_code(ip: &str, port: u64) {
 }
 
 /// 处理客户端连接
-pub async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool, disable_auth: bool) -> Result<()> {
+pub async fn handle_connection(mut client: TcpStream, conf: AppConfig, debug: bool, disable_auth: bool) -> Result<()> {
     let mut is_authed = false;
     let token: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -159,6 +154,7 @@ pub async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool,
     println!();
     info(format!("{}{}", t!("info_connect"), client.peer_addr()?));
     let mut buffer = vec![0; BUFFER_SIZE];
+    let mut api_ver: u64 = SERVER_API_VERSION;
 
     // 处理客户端请求
     loop {
@@ -213,7 +209,12 @@ pub async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool,
         // 检查操作和权限
         match opt {
             Operation::Status => {
-                handle_status(&mut client, is_authed, debug).await?;
+                api_ver = json["api"].as_u64().unwrap_or(5);
+                match api_ver {
+                    5 => handle_status_api5(&mut client, is_authed, debug).await?,
+                    _ => handle_status(&mut client, is_authed, debug).await?
+                }
+                
             }
             Operation::Auth => {
                 handle_auth(&mut client, json, &mut is_authed, debug, &token, disable_auth).await?;
@@ -223,7 +224,10 @@ pub async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool,
                 if is_authed && client_token == token {
                     match opt {
                         Operation::Request => handle_request(&mut client, &conf, debug).await?,
-                        Operation::Sync => handle_sync(&mut client, json, &conf).await?,
+                        Operation::Sync => match api_ver {
+                            5 => handle_sync_api5(&mut client, json, &conf).await?,
+                            _ => handle_sync(&mut client, json, &conf).await?
+                        },
                         Operation::Combined => macros(json["macro"].clone(), &conf).await?,
                         Operation::Independent => independent(json["input"].clone(), &conf).await?,
                         _ => {} // 已经处理的Status和Auth操作
@@ -238,7 +242,28 @@ pub async fn handle_connection(mut client: TcpStream, conf: Config, debug: bool,
 
 /// 处理状态请求
 async fn handle_status(client: &mut TcpStream, is_authed: bool, debug: bool) -> Result<()> {
-    // 版本检查总是通过
+    let res: String;
+    
+    // 检查认证
+    if is_authed {
+        res = format!("{{\"status\":{},\"api\":{SERVER_API_VERSION}}}\n", Status::Success);
+    } else {
+        res = format!(
+            "{{\"status\":{},\"api\":{SERVER_API_VERSION}}}\n",
+            Status::Unauthorized
+        );
+    }
+
+    if debug {
+        debug_log(format!(" <<< {}", res));
+    }
+
+    client.write_all(res.as_bytes()).await?;
+    Ok(())
+}
+
+/// 处理状态请求（API5）
+async fn handle_status_api5(client: &mut TcpStream, is_authed: bool, debug: bool) -> Result<()> {
     let res: String;
     
     // 检查认证
@@ -260,7 +285,7 @@ async fn handle_status(client: &mut TcpStream, is_authed: bool, debug: bool) -> 
 }
 
 /// 处理配置请求
-async fn handle_request(client: &mut TcpStream, conf: &Config, debug: bool) -> Result<()> {
+async fn handle_request(client: &mut TcpStream, conf: &AppConfig, debug: bool) -> Result<()> {
     let res: String = serde_json::to_string(conf).unwrap();
 
     if debug {
@@ -273,21 +298,53 @@ async fn handle_request(client: &mut TcpStream, conf: &Config, debug: bool) -> R
 }
 
 /// 处理同步请求
-async fn handle_sync(client: &mut TcpStream, json: Value, conf: &Config) -> Result<()> {
+async fn handle_sync(client: &mut TcpStream, json: Value, conf: &AppConfig) -> Result<()> {
     println(format!("{}{}", t!("n_sync_conf"), client.peer_addr()?));
     print(t!("ask_sync"));
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
     if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
-        let client_config: Config =
-            serde_json::from_str(json["config"].to_string().as_str())
-                .unwrap_or_default();
+        match serde_json::from_str::<AppConfig>(json["config"].to_string().as_str()) {
+            Ok(mut client_config) => {
+                // 判断是否指定ip
+                if client_config.server.ip.is_empty() {
+                    client_config.server.ip = conf.server.ip.clone();
+                }
+                // 保留认证信息
+                client_config.auth_records = conf.auth_records.clone();
+
+                save_config(&client_config, true).await;
+            },
+            Err(e) => {
+                error(format!("{}{}", t!("err_conf_parse_failed"), e));
+            }
+        }
+    } else {
+        warning(t!("warn_reject_sync"));
+    }
+    Ok(())
+}
+
+/// 处理同步请求（API5）
+async fn handle_sync_api5(client: &mut TcpStream, json: Value, conf: &AppConfig) -> Result<()> {
+    println(format!("{}{}", t!("n_sync_conf"), client.peer_addr()?));
+    print(t!("ask_sync"));
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).unwrap();
+    if input.to_lowercase().trim() == "y" || input.to_lowercase().trim() == "yes" {
+        match serde_json::from_str::<AppConfig5>(json["config"].to_string().as_str()) {
+            Ok(client_config) => {
+                // 转换为AppConfig，但保留本地IP和认证信息
+                let mut app_config = AppConfig::from(client_config);
+                app_config.server.ip = conf.server.ip.clone();
+                app_config.auth_records = conf.auth_records.clone();
         
-        // 转换为AppConfig，但保留本地IP
-        let mut app_config = AppConfig::from(client_config);
-        app_config.server.ip = conf.ip.clone();
-        
-        save_config(toml::to_string_pretty(&app_config).unwrap().as_str(), true).await;
+                save_config(&app_config, true).await;
+            },
+            Err(e) => {
+                error(format!("{}{}", t!("err_conf_parse_failed"), e));
+            }
+        }
     } else {
         warning(t!("warn_reject_sync"));
     }
