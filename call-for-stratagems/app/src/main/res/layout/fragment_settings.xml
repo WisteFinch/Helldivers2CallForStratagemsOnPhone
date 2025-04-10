@@ -149,6 +149,7 @@
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="TouchTargetSizeCheck,TextContrastCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck" />
+
                 </LinearLayout>
 
                 <Space
@@ -337,11 +338,11 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
-                        android:id="@+id/textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/set_unit_ms"
                         android:theme="@style/AppTextHint" />
+
                 </LinearLayout>
 
                 <Space
@@ -558,6 +559,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
+                <indie.wistefinch.callforstratagems.utils.AppButton
+                    android:id="@+id/set_sync_advance"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:text="@string/set_sync_advance" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_sync_apply"
@@ -636,6 +646,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/set_ctrl_simplified_mode_desc"
                             android:theme="@style/AppTextHint" />
+
                     </LinearLayout>
 
                     <Space
@@ -649,7 +660,6 @@
                         android:layout_height="35dp"
                         app:trackTint="@color/switch_color"
                         tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
-
 
                 </LinearLayout>
 

@@ -260,6 +260,9 @@ class SettingsFragment : Fragment() {
                 )
             )
         )
+        binding.setSyncAdvance.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_settingsSyncFragment)
+        }
         // Control
         binding.setCtrlSimplifiedMode.isChecked =
             preferences.getBoolean("enable_simplified_mode", false)
