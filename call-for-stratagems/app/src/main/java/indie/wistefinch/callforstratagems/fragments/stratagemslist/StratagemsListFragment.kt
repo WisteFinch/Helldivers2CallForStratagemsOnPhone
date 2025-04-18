@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
@@ -53,13 +54,19 @@ class StratagemsListFragment : Fragment() {
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val dbName =
-            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
+            preference.getString("db_name", Constants.ID_DB_HD2)!!
         var lang = preference.getString("lang_stratagem", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
 
-        binding.stratagemsListTitle.text = dbName
+        val displayName = when (lang) {
+            "zh-CN" -> preference.getString("db_name_zh", "")!!
+            else -> preference.getString("db_name_en", "")!!
+        }
+        binding.stratagemsListTitle.text = displayName.ifEmpty {
+            dbName
+        }
 
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter

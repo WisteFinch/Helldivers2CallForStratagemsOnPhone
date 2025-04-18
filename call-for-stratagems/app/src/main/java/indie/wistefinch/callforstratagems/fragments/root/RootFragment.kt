@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.SharedViewModel
@@ -78,14 +79,14 @@ class RootFragment : Fragment() {
             dialog.setView(view)
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_db_incomplete)
+            view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.dlg_db_incomplete_title)
             view.findViewById<TextView>(R.id.dialog_info_msg)
-                .setText(R.string.hint_db_incomplete_desc)
+                .setText(R.string.dlg_db_incomplete_desc)
             view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
                 dialog.hide()
             }
             val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.dialog_settings))
+            button2.setTitle(resources.getString(R.string.dlg_comm_settings))
             button2.setOnClickListener {
                 val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
                 findNavController().navigate(R.id.settingsFragment, bundle)
@@ -93,7 +94,7 @@ class RootFragment : Fragment() {
             }
             val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
             button3.visibility = VISIBLE
-            button3.setTitle(resources.getString(R.string.dialog_ignore))
+            button3.setTitle(resources.getString(R.string.dlg_comm_ignore))
             button3.setAlert(true)
             button3.setOnClickListener {
                 preferences.edit().putBoolean("hint_db_incomplete", true).apply()
@@ -117,8 +118,8 @@ class RootFragment : Fragment() {
             dialog.show()
 
             view.findViewById<TextView>(R.id.dialog_info_title).text =
-                String.format(resources.getString(R.string.hint_welcome), ver)
-            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_welcome_desc)
+                String.format(resources.getString(R.string.dlg_welcome_title), ver)
+            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.dlg_welcome_desc)
             view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
                 dialog.hide()
@@ -127,10 +128,10 @@ class RootFragment : Fragment() {
             view.findViewById<AppButton>(R.id.dialog_info_button2).visibility = GONE
             val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
             button3.visibility = VISIBLE
-            button3.setTitle(resources.getString(R.string.hint_welcome_usage))
+            button3.setTitle(resources.getString(R.string.dlg_welcome_usage))
             button3.setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
-                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val uri = Uri.parse(Constants.URL_APP_USAGE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)

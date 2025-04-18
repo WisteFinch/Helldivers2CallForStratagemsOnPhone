@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
@@ -84,7 +85,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
         layout.post {
             val preference = context.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
             val dbName =
-                preference.getString("db_name", context.resources.getString(R.string.db_hd2_name))!!
+                preference.getString("db_name", Constants.ID_DB_HD2)!!
             val maxCount =
                 (holder.itemView.width / (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT) - 50) / 34
             if (dataList.size <= pos) {
@@ -108,7 +109,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                                     Uri.fromFile(
                                         File(
                                             context.filesDir.path +
-                                                    context.resources.getString(R.string.icons_path) +
+                                                    Constants.PATH_DB_ICONS +
                                                     "$dbName/" +
                                                     data.icon + ".svg"
                                         )

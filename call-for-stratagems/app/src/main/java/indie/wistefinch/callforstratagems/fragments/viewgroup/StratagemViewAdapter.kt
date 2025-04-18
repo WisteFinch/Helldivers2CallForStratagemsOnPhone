@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemInfoDialog
@@ -55,9 +56,9 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
             imageView.setImageURI(
                     Uri.fromFile(
                         File(context.filesDir.path +
-                            context.resources.getString(R.string.icons_path) +
-                            "$dbName/" +
-                            dataList[pos].icon + ".svg")))
+                                Constants.PATH_DB_ICONS +
+                                "$dbName/" +
+                                dataList[pos].icon + ".svg")))
         }
         catch (_: Exception) {}
 

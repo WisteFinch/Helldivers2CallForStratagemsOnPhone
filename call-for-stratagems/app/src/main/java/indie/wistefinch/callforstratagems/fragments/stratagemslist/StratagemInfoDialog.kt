@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import java.io.File
@@ -38,7 +39,7 @@ class StratagemInfoDialog(context: Context) : Dialog(context) {
                 .setImageURI(
                     Uri.fromFile(
                         File(context.filesDir.path +
-                                context.resources.getString(R.string.icons_path) +
+                                Constants.PATH_DB_ICONS +
                                 "$dbName/" +
                                 data.icon + ".svg")
                     ))

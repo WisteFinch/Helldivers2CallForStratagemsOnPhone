@@ -31,6 +31,7 @@ import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.utils.Util
 import indie.wistefinch.callforstratagems.data.models.StratagemData
@@ -160,7 +161,7 @@ class SettingsFragment : Fragment() {
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
         sid = preferences.getString("sid", "0")!!
         dbVer = preferences.getString("db_version", "0")!!
-        dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+        dbName = preferences.getString("db_name", Constants.ID_DB_HD2)!!
 
         inputValues = resources.getStringArray(R.array.input_values)
         inputTypeValues = resources.getStringArray(R.array.input_type_values)
@@ -296,11 +297,11 @@ class SettingsFragment : Fragment() {
         // Set database version
         binding.setInfoDb.setHint(
             String.format(
-                resources.getString(R.string.info_db_version_desc),
+                resources.getString(R.string.set_info_db_ver),
                 dbName,
                 when (dbVer) {
-                    "0" -> resources.getString(R.string.info_db_version_empty)
-                    "1" -> resources.getString(R.string.info_db_version_incomplete)
+                    "0" -> resources.getString(R.string.set_info_db_empty)
+                    "1" -> resources.getString(R.string.set_info_db_incomplete)
                     else -> dbVer
                 }
             )
@@ -310,7 +311,7 @@ class SettingsFragment : Fragment() {
         val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
         binding.setInfoApp.setHint(
             String.format(
-                getString(R.string.info_app_version_desc),
+                getString(R.string.set_info_app_ver),
                 pkgInfo.versionName
             )
         )
@@ -522,18 +523,18 @@ class SettingsFragment : Fragment() {
             }
             connDialog.show()
             connView.findViewById<TextView>(R.id.dialog_conn_title).text =
-                resources.getString(R.string.set_conn_test_title)
+                resources.getString(R.string.dlg_conn_test_title)
             val progress = connView.findViewById<LinearLayout>(R.id.dialog_conn_progress)
             val msg = connView.findViewById<TextView>(R.id.dialog_conn_msg)
             progress.visibility = VISIBLE
             msg.visibility = GONE
             val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
-            button.setTitle(resources.getString(R.string.dialog_cancel))
+            button.setTitle(resources.getString(R.string.dlg_comm_cancel))
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
-                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.setTitle(resources.getString(R.string.dlg_comm_confirm))
             }
 
             // Prepare socket and data.
@@ -557,7 +558,7 @@ class SettingsFragment : Fragment() {
                                 0 -> {
                                     withContext(Dispatchers.Main) {
                                         connFinish(
-                                            resources.getText(R.string.tcp_test_success).toString()
+                                            resources.getText(R.string.dlg_conn_test_success).toString()
                                         )
                                     }
                                 }
@@ -591,7 +592,7 @@ class SettingsFragment : Fragment() {
                                     withContext(Dispatchers.Main) {
                                         if (auth.auth) {
                                             connFinish(
-                                                String.format(getString(R.string.tcp_test_success))
+                                                String.format(getString(R.string.dlg_conn_test_success))
                                             )
                                         } else {
                                             connFinish(
@@ -621,7 +622,7 @@ class SettingsFragment : Fragment() {
                         }
                     } else { // Connection failed.
                         withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+                            connFinish(resources.getText(R.string.dlg_conn_test_failed).toString())
                         }
                     }
                     // Disconnect.
@@ -647,13 +648,13 @@ class SettingsFragment : Fragment() {
             progress.visibility = VISIBLE
             msg.visibility = GONE
             val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
-            button.setTitle(resources.getString(R.string.dialog_cancel))
+            button.setTitle(resources.getString(R.string.dlg_comm_cancel))
             button.requestLayout()
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
-                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.setTitle(resources.getString(R.string.dlg_comm_confirm))
                 button.requestLayout()
             }
 
@@ -689,7 +690,7 @@ class SettingsFragment : Fragment() {
                                 0 -> {
                                     withContext(Dispatchers.Main) {
                                         connFinish(
-                                            resources.getText(R.string.tcp_test_success).toString()
+                                            resources.getText(R.string.dlg_conn_test_success).toString()
                                         )
                                     }
                                 }
@@ -727,7 +728,7 @@ class SettingsFragment : Fragment() {
                                         )
                                         withContext(Dispatchers.Main) {
                                             connFinish(
-                                                resources.getText(R.string.sync_config_finished)
+                                                resources.getText(R.string.set_sync_apply_finished)
                                                     .toString()
                                             )
                                         }
@@ -760,7 +761,7 @@ class SettingsFragment : Fragment() {
                         }
                     } else { // Connection failed.
                         withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+                            connFinish(resources.getText(R.string.dlg_conn_test_failed).toString())
                         }
                     }
                     // Disconnect.
@@ -786,35 +787,35 @@ class SettingsFragment : Fragment() {
             val curVer = pkgInfo.versionName
 
             aboutView.findViewById<TextView>(R.id.dialog_info_title).text = String.format(
-                resources.getString(R.string.info_about_title),
+                resources.getString(R.string.dlg_about_title),
                 curVer
             )
             aboutView.findViewById<ImageView>(R.id.dialog_info_icon)
                 .setImageResource(R.drawable.ic_launcher_foreground)
-            aboutView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_about_desc)
+            aboutView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.dlg_about_desc)
             val button1 = aboutView.findViewById<AppButton>(R.id.dialog_info_button1)
-            button1.setTitle(resources.getString(R.string.info_about_usage))
+            button1.setTitle(resources.getString(R.string.dlg_about_usage))
             button1.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val uri = Uri.parse(Constants.URL_APP_USAGE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
                 aboutDialog.hide()
             }
             val button2 = aboutView.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.info_about_license))
+            button2.setTitle(resources.getString(R.string.dlg_about_license))
             button2.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.license_url))
+                val uri = Uri.parse(Constants.URL_APP_LICENSE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
                 aboutDialog.hide()
             }
             val button3 = aboutView.findViewById<AppButton>(R.id.dialog_info_button3)
-            button3.setTitle(resources.getString(R.string.info_about_repo))
+            button3.setTitle(resources.getString(R.string.dlg_about_repo))
             button3.visibility = VISIBLE
             button3.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.repo_url))
+                val uri = Uri.parse(Constants.URL_APP_REPO)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
@@ -831,10 +832,10 @@ class SettingsFragment : Fragment() {
         // Check app update.
         // Launch coroutine
         lifecycleScope.launch {
-            binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_check))
+            binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_chk))
             try {
                 val json =
-                    JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
+                    JSONObject(Util.downloadToStr(Constants.URL_APP_RELEASE_API))
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
@@ -844,28 +845,28 @@ class SettingsFragment : Fragment() {
                     val curVer = pkgInfo.versionName
                     val title: String
                     if (curVer != newVer) {
-                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_updatable))
+                        binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_updatable))
                         binding.setInfoApp.setHint(
                             String.format(
-                                resources.getString(R.string.info_app_version_updatable_desc),
+                                resources.getString(R.string.set_info_app_ver_diff),
                                 pkgInfo.versionName,
                                 newVer
                             )
                         )
                         title = String.format(
-                            resources.getString(R.string.info_app_version_log_updatable),
+                            resources.getString(R.string.dlg_app_ver_log_updatable),
                             newVer
                         )
                     } else {
-                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
+                        binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app))
                         binding.setInfoApp.setHint(
                             String.format(
-                                resources.getString(R.string.info_app_version_latest),
+                                resources.getString(R.string.set_info_app_latest),
                                 pkgInfo.versionName
                             )
                         )
                         title = String.format(
-                            resources.getString(R.string.info_app_version_log_latest),
+                            resources.getString(R.string.dlg_app_ver_log_latest),
                             curVer
                         )
                     }
@@ -882,9 +883,9 @@ class SettingsFragment : Fragment() {
                         appView.findViewById<TextView>(R.id.dialog_info_msg).text =
                             json.getString("body")
                         val button1 = appView.findViewById<AppButton>(R.id.dialog_info_button1)
-                        button1.setTitle(resources.getString(R.string.dialog_download))
+                        button1.setTitle(resources.getString(R.string.dlg_comm_download))
                         button1.setOnClickListener {
-                            val uri = Uri.parse(resources.getString(R.string.release_url))
+                            val uri = Uri.parse(Constants.URL_APP_RELEASE)
                             val internet = Intent(Intent.ACTION_VIEW, uri)
                             internet.addCategory(Intent.CATEGORY_BROWSABLE)
                             startActivity(internet)
@@ -898,7 +899,7 @@ class SettingsFragment : Fragment() {
                 }
             } catch (_: Exception) {
                 withContext(Dispatchers.Main) {
-                    binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
+                    binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app))
                 }
             }
         }
@@ -955,9 +956,9 @@ class SettingsFragment : Fragment() {
                     clearDialog.show()
 
                     val title = clearView.findViewById<TextView>(R.id.dialog_info_title)
-                    title.setText(R.string.info_db_update_clear)
+                    title.setText(R.string.dlg_db_updt_clear)
                     clearView.findViewById<TextView>(R.id.dialog_info_msg)
-                        .setText(R.string.info_db_update_clear_desc)
+                        .setText(R.string.dlg_db_updt_clear_desc)
                     val button1 = clearView.findViewById<AppButton>(R.id.dialog_info_button1)
                     button1.setAlert(true)
                     button1.setOnClickListener {
@@ -999,16 +1000,16 @@ class SettingsFragment : Fragment() {
                 preferences.edit().putInt("db_update_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!
                 dbName =
-                    preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+                    preferences.getString("db_name", Constants.ID_DB_HD2)!!
 
                 preferences.edit()
                     .putString("db_name", resources.getString(R.string.default_string)).apply()
 
                 var url: String = when (preferences.getInt("db_update_channel", 0)) {
-                    0 -> getString(R.string.db_hd2_url)
-                    1 -> getString(R.string.db_hd_url)
+                    0 -> Constants.URL_DB_HD2
+                    1 -> Constants.URL_DB_HD
                     2 -> preferences.getString("db_update_channel_custom", "")!!
-                    else -> getString(R.string.db_hd2_url)
+                    else -> Constants.URL_DB_HD2
                 }
                 if (url.isEmpty()) {
                     url = getString(R.string.default_string)
@@ -1021,8 +1022,8 @@ class SettingsFragment : Fragment() {
                 lifecycleScope.launch {
                     binding.setInfoDb.isEnabled = false
                     withContext(Dispatchers.Main) {
-                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
-                        binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_updating_index_desc))
+                        binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
+                        binding.setInfoDb.setHint(resources.getString(R.string.set_info_db_updt_idx))
                     }
 
                     try {
@@ -1035,20 +1036,24 @@ class SettingsFragment : Fragment() {
                         val iconsUrl = url + indexObj.getString("icons_path")
                         val iconsList: MutableList<String> = emptyList<String>().toMutableList()
                         val name = indexObj.getString("name")
+                        val nameEn = indexObj.getString("nameEn")
+                        val nameZh = indexObj.getString("nameZh")
                         val iconsPath = context?.filesDir?.path + "/icons/$name/"
 
                         // Analyze the index.
                         preferences.edit().putString("db_name", name).apply()
+                        preferences.edit().putString("db_name_en", nameEn).apply()
+                        preferences.edit().putString("db_name_zh", nameZh).apply()
 
                         // Download database.
                         withContext(Dispatchers.Main) {
                             binding.setInfoDb.setHint(
                                 String.format(
-                                    resources.getString(R.string.info_db_version_updating_db_desc),
+                                    resources.getString(R.string.set_info_db_updt_db),
                                     name
                                 )
                             )
-                            binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
+                            binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
                         }
                         val dbObj = JSONObject(Util.downloadToStr(dbUrl))
                         // Regenerate database.
@@ -1091,13 +1096,13 @@ class SettingsFragment : Fragment() {
                             withContext(Dispatchers.Main) {
                                 binding.setInfoDb.setHint(
                                     String.format(
-                                        resources.getString(R.string.info_db_version_updating_icons_desc),
+                                        resources.getString(R.string.set_info_db_updt_icons),
                                         name,
                                         i,
                                         iconsList.size
                                     )
                                 )
-                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
+                                binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
                             }
                             Util.download(
                                 iconsUrl + iconsList[i] + ".svg",
@@ -1110,7 +1115,7 @@ class SettingsFragment : Fragment() {
                         withContext(Dispatchers.Main) {
                             binding.setInfoDb.setHint(
                                 String.format(
-                                    resources.getString(R.string.info_db_version_update_complete_desc),
+                                    resources.getString(R.string.set_info_db_updt_complete),
                                     name
                                 )
                             )
@@ -1118,13 +1123,13 @@ class SettingsFragment : Fragment() {
                     } catch (e: Exception) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                         withContext(Dispatchers.Main) {
-                            binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_update_failed_desc))
+                            binding.setInfoDb.setHint(resources.getString(R.string.set_info_db_updt_failed))
                             binding.setInfoDb.isEnabled = true
                         }
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
                     withContext(Dispatchers.Main) {
-                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                        binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
                     }
                 }
             }
@@ -1135,13 +1140,13 @@ class SettingsFragment : Fragment() {
      * Check if the database is updatable
      */
     private suspend fun checkDBUpdate() {
-        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_check))
+        binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_chk))
         try {
             var url: String = when (preferences.getInt("db_update_channel", 0)) {
-                0 -> getString(R.string.db_hd2_url)
-                1 -> getString(R.string.db_hd_url)
+                0 -> Constants.URL_DB_HD2
+                1 -> Constants.URL_DB_HD
                 2 -> preferences.getString("db_update_channel_custom", "")!!
-                else -> getString(R.string.db_hd2_url)
+                else -> Constants.URL_DB_HD2
             }
             if (url.isEmpty()) {
                 url = getString(R.string.default_string)
@@ -1157,27 +1162,27 @@ class SettingsFragment : Fragment() {
                 if (dbVer != newVer) {
                     binding.setInfoDb.setHint(
                         String.format(
-                            resources.getString(R.string.info_db_version_updatable_desc),
-                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            resources.getString(R.string.set_info_db_ver_diff),
+                            preferences.getString("db_name", Constants.ID_DB_HD2),
                             when (dbVer) {
-                                "0" -> resources.getString(R.string.info_db_version_empty)
-                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                "0" -> resources.getString(R.string.set_info_db_empty)
+                                "1" -> resources.getString(R.string.set_info_db_incomplete)
                                 else -> dbVer
                             },
                             json.getString("name"),
                             newVer
                         )
                     )
-                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updatable))
+                    binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updatable))
                 } else {
-                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                    binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
                     binding.setInfoDb.setHint(
                         String.format(
-                            resources.getString(R.string.info_db_version_latest),
-                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            resources.getString(R.string.set_info_db_latest),
+                            preferences.getString("db_name", Constants.ID_DB_HD2),
                             when (dbVer) {
-                                "0" -> resources.getString(R.string.info_db_version_empty)
-                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                "0" -> resources.getString(R.string.set_info_db_empty)
+                                "1" -> resources.getString(R.string.set_info_db_incomplete)
                                 else -> dbVer
                             }
                         )
@@ -1186,7 +1191,7 @@ class SettingsFragment : Fragment() {
             }
         } catch (_: Exception) {
             withContext(Dispatchers.Main) {
-                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
             }
         }
     }

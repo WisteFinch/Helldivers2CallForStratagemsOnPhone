@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.MainActivity
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
@@ -298,7 +299,6 @@ class PlayFragment : Fragment() {
             binding.playBgCross.visibility = View.GONE
             binding.playBgMask.visibility = View.GONE
             binding.playSimplifiedScrollView.visibility = View.VISIBLE
-            view.setBackgroundColor(resources.getColor(R.color.colorBackground, context?.theme))
         }
 
         // Init runtime.
@@ -365,7 +365,7 @@ class PlayFragment : Fragment() {
                 list.toList(),
                 preference.getString(
                     "db_name",
-                    context?.resources?.getString(R.string.db_hd2_name)
+                    Constants.ID_DB_HD2
                 )!!
             )
             // Setup click listener.
@@ -391,7 +391,7 @@ class PlayFragment : Fragment() {
                 list.toList(),
                 preference.getString(
                     "db_name",
-                    context?.resources?.getString(R.string.db_hd2_name)
+                    Constants.ID_DB_HD2
                 )!!
             )
             // Setup click listener.
@@ -640,7 +640,7 @@ class PlayFragment : Fragment() {
             // Initial connection.
             withContext(Dispatchers.Main) {
                 binding.playConnectTitle.text = String.format(
-                    getString(R.string.network_add_suffix),
+                    getString(R.string.network_addr_suffix),
                     String.format(getString(R.string.network_connecting)),
                     address,
                     port
@@ -657,7 +657,7 @@ class PlayFragment : Fragment() {
             while (!isConnected && tryTimes < 5) {
                 withContext(Dispatchers.Main) {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
+                        getString(R.string.network_addr_suffix),
                         String.format(
                             getString(R.string.network_waiting),
                             tryTimes,
@@ -671,7 +671,7 @@ class PlayFragment : Fragment() {
                 delay(2000)
                 withContext(Dispatchers.Main) {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
+                        getString(R.string.network_addr_suffix),
                         String.format(
                             getString(R.string.network_retry),
                             tryTimes,
@@ -691,7 +691,7 @@ class PlayFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 if (isConnected) {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
+                        getString(R.string.network_addr_suffix),
                         String.format(getString(R.string.network_connected)),
                         address,
                         port
@@ -707,7 +707,7 @@ class PlayFragment : Fragment() {
                     )
                 } else {
                     binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
+                        getString(R.string.network_addr_suffix),
                         String.format(getString(R.string.network_failed)),
                         address,
                         port
@@ -744,7 +744,7 @@ class PlayFragment : Fragment() {
                         // Request authentication.
                         withContext(Dispatchers.Main) {
                             binding.playConnectTitle.text = String.format(
-                                getString(R.string.network_add_suffix),
+                                getString(R.string.network_addr_suffix),
                                 String.format(getString(R.string.network_auth), sid),
                                 address,
                                 port

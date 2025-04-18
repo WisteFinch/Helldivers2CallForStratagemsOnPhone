@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
@@ -89,9 +90,9 @@ class ViewGroupFragment : Fragment() {
             dialog.show()
 
             dialogView.findViewById<ImageView>(R.id.dialog_info_icon).setImageResource(R.drawable.ic_alert)
-            dialogView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_delete)
+            dialogView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.dlg_delete_title)
             dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
-                getString(R.string.hint_delete_desc),
+                getString(R.string.dlg_delete_desc),
                 currentItem.title
             )
             val button1 = dialogView.findViewById<AppButton>(R.id.dialog_info_button1)
@@ -118,7 +119,7 @@ class ViewGroupFragment : Fragment() {
 
         // Check database name.
         preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        val dbName = preferences.getString("db_name", getString(R.string.db_hd2_name))
+        val dbName = preferences.getString("db_name", Constants.ID_DB_HD2)
         if (currentItem.dbName != "0" && currentItem.dbName != dbName) {
             // Setup dialog.
             val dialog = AlertDialog.Builder(requireContext()).create()
@@ -127,9 +128,9 @@ class ViewGroupFragment : Fragment() {
             dialog.show()
 
             dialogView.findViewById<TextView>(R.id.dialog_info_title)
-                .setText(R.string.hint_group_db_not_match)
+                .setText(R.string.dlg_group_db_not_match_title)
             dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
-                getString(R.string.hint_group_db_not_match_desc),
+                getString(R.string.dlg_group_db_not_match_desc),
                 currentItem.dbName,
                 dbName
             )
@@ -137,7 +138,7 @@ class ViewGroupFragment : Fragment() {
                 dialog.hide()
             }
             val button2 = dialogView.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.dialog_settings))
+            button2.setTitle(resources.getString(R.string.dlg_comm_settings))
             button2.setOnClickListener {
                 val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
                 findNavController().navigate(R.id.settingsFragment, bundle)
@@ -193,7 +194,7 @@ class ViewGroupFragment : Fragment() {
         adapter.setData(
             list.toList(), preference.getString(
                 "db_name",
-                context?.resources?.getString(R.string.db_hd2_name)
+                Constants.ID_DB_HD2
             )!!,
             lang
         )

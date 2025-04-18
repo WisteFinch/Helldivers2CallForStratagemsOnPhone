@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_gravity="start"
-            android:text="@string/info_db_update_title"
+            android:text="@string/dlg_db_updt_title"
             style="@style/AppTextTitle"
             android:textSize="20sp"
             android:visibility="visible" />
@@ -68,24 +68,24 @@
                             android:id="@+id/db_update_hd2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/info_db_update_channel_hd2"
-                            android:textColor="@color/textColorPrimary"
+                            android:text="@string/dlg_db_updt_channel_hd2"
+                            android:textColor="@color/textPrimary"
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/db_update_hd"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/info_db_update_channel_hd"
-                            android:textColor="@color/textColorPrimary"
+                            android:text="@string/dlg_db_updt_channel_hd"
+                            android:textColor="@color/textPrimary"
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/db_update_custom"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/info_db_update_channel_custom"
-                            android:textColor="@color/textColorPrimary"
+                            android:text="@string/dlg_db_updt_channel_custom"
+                            android:textColor="@color/textPrimary"
                             tools:ignore="VisualLintButtonSize" />
 
                     </RadioGroup>
@@ -94,10 +94,10 @@
                         android:id="@+id/db_update_custom_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:importantForAutofill="no"
                         android:width="150dp"
-                        android:autofillHints="@string/db_hd2_url"
                         android:background="@color/backgroundSecondary"
-                        android:hint="@string/info_db_update_channel_custom_url"
+                        android:hint="@string/dlg_db_updt_channel_custom_url"
                         android:inputType="text"
                         android:theme="@style/AppEditText"
                         tools:ignore="TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
@@ -119,7 +119,7 @@
                 android:id="@+id/db_update_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                app:text="@string/info_db_update_clear"/>
+                app:text="@string/dlg_db_updt_clear"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,13 +131,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
-                    app:text="@string/dialog_cancel"/>
+                    app:text="@string/dlg_comm_cancel"/>
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/db_update_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    app:text="@string/dialog_confirm"/>
+                    app:text="@string/dlg_comm_confirm"/>
 
             </LinearLayout>
 

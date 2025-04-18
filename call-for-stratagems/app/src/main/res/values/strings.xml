@@ -1,16 +1,7 @@
 <resources>
     <string name="app_name">CallForStratagems</string>
-    <string name="repo_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone</string>
-    <string name="release_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
-    <string name="release_api_url" translatable="false">https://api.github.com/repos/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest</string>
-    <string name="db_hd2_url" translatable="false">https://cfsdb-hd2.wistefinch.site</string>
-    <string name="db_hd_url" translatable="false">https://cfsdb-hd.wistefinch.site</string>
-    <string name="db_hd2_name" translatable="false">hd2_db</string>
-    <string name="license_url" translatable="false">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/LICENSE</string>
-    <string name="usage_url">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/usage.md</string>
-    <string name="icons_path" translatable="false">/icons/</string>
     <string name="default_string" translatable="false">NULL</string>
-    <string name="back">Back</string>
+    <string name="menu_back">Back</string>
 
     <!-- Fragment Title -->
     <string name="fragment_root">CallForStratagems</string>
@@ -21,22 +12,21 @@
     <string name="fragment_play">Play</string>
     <string name="fragment_stratagemsList">Stratagems List</string>
 
-    <!-- Fragment Root -->
-    <string name="root_new_group_FAB">New Stratagems Group</string>
+    <!-- Fragment Navigation Menu -->
+    <string name="menu_save">Save</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+
+    <!-- Root Fragment -->
     <string name="root_no_group">The Galactic War Awaits</string>
-    <string name="root_no_group_img">No stratagems group</string>
     <string name="root_group_overflow" translatable="false">... +%1$s</string>
 
-    <!-- Fragment Edit Group -->
+    <!-- Edit Group Fragment -->
     <string name="editGroup_title">New Stratagems Group</string>
     <string name="editGroup_title_hint">Stratagems Group Name</string>
 
-    <!-- Fragment View Group -->
-    <string name="viewGroup_play_FAB">Play</string>
-
-    <!-- Fragment Play -->
+    <!-- Play Fragment -->
     <string name="play_blank" translatable="false">PERSONAL HELLPAD\nSYSTEM</string>
-    <string name="play_banner_desc">Banner</string>
     <string name="play_exit">Exit</string>
     <string name="play_mode">Input mode</string>
     <string name="play_freeInput">FREE INPUT</string>
@@ -46,146 +36,18 @@
     <string name="play_forward">Forward</string>
     <string name="play_network_status">Connect status</string>
 
-    <!-- Preference Titles -->
-    <string name="connection_header">Connection</string>
-    <string name="sync_header">Sync</string>
-    <string name="control_header">Control</string>
-    <string name="info_header">Info</string>
-
-    <!-- Connection Preferences -->
-    <string name="tcp_add_title">Server Address</string>
-    <string name="tcp_port_title">Server Port</string>
-    <string name="tcp_retry_title">Retry Times</string>
-    <string name="tcp_scan">Scan QR Code</string>
-    <string name="tcp_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
+    <!-- Settings Fragment -->
+    <string name="set_conn_hdr">Connection</string>
+    <string name="set_conn_server">Server</string>
+    <string name="set_conn_addr">Address</string>
+    <string name="set_conn_port">Port</string>
+    <string name="set_conn_retry">Retry Times</string>
+    <string name="set_conn_test">Test Connection</string>
+    <string name="set_conn_scan">Scan QR Code</string>
+    <string name="set_conn_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
     <string name="tcp_scan_success">Scan Successful</string>
     <string name="tcp_scan_failed">Scan Failed</string>
     <string name="tcp_scan_canceled">Scan Canceled</string>
-    <string name="tcp_test_title">Test Connection</string>
-    <string name="tcp_test_default">Test the connection to the PC server</string>
-    <string name="tcp_test_connecting">Connecting…</string>
-    <string name="tcp_test_waiting">Waiting for response…</string>
-    <string name="tcp_test_success">Success</string>
-    <string name="tcp_test_failed">Connect failed, please check the network settings</string>
-
-    <!-- Sync Preferences -->
-    <string name="server_port_title">Port</string>
-    <string name="input_delay_title">Input Interval Time(ms)</string>
-    <string name="input_open_title">Input: Open Stratagems List</string>
-    <string name="input_type_open_title">Type: Open Stratagems List</string>
-    <string name="input_up_title">Input: Up</string>
-    <string name="input_down_title">Input: Down</string>
-    <string name="input_left_title">Input: Left</string>
-    <string name="input_right_title">Input: Right</string>
-    <string name="sync_config_title">Apply Configuration</string>
-    <string name="sync_config_default">Synchronize configuration with the PC server, then you need to restart the server to apply it</string>
-    <string name="sync_config_finished">Please accept the request on the server, then restart the server to apply the configuration</string>
-
-    <!-- Control Preferences -->
-    <string name="enable_simplified_mode_title">Enable Simplified Mode</string>
-    <string name="enable_simplified_mode_desc">Keep only macro functions and remove most decorations</string>
-    <string name="enable_fastboot_mode_title">Enable Fastboot Mode</string>
-    <string name="enable_fastboot_mode_desc">Click the group to start directly, long press the group to view details</string>
-    <string name="swipe_distance_threshold_title">Gesture Swipe Distance Threshold (pixel)</string>
-    <string name="swipe_velocity_threshold_title">Gesture Swipe Velocity Threshold (pixel/s)</string>
-    <string name="lang_stratagem_title">Language: Stratagem Name</string>
-
-    <!-- Info Preferences -->
-    <string name="info_db_version">Database Version</string>
-    <string name="info_db_version_desc">[%1$s] %2$s</string>
-    <string name="info_db_version_latest">[%1$s] %2$s (latest)</string>
-    <string name="info_db_version_empty">Empty</string>
-    <string name="info_db_version_incomplete">Incomplete</string>
-    <string name="info_db_version_check">Database Version (Checking)</string>
-    <string name="info_db_version_updatable">Database Version (Updatable)</string>
-    <string name="info_db_version_updatable_desc">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
-    <string name="info_db_version_updating">Database Version (Updating)</string>
-    <string name="info_db_version_updating_index_desc">Downloading index…</string>
-    <string name="info_db_version_updating_db_desc">[%1$s] Downloading database…</string>
-    <string name="info_db_version_updating_icons_desc">[%1$s] Downloading icons… (%2$d/%3$d)</string>
-    <string name="info_db_version_update_complete_desc">[%1$s] Update complete, please restart the app</string>
-    <string name="info_db_version_update_failed_desc">Update failed, please try again</string>
-    <string name="info_db_version_update_latest">[%1$s] Already the latest version</string>
-    <string name="info_app_version">App Version</string>
-    <string name="info_app_version_check">App Version (Checking)</string>
-    <string name="info_app_version_updatable">App Version (Updatable)</string>
-    <string name="info_app_version_desc">%1$s</string>
-    <string name="info_app_version_latest">%1$s (latest)</string>
-    <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
-    <string name="info_app_version_log_updatable">New Version: v%1$s</string>
-    <string name="info_app_version_log_latest">Current Version: v%1$s</string>
-    <string name="info_about">About</string>
-    <string name="info_about_title">CallForStratagems v%1$s</string>
-    <string name="info_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
-    <string name="info_about_usage">Usage</string>
-    <string name="info_about_license">License</string>
-    <string name="info_about_repo">Project Repo</string>
-
-    <!-- Update Channel Layout -->
-    <string name="info_db_update_title">Select Database Channel</string>
-    <string name="info_db_update_channel_hd2">Helldivers 2</string>
-    <string name="info_db_update_channel_hd">Helldivers</string>
-    <string name="info_db_update_channel_custom">Custom</string>
-    <string name="info_db_update_channel_custom_url">Custom DB Index URL</string>
-    <string name="info_db_update_clear">Clear Cache</string>
-    <string name="info_db_update_clear_desc">Clear cached stratagems database and icon files</string>
-
-    <!-- Edit Group Menu -->
-    <string name="editGroup_menu_save_title">Save</string>
-
-    <!-- View Group Menu -->
-    <string name="viewGroup_menu_edit_title">Edit</string>
-    <string name="viewGroup_menu_delete_title">Delete</string>
-
-    <!-- Network -->
-    <string name="network_add_suffix" translatable="false">%1$s ┃ %2$s:%3$d</string>
-    <string name="network_connecting">Connecting…</string>
-    <string name="network_retry">Connecting… (retry %1$d/%2$d)</string>
-    <string name="network_waiting">Waiting… (retry %1$d/%2$d)</string>
-    <string name="network_connected">Connected</string>
-    <string name="network_failed">Connect failed</string>
-    <string name="network_response_error">Server response error, please check whether the server is running properly</string>
-    <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
-    <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
-    <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
-    <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
-
-    <!-- Root Menu -->
-    <string name="root_menu_preferences_title">Preferences</string>
-    <string name="root_menu_stratagems_title">Stratagems List</string>
-
-    <!-- Dialog -->
-    <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_confirm">Confirm</string>
-    <string name="dialog_download">Download</string>
-    <string name="dialog_ignore">Ignore</string>
-    <string name="dialog_no_ask">Don\'t ask again</string>
-    <string name="dialog_progress">Please Wait Democratically</string>
-    <string name="dialog_settings">Go to Settings</string>
-
-    <!-- Toast -->
-    <string name="toast_complete">Complete</string>
-
-    <!-- Hints -->
-    <string name="hint_db_incomplete">Database Incomplete</string>
-    <string name="hint_db_incomplete_desc">The database is incomplete, please go to \"Settings>Info>Database Version\" to update the database</string>
-    <string name="hint_welcome">Welcome to v%1$s</string>
-    <string name="hint_welcome_usage">Usage</string>
-    <string name="hint_welcome_desc">This update added sound effects and vibration, you can go to \"Settings>Control\" and enable them</string>
-    <string name="hint_group_db_not_match">Database not match</string>
-    <string name="hint_group_db_not_match_desc">This group was created under database [%1$s], but it is currently in database [%2$s]. Continuing to use it may result in errors. Please go to \"Settings>Info>Database Version\" to switch the database</string>
-    <string name="hint_delete">Delete</string>
-    <string name="hint_delete_desc">Confirm to delete \"%1$s\"?</string>
-
-    <!-- Fragment Settings -->
-    <string name="set_conn_server">Server</string>
-    <string name="set_conn_retry">Retry Times</string>
-    <string name="set_conn_test">Test Connection</string>
-    <string name="set_conn_test_title">Test Connection to Server</string>
-    <string name="set_conn_addr">Address</string>
-    <string name="set_conn_port">Port</string>
-    <string name="set_conn_scan">Scan QR Code</string>
-    <string name="set_conn_hdr">Connection</string>
     <string name="set_sync_hdr">Sync</string>
     <string name="set_sync_port">Port</string>
     <string name="set_sync_delay">Input Interval Time</string>
@@ -193,6 +55,7 @@
     <string name="set_sync_advance">Advanced Options</string>
     <string name="set_sync_advance_alert">Modifying the following settings may reduce server stability</string>
     <string name="set_sync_apply">Apply Configuration to Server</string>
+    <string name="set_sync_apply_finished">Please accept the request on the server, then restart the server to apply the configuration</string>
     <string name="set_unit_ms">ms</string>
     <string name="set_unit_day">days</string>
     <string name="set_sync_type_open">Type: Open Stratagems List</string>
@@ -225,10 +88,94 @@
     <string name="set_ctrl_vibrator_desc">Enable vibrator for step input and stratagem activation</string>
     <string name="set_info_hdr">Info</string>
     <string name="set_info_db">Database Version</string>
-    <string name="set_info_chk_updt">Check Update</string>
-    <string name="set_info_latest">Latest</string>
-    <string name="set_info_updatable">Updatable</string>
+    <string name="set_info_db_ver">[%1$s] %2$s</string>
+    <string name="set_info_db_latest">[%1$s] %2$s (latest)</string>
+    <string name="set_info_db_empty">Empty</string>
+    <string name="set_info_db_incomplete">Incomplete</string>
+    <string name="set_info_db_chk">Database Version (Checking)</string>
+    <string name="set_info_db_updatable">Database Version (Updatable)</string>
+    <string name="set_info_db_ver_diff">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
+    <string name="set_info_db_updt_title">Database Version (Updating)</string>
+    <string name="set_info_db_updt_idx">Downloading index…</string>
+    <string name="set_info_db_updt_db">[%1$s] Downloading database…</string>
+    <string name="set_info_db_updt_icons">[%1$s] Downloading icons… (%2$d/%3$d)</string>
+    <string name="set_info_db_updt_complete">[%1$s] Update complete, please restart the app</string>
+    <string name="set_info_db_updt_failed">Update failed, please try again</string>
     <string name="set_info_app">App Version</string>
+    <string name="set_info_app_chk">App Version (Checking)</string>
+    <string name="set_info_app_updatable">App Version (Updatable)</string>
+    <string name="set_info_app_ver">%1$s</string>
+    <string name="set_info_app_latest">%1$s (latest)</string>
+    <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
     <string name="set_info_about">About</string>
+
+    <!-- Network -->
+    <string name="network_addr_suffix" translatable="false">%1$s ┃ %2$s:%3$d</string>
+    <string name="network_connecting">Connecting…</string>
+    <string name="network_retry">Connecting… (retry %1$d/%2$d)</string>
+    <string name="network_waiting">Waiting… (retry %1$d/%2$d)</string>
+    <string name="network_connected">Connected</string>
+    <string name="network_failed">Connect failed</string>
+    <string name="network_response_error">Server response error, please check whether the server is running properly</string>
+    <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
+    <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
+    <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
+    <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
+
+    <!-- Common Dialog -->
+    <string name="dlg_comm_cancel">Cancel</string>
+    <string name="dlg_comm_confirm">Confirm</string>
+    <string name="dlg_comm_download">Download</string>
+    <string name="dlg_comm_ignore">Ignore</string>
+    <string name="dlg_comm_no_ask">Don\'t ask again</string>
+    <string name="dlg_comm_progressing">Please Wait Democratically</string>
+    <string name="dlg_comm_settings">Go to Settings</string>
+
+    <!-- Connection Test Dialog -->
+    <string name="dlg_conn_test_title">Test Connection to Server</string>
+    <string name="dlg_conn_test_connecting">Connecting…</string>
+    <string name="dlg_conn_test_waiting">Waiting for response…</string>
+    <string name="dlg_conn_test_success">Success</string>
+    <string name="dlg_conn_test_failed">Connect failed, please check the network settings</string>
+
+    <!-- DB Update Dialog -->
+    <string name="dlg_db_updt_title">Select Database Channel</string>
+    <string name="dlg_db_updt_channel_hd2">Helldivers 2</string>
+    <string name="dlg_db_updt_channel_hd">Helldivers</string>
+    <string name="dlg_db_updt_channel_custom">Custom</string>
+    <string name="dlg_db_updt_channel_custom_url">Custom DB Index URL</string>
+    <string name="dlg_db_updt_clear">Clear Cache</string>
+    <string name="dlg_db_updt_clear_desc">Clear cached stratagems database and icon files</string>
+
+    <!-- App Version Log Dialog -->
+    <string name="dlg_app_ver_log_updatable">New Version: v%1$s</string>
+    <string name="dlg_app_ver_log_latest">Current Version: v%1$s</string>
+
+    <!-- Welcome Dialog -->
+    <string name="dlg_welcome_title">Welcome to v%1$s</string>
+    <string name="dlg_welcome_usage">Usage</string>
+    <string name="dlg_welcome_desc">This update added sound effects and vibration, you can go to \"Settings>Control\" and enable them</string>
+
+    <!-- DB Incomplete Dialog -->
+    <string name="dlg_db_incomplete_title">Database Incomplete</string>
+    <string name="dlg_db_incomplete_desc">The database is incomplete, please go to \"Settings>Info>Database Version\" to update the database</string>
+
+    <!-- Group DB Not Match Dialog -->
+    <string name="dlg_group_db_not_match_title">Database not match</string>
+    <string name="dlg_group_db_not_match_desc">This group was created under database [%1$s], but it is currently in database [%2$s]. Continuing to use it may result in errors. Please go to \"Settings>Info>Database Version\" to switch the database</string>
+
+    <!-- Delete Dialog -->
+    <string name="dlg_delete_title">Delete</string>
+    <string name="dlg_delete_desc">Confirm to delete \"%1$s\"?</string>
+
+    <!-- About Dialog -->
+    <string name="dlg_about_title">CallForStratagems v%1$s</string>
+    <string name="dlg_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
+    <string name="dlg_about_usage">Usage</string>
+    <string name="dlg_about_license">License</string>
+    <string name="dlg_about_repo">Project Repo</string>
+
+    <!-- Toast -->
+    <string name="toast_complete">Complete</string>
 
 </resources>

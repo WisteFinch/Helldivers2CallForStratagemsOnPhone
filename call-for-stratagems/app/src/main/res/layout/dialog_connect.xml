@@ -77,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:text="@string/dialog_progress"/>
+                    android:text="@string/dlg_comm_progressing"/>
 
             </LinearLayout>
 
@@ -102,7 +102,7 @@
                 android:id="@+id/dialog_conn_button"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                app:text="@string/dialog_confirm" />
+                app:text="@string/dlg_comm_confirm" />
 
         </LinearLayout>
 

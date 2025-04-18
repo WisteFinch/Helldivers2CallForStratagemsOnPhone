@@ -33,7 +33,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="10dp"
             android:background="@drawable/round_button"
-            android:contentDescription="@string/back"
+            android:contentDescription="@string/menu_back"
             android:src="@drawable/ic_back"
             tools:ignore="TouchTargetSizeCheck" />
 

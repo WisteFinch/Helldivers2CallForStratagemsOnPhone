@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
@@ -102,7 +103,7 @@ class EditGroupFragment : Fragment() {
                 0,
                 "",
                 listOf(1, 2, 3), // The default stratagems: Reinforce, SOS and Resupply.,
-                preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+                preferences.getString("db_name", Constants.ID_DB_HD2)!!
             )
         }
 
@@ -122,7 +123,7 @@ class EditGroupFragment : Fragment() {
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
-            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+            preferences.getString("db_name", Constants.ID_DB_HD2)!!
         )
     }
 
@@ -139,7 +140,7 @@ class EditGroupFragment : Fragment() {
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
-            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+            preferences.getString("db_name", Constants.ID_DB_HD2)!!
         )
     }
 
@@ -189,7 +190,7 @@ class EditGroupFragment : Fragment() {
         adapter.setData(
             orderedList,
             currentItem.list.toMutableSet(),
-            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!,
+            preference.getString("db_name", Constants.ID_DB_HD2)!!,
             lang
         )
         val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
