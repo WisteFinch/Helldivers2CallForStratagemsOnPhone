@@ -1039,20 +1039,6 @@ class SettingsFragment : Fragment() {
 
                         // Analyze the index.
                         preferences.edit().putString("db_name", name).apply()
-                        if (date == dbVer && name == dbName) {
-                            // Database is latest, no need to update.
-                            withContext(Dispatchers.Main) {
-                                binding.setInfoDb.setHint(
-                                    String.format(
-                                        resources.getString(R.string.info_db_version_update_latest),
-                                        name
-                                    )
-                                )
-                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
-                            }
-                            preferences.edit().putString("db_version", date).apply()
-                            return@launch
-                        }
 
                         // Download database.
                         withContext(Dispatchers.Main) {
@@ -1077,13 +1063,25 @@ class SettingsFragment : Fragment() {
                             for (j in 0 until stepsArray.length()) {
                                 steps.add(stepsArray.getInt(j))
                             }
-                            val item = StratagemData(
-                                row.getInt(0),
-                                row.getString(1),
-                                row.getString(2),
-                                row.getString(3),
-                                steps
-                            )
+                            var item: StratagemData
+                            if (row.length() == 6) {
+                                item = StratagemData(
+                                    row.getInt(0),
+                                    row.getString(1),
+                                    row.getString(2),
+                                    row.getString(3),
+                                    steps,
+                                    row.getInt(5)
+                                )
+                            } else {
+                                item = StratagemData(
+                                    row.getInt(0),
+                                    row.getString(1),
+                                    row.getString(2),
+                                    row.getString(3),
+                                    steps
+                                )
+                            }
                             iconsList.add(row.getString(3))
                             stratagemViewModel.insertItem(item)
                         }
@@ -1147,7 +1145,7 @@ class SettingsFragment : Fragment() {
             }
             if (url.isEmpty()) {
                 url = getString(R.string.default_string)
-            } 
+            }
             if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
                 url = "$url/"
             }

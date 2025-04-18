@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.data.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,8 +12,13 @@ import androidx.room.PrimaryKey
 data class StratagemData(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    var name: String,
-    var nameZh: String,
-    var icon: String,
-    var steps: List<Int>
+    @ColumnInfo(name = "name", defaultValue = "")
+    var name: String = "",
+    @ColumnInfo(name = "nameZh", defaultValue = "")
+    var nameZh: String = "",
+    @ColumnInfo(name = "icon", defaultValue = "")
+    var icon: String = "",
+    var steps: List<Int> = listOf(),
+    @ColumnInfo(name = "idx", defaultValue = "0")
+    var idx: Int = 0
 )

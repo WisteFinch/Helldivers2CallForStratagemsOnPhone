@@ -52,7 +52,8 @@ class StratagemsListFragment : Fragment() {
 
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val dbName = preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
+        val dbName =
+            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
         var lang = preference.getString("lang_stratagem", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
@@ -63,7 +64,17 @@ class StratagemsListFragment : Fragment() {
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(90)
-        adapter.setData(stratagemViewModel.getAllItems(), dbName, lang)
+        adapter.setData(
+            stratagemViewModel.getAllItems().sortedWith { o1, o2 ->
+                if (o1.idx == o2.idx) {
+                    o1.id.compareTo(o2.id)
+                } else {
+                    o1.idx.compareTo(o2.idx)
+                }
+            },
+            dbName,
+            lang
+        )
 
         return view
     }
@@ -74,7 +85,8 @@ class StratagemsListFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }

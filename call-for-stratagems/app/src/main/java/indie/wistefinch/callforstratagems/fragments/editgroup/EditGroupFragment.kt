@@ -78,8 +78,7 @@ class EditGroupFragment : Fragment() {
             // Save data to database
             if (isEdit) {
                 updateDataToDb()
-            }
-            else {
+            } else {
                 insertDataToDb()
             }
             findNavController().popBackStack(R.id.rootFragment, false)
@@ -136,6 +135,7 @@ class EditGroupFragment : Fragment() {
                 "" -> { // User did not name the item, use the default name.
                     binding.editGroupTitle.autofillHints!![0]
                 }
+
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
@@ -153,7 +153,13 @@ class EditGroupFragment : Fragment() {
         recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.autoFitColumns(90)
         // Init data.
-        val list = stratagemViewModel.getAllItems()
+        val list = stratagemViewModel.getAllItems().sortedWith { o1, o2 ->
+            if (o1.idx == o2.idx) {
+                o1.id.compareTo(o2.id)
+            } else {
+                o1.idx.compareTo(o2.idx)
+            }
+        }
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         var lang: String = preference.getString("lang_stratagem", "auto")!!
         if (lang == "auto") {
@@ -163,14 +169,16 @@ class EditGroupFragment : Fragment() {
         for (i in currentItem.list) {
             if (stratagemViewModel.isIdValid(i)) {
                 orderedList.add(stratagemViewModel.retrieveItem(i))
-            }
-            else {
-                orderedList.add(StratagemData(i,
-                    "Unknown [$i]",
-                    "未知 [$i]",
-                    String(),
-                    emptyList()
-                ))
+            } else {
+                orderedList.add(
+                    StratagemData(
+                        i,
+                        "Unknown [$i]",
+                        "未知 [$i]",
+                        String(),
+                        emptyList()
+                    )
+                )
             }
         }
         for (i in list) {
@@ -178,10 +186,12 @@ class EditGroupFragment : Fragment() {
                 orderedList.add(i)
             }
         }
-        adapter.setData(orderedList,
+        adapter.setData(
+            orderedList,
             currentItem.list.toMutableSet(),
             preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!,
-            lang)
+            lang
+        )
         val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
         val helper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(recyclerView)
@@ -193,7 +203,8 @@ class EditGroupFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }

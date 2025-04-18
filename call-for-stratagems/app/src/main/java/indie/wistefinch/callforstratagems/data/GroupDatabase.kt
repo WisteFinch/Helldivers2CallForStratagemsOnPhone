@@ -36,7 +36,6 @@ abstract class GroupDatabase: RoomDatabase() {
                     GroupDatabase::class.java,
                     "group_database"
                 )
-                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
