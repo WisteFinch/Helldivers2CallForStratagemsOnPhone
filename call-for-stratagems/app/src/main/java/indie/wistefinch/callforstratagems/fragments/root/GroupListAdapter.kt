@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.root
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.net.Uri
 import android.util.DisplayMetrics
@@ -172,17 +173,28 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
             dataList.add(toPos, ori)
             notifyItemMoved(fromPos, toPos)
         }
-        onItemClear(source)
     }
 
     override fun onItemSelect(source: RecyclerView.ViewHolder) {
-        source.itemView.scaleX = 1.2f
-        source.itemView.scaleY = 1.2f
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1f, 1.1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1f, 1.1f)
+            .setDuration(200)
+            .start()
     }
 
     override fun onItemClear(source: RecyclerView.ViewHolder) {
-        source.itemView.scaleX = 1.0f
-        source.itemView.scaleY = 1.0f
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1.1f, 1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1.1f, 1f)
+            .setDuration(200)
+            .start()
     }
 
     fun getData(): List<GroupData> {
