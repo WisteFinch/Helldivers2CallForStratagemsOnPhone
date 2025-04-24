@@ -22,6 +22,7 @@ import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentEditGroupBinding
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperCallback
 
 class EditGroupFragment : Fragment() {
 
@@ -67,7 +68,8 @@ class EditGroupFragment : Fragment() {
     private lateinit var preferences: SharedPreferences
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment.
@@ -123,7 +125,8 @@ class EditGroupFragment : Fragment() {
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
-            preferences.getString("db_name", Constants.ID_DB_HD2)!!
+            preferences.getString("db_name", Constants.ID_DB_HD2)!!,
+            currentItem.idx
         )
     }
 
@@ -154,13 +157,7 @@ class EditGroupFragment : Fragment() {
         recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.autoFitColumns(90)
         // Init data.
-        val list = stratagemViewModel.getAllItems().sortedWith { o1, o2 ->
-            if (o1.idx == o2.idx) {
-                o1.id.compareTo(o2.id)
-            } else {
-                o1.idx.compareTo(o2.idx)
-            }
-        }
+        val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         var lang: String = preference.getString("lang_stratagem", "auto")!!
         if (lang == "auto") {

@@ -1,4 +1,4 @@
-package indie.wistefinch.callforstratagems.fragments.editgroup
+package indie.wistefinch.callforstratagems.utils
 
 import androidx.recyclerview.widget.RecyclerView
 

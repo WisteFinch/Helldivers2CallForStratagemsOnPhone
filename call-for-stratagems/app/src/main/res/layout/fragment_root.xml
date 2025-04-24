@@ -59,7 +59,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="85dp"
         android:paddingTop="5dp"
-        android:paddingBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:fadeScrollbars="false"
         android:gravity="center"
         android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"

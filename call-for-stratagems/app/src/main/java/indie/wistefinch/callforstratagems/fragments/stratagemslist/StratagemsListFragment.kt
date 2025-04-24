@@ -72,13 +72,7 @@ class StratagemsListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(90)
         adapter.setData(
-            stratagemViewModel.getAllItems().sortedWith { o1, o2 ->
-                if (o1.idx == o2.idx) {
-                    o1.id.compareTo(o2.id)
-                } else {
-                    o1.idx.compareTo(o2.idx)
-                }
-            },
+            stratagemViewModel.getAllItems(),
             dbName,
             lang
         )

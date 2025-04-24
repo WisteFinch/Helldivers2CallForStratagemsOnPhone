@@ -14,10 +14,11 @@ import indie.wistefinch.callforstratagems.data.dao.GroupDao
  */
 @Database(
     entities = [GroupData::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration (from = 1, to = 2)
+        AutoMigration (from = 1, to = 2),
+        AutoMigration (from = 2, to = 3)
     ]
 )
 @TypeConverters(Converters::class)

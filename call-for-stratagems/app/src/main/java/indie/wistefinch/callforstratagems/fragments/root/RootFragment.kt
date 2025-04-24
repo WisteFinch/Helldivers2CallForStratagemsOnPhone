@@ -16,8 +16,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.R
@@ -29,6 +31,10 @@ import indie.wistefinch.callforstratagems.data.viewmodel.SharedViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentRootBinding
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RootFragment : Fragment() {
 
@@ -79,7 +85,8 @@ class RootFragment : Fragment() {
             dialog.setView(view)
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.dlg_db_incomplete_title)
+            view.findViewById<TextView>(R.id.dialog_info_title)
+                .setText(R.string.dlg_db_incomplete_title)
             view.findViewById<TextView>(R.id.dialog_info_msg)
                 .setText(R.string.dlg_db_incomplete_desc)
             view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
@@ -191,15 +198,41 @@ class RootFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-
         val recyclerView = binding.rootRecyclerView
         recyclerView.adapter = adapter
         recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         adapter.setStratagemViewModel(stratagemViewModel)
+        // Init data
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                groupViewModel.initIdx()
+            }
+        }
         groupViewModel.allItems.observe(viewLifecycleOwner) { data ->
             sharedViewModel.checkIfDbIsEmpty(data)
-            adapter.setData(data, preferences.getBoolean("enable_fastboot_mode", false))
+            adapter.setData(
+                data,
+                preferences.getBoolean("enable_fastboot_mode", false)
+            )
         }
+        if (!preferences.getBoolean("enable_fastboot_mode", false)) {
+            val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
+            val helper = ItemTouchHelper(callback)
+            helper.attachToRecyclerView(recyclerView)
+        }
+    }
+
+    override fun onPause() {
+        if (adapter.isGroupMoved()) {
+            val list = adapter.getData()
+            for (i in list.indices) {
+                if (i != list[i].idx) {
+                    list[i].idx = i
+                    groupViewModel.updateIdx(list[i])
+                }
+            }
+        }
+        super.onPause()
     }
 }

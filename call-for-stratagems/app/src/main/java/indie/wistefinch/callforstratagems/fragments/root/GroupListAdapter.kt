@@ -19,18 +19,19 @@ import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperAdapter
 import java.io.File
 import kotlin.math.min
 
 /**
  * Adapter for the group recycler view in [RootFragment]
  */
-class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() {
-
+class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>(),
+    ItemTouchHelperAdapter {
     /**
      * All data in the adapter.
      */
-    private var dataList = emptyList<GroupData>()
+    private var dataList = emptyList<GroupData>().toMutableList()
 
     /**
      * The stratagem view model,.
@@ -46,6 +47,8 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
      * Enable fastboot mode.
      */
     private var fastboot = false
+
+    private var groupMoved = false
 
 
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -73,7 +76,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                     true
                 }
         } else {
-            holder.itemView.findViewById<ConstraintLayout>(R.id.group_cardView).setOnClickListener {
+            holder.itemView.setOnClickListener {
                 holder.itemView.findNavController()
                     .navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
             }
@@ -150,11 +153,43 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
      * Set the adapter data.
      */
     fun setData(list: List<GroupData>, fastboot: Boolean) {
+        this.groupMoved = false
         this.fastboot = fastboot
         // Check difference.
         val groupListDiffUtil = GroupListDiffUtil(dataList, list)
         val groupListDiffResult = DiffUtil.calculateDiff(groupListDiffUtil)
-        this.dataList = list
+        this.dataList = list.toMutableList()
         groupListDiffResult.dispatchUpdatesTo(this)
+    }
+
+    override fun onItemMove(source: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) {
+        this.groupMoved = true
+        val fromPos = source.adapterPosition
+        val toPos = target.adapterPosition
+        if (fromPos < dataList.size && toPos < dataList.size) {
+            val ori = dataList[fromPos]
+            dataList.removeAt(fromPos)
+            dataList.add(toPos, ori)
+            notifyItemMoved(fromPos, toPos)
+        }
+        onItemClear(source)
+    }
+
+    override fun onItemSelect(source: RecyclerView.ViewHolder) {
+        source.itemView.scaleX = 1.2f
+        source.itemView.scaleY = 1.2f
+    }
+
+    override fun onItemClear(source: RecyclerView.ViewHolder) {
+        source.itemView.scaleX = 1.0f
+        source.itemView.scaleY = 1.0f
+    }
+
+    fun getData(): List<GroupData> {
+        return dataList.toList()
+    }
+
+    fun isGroupMoved(): Boolean {
+        return groupMoved
     }
 }

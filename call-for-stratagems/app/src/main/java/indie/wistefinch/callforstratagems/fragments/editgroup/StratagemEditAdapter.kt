@@ -11,6 +11,7 @@ import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperAdapter
 import java.io.File
 
 /**

@@ -24,7 +24,5 @@ class GroupListDiffUtil(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return newList[newItemPosition].id == oldList[oldItemPosition].id
-                && newList[newItemPosition].title == oldList[oldItemPosition].title
-                && newList[newItemPosition].list == oldList[oldItemPosition].list
     }
 }

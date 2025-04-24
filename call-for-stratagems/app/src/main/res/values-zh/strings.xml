@@ -79,7 +79,7 @@
     <string name="set_unit_pixel">像素</string>
     <string name="set_unit_pixel_s">像素/秒</string>
     <string name="set_ctrl_fastboot_mode">启用快速启动</string>
-    <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
+    <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览（该模式下将禁止调整组合顺序）</string>
     <string name="set_ctrl_sfx">启用音效</string>
     <string name="set_ctrl_sfx_desc">启用按键输入和战备激活的音效</string>
     <string name="set_ctrl_vibrator">启用震动</string>

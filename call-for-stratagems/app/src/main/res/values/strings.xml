@@ -81,7 +81,7 @@
     <string name="set_unit_pixel">pixel</string>
     <string name="set_unit_pixel_s">pixel/s</string>
     <string name="set_ctrl_fastboot_mode">Enable Fastboot Mode</string>
-    <string name="set_ctrl_fastboot_mode_desc">Click the group to start directly, long press the group to view details</string>
+    <string name="set_ctrl_fastboot_mode_desc">Click the group to start directly, long press the group to view details (this will disable you to adjust the group order)</string>
     <string name="set_ctrl_sfx">Enable Sound Effects</string>
     <string name="set_ctrl_sfx_desc">Enable sound effects for step input and stratagem activation</string>
     <string name="set_ctrl_vibrator">Enable Vibrator</string>
