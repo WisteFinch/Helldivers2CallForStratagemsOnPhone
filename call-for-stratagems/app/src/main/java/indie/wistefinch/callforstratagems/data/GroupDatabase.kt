@@ -37,6 +37,7 @@ abstract class GroupDatabase: RoomDatabase() {
                     GroupDatabase::class.java,
                     "group_database"
                 )
+                    .allowMainThreadQueries()
                     .build()
                 INSTANCE = instance
                 instance

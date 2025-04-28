@@ -19,6 +19,8 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
      */
     val allItems: LiveData<List<GroupData>> = groupDao.getItems().asLiveData()
 
+    val allItemsSync: List<GroupData> = groupDao.getItemsSync()
+
     fun updateItem(
         id: Int,
         title: String,
@@ -58,7 +60,7 @@ class GroupViewModel(private val groupDao: GroupDao) : ViewModel() {
     }
 
     fun initIdx() {
-        val list = groupDao.getSyncItems()
+        val list = groupDao.getItemsSync()
         for (i in list.indices) {
             if (i != list[i].idx) {
                 list[i].idx = i

@@ -25,7 +25,7 @@ interface GroupDao {
      * Get all the entries in the database.
      */
     @Query("SELECT * FROM group_table ORDER BY idx ASC, id ASC")
-    fun getSyncItems(): List<GroupData>
+    fun getItemsSync(): List<GroupData>
 
     /**
      * Get the specified entry from the database by id.

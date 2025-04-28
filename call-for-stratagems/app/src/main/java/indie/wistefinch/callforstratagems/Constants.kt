@@ -14,4 +14,5 @@ object Constants {
     const val ID_DB_HD2: String = "hd2_db"
     const val ID_DB_HD: String = "hd_db"
 
+    const val BACKUP_FILE_NAME: String = "cfs_backup"
 }

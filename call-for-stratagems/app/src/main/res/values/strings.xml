@@ -47,7 +47,7 @@
     <string name="set_conn_scan_desc">Scan the QR code from the server to obtain the connection configuration</string>
     <string name="tcp_scan_success">Scan Successful</string>
     <string name="tcp_scan_failed">Scan Failed</string>
-    <string name="tcp_scan_canceled">Scan Canceled</string>
+    <string name="tcp_scan_cancel">Scan Canceled</string>
     <string name="set_sync_hdr">Sync</string>
     <string name="set_sync_port">Port</string>
     <string name="set_sync_delay">Input Interval Time</string>
@@ -107,6 +107,11 @@
     <string name="set_info_app_ver">%1$s</string>
     <string name="set_info_app_latest">%1$s (latest)</string>
     <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
+    <string name="set_info_export">Backup Settings &amp; Groups</string>
+    <string name="set_info_export_success">Export Successful</string>
+    <string name="set_info_export_failed">Export Failed: %1$s</string>
+    <string name="set_info_export_cancel">Export Canceled</string>
+    <string name="set_info_import">Restore Settings &amp; Groups</string>
     <string name="set_info_about">About</string>
 
     <!-- Network -->

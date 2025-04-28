@@ -29,12 +29,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
-import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
-import indie.wistefinch.callforstratagems.utils.Util
+import indie.wistefinch.callforstratagems.data.AppSettingsConnData
+import indie.wistefinch.callforstratagems.data.AppSettingsCtrlData
+import indie.wistefinch.callforstratagems.data.AppSettingsDBData
+import indie.wistefinch.callforstratagems.data.AppSettingsData
+import indie.wistefinch.callforstratagems.data.BackupFileData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
@@ -47,12 +52,16 @@ import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
 import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
 import indie.wistefinch.callforstratagems.socket.ServerConfigData
 import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
+import indie.wistefinch.callforstratagems.utils.AppButton
+import indie.wistefinch.callforstratagems.utils.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.OutputStream
+
 
 class SettingsFragment : Fragment() {
     // View binding.
@@ -116,7 +125,7 @@ class SettingsFragment : Fragment() {
                 RESULT_CANCELED -> {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.tcp_scan_canceled),
+                        getString(R.string.tcp_scan_cancel),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -125,6 +134,95 @@ class SettingsFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.tcp_scan_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+    /**
+     * Export activity launcher
+     */
+    private val requestExportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val uri = result.data?.data!!
+                    val sync = ServerConfigData(
+                        port = preferences.getString("server_port", "23333")!!.toInt(),
+                        delay = preferences.getString("input_delay", "25")!!.toInt(),
+                        open = preferences.getString("input_open", "ctrl_left")!!,
+                        openType = preferences.getString("input_type_open", "hold")!!,
+                        up = preferences.getString("input_up", "w")!!,
+                        down = preferences.getString("input_down", "s")!!,
+                        left = preferences.getString("input_left", "a")!!,
+                        right = preferences.getString("input_right", "d")!!,
+                        ip = "",
+                    )
+                    val conn = AppSettingsConnData(
+                        preferences.getString("tcp_add", "127.0.0.1")!!,
+                        preferences.getString("tcp_port", "23333")!!.toInt(),
+                        preferences.getString("tcp_retry", "5")!!.toInt()
+                    )
+                    val ctrl = AppSettingsCtrlData(
+                        preferences.getBoolean("enable_simplified_mode", false),
+                        preferences.getBoolean("enable_fastboot_mode", false),
+                        preferences.getBoolean("enable_sfx", false),
+                        preferences.getBoolean("enable_vibrator", false),
+                        preferences.getString(
+                            "swipe_distance_threshold",
+                            "100"
+                        )!!.toFloat(),
+                        preferences.getString(
+                            "swipe_velocity_threshold",
+                            "50"
+                        )!!.toFloat(),
+                        preferences.getString(
+                            "lang_stratagem",
+                            "auto"
+                        )!!
+                    )
+                    val db = AppSettingsDBData(
+                        preferences.getInt("db_update_channel", 0),
+                        preferences.getString("db_update_channel_custom", "")!!
+                    )
+                    val settings = AppSettingsData(conn, ctrl, db)
+                    try {
+                        val json = Gson().toJson(BackupFileData(
+                            Constants.API_VERSION,
+                            sync,
+                            settings,
+                            groupViewModel.allItemsSync
+                        ))
+                        val cr = context?.contentResolver!!
+                        val os: OutputStream = cr.openOutputStream(uri)!!
+                        os.write(json.toByteArray())
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.set_info_export_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            requireContext(),
+                            String.format(getString(R.string.set_info_export_failed), e.toString()),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.set_info_export_cancel),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        String.format(getString(R.string.set_info_export_failed), "NULL"),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -142,6 +240,15 @@ class SettingsFragment : Fragment() {
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
             (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * Group view model
+     */
+    private val groupViewModel: GroupViewModel by activityViewModels {
+        GroupViewModelFactory(
+            (activity?.application as CFSApplication).groupDb.groupDao()
         )
     }
 
@@ -1133,6 +1240,16 @@ class SettingsFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        binding.setInfoExport.setOnClickListener {
+            val fileName = "${Constants.BACKUP_FILE_NAME}.json"
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, fileName)
+            }
+            requestExportLauncher.launch(intent)
         }
     }
 

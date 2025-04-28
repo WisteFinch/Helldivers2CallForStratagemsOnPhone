@@ -45,7 +45,7 @@
     <string name="set_conn_scan_desc">扫描服务器的二维码，快速获取连接配置</string>
     <string name="tcp_scan_success">扫描成功</string>
     <string name="tcp_scan_failed">扫描失败</string>
-    <string name="tcp_scan_canceled">扫码取消</string>
+    <string name="tcp_scan_cancel">扫码取消</string>
     <string name="set_sync_hdr">同步</string>
     <string name="set_sync_port">端口</string>
     <string name="set_sync_delay">输入延迟</string>
@@ -105,6 +105,11 @@
     <string name="set_info_app_ver">%1$s</string>
     <string name="set_info_app_latest">%1$s (最新)</string>
     <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
+    <string name="set_info_export">备份设置和组合</string>
+    <string name="set_info_export_success">导出成功</string>
+    <string name="set_info_export_failed">导出失败：%1$s</string>
+    <string name="set_info_export_cancel">导出取消</string>
+    <string name="set_info_import">还原设置和组合</string>
     <string name="set_info_about">关于</string>
 
     <!-- Network -->
