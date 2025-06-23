@@ -3,12 +3,12 @@ package indie.wistefinch.callforstratagems.data
 import androidx.annotation.Keep
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.data.models.GroupData
-import indie.wistefinch.callforstratagems.socket.ServerConfigData
+import indie.wistefinch.callforstratagems.network.SyncConfigData
 
 @Keep
 data class BackupFileData(
     var ver: Int = Constants.API_VERSION,
-    var sync: ServerConfigData,
+    var sync: SyncConfigData,
     var settings: AppSettingsData,
     var groups: List<GroupData>
 )

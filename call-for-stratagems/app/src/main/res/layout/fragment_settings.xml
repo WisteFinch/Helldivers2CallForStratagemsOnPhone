@@ -999,14 +999,14 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
                     <indie.wistefinch.callforstratagems.utils.AppButton
                         android:id="@+id/set_info_export"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
                         android:layout_weight="1"
                         app:text="@string/set_info_export"/>
 
@@ -1017,7 +1017,7 @@
                     <indie.wistefinch.callforstratagems.utils.AppButton
                         android:id="@+id/set_info_import"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="50dp"
                         android:layout_weight="1"
                         app:text="@string/set_info_import"/>
 

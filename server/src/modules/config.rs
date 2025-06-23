@@ -30,8 +30,8 @@ pub async fn load_config() -> Option<AppConfig> {
                     .duration_since(UNIX_EPOCH)
                     .unwrap()
                     .as_secs();
-                let timeout = loaded_config.auth.timeout_days * 60 * 60 * 24;
-                app_config.auth_records = loaded_config.auth_records
+                let timeout = loaded_config.auth.timeout * 60 * 60 * 24;
+                app_config.records = loaded_config.records
                     .into_iter()
                     .filter(|x| x.time.abs_diff(current_time) <= timeout)
                     .collect();
@@ -87,16 +87,12 @@ pub async fn load_config() -> Option<AppConfig> {
                     } else { 
                         old_conf.ip.clone()
                     });
-        println!(" {}{}", t!("n_conf_port"), old_conf.port);
-        println!(" {}", t!("n_conf_input"));
-        println!("  ├─{}{}", t!("n_conf_input_open"), old_conf.open);
+        println!(" {:30}{}", t!("n_conf_input"), t!("n_conf_type"));
+        println!(" {:30}{}", format!(" ├─{}{}", t!("n_conf_input_open"), old_conf.open), format!(" └─{}{}", t!("n_conf_type_open"), old_conf.openType));
         println!("  ├─{}{}", t!("n_conf_input_up"), old_conf.up);
-        println!("  ├─{}{}", t!("n_conf_input_down"), old_conf.down);
+        println!(" {:30}{}", format!(" ├─{}{}", t!("n_conf_input_down"), old_conf.down), format!("{}{}", t!("n_conf_input_delay"), old_conf.delay));
         println!("  ├─{}{}", t!("n_conf_input_left"), old_conf.left);
         println!("  └─{}{}", t!("n_conf_input_right"), old_conf.right);
-        println!(" {}", t!("n_conf_type"));
-        println!("  └─{}{}", t!("n_conf_type_open"), old_conf.openType);
-        println!(" {}{}", t!("n_conf_input_delay"), old_conf.delay);
         
         // 打印认证记录信息
         if has_old_auth && !old_auths.is_empty() {
@@ -113,7 +109,7 @@ pub async fn load_config() -> Option<AppConfig> {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_secs();
-            app_config.auth_records = old_auths
+            app_config.records = old_auths
                 .into_iter()
                 .filter(|x| x.time.abs_diff(current_time) <= AUTH_TIMEOUT)
                 .collect();

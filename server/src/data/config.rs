@@ -40,7 +40,8 @@ pub struct AppConfig {
     pub server: ServerConfig,
     pub auth: AuthConfig,
     pub input: InputConfig,
-    pub auth_records: Vec<Auth>,
+    pub records: Vec<Auth>,
+    pub debug: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -52,14 +53,14 @@ pub struct ServerConfig {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AuthConfig {
     pub enabled: bool,
-    pub timeout_days: u64,
+    pub timeout: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InputConfig {
     pub delay: u64,
     pub open: String,
-    pub open_type: String,
+    pub keytype: String,
     pub up: String,
     pub down: String,
     pub left: String,
@@ -75,18 +76,19 @@ impl Default for AppConfig {
             },
             auth: AuthConfig {
                 enabled: true,
-                timeout_days: 3,
+                timeout: 3,
             },
             input: InputConfig {
                 delay: 25,
                 open: String::from("ctrl_left"),
-                open_type: String::from("hold"),
+                keytype: String::from("hold"),
                 up: String::from("w"),
                 down: String::from("s"),
                 left: String::from("a"),
                 right: String::from("d"),
             },
-            auth_records: Vec::new(),
+            records: Vec::new(),
+            debug: false,
         }
     }
 }
@@ -101,18 +103,19 @@ impl From<AppConfig5> for AppConfig {
             },
             auth: AuthConfig {
                 enabled: true,
-                timeout_days: 3,
+                timeout: 3,
             },
             input: InputConfig {
                 delay: old_config.delay,
                 open: old_config.open,
-                open_type: old_config.openType,
+                keytype: old_config.openType,
                 up: old_config.up,
                 down: old_config.down,
                 left: old_config.left,
                 right: old_config.right,
             },
-            auth_records: Vec::new(),
+            records: Vec::new(),
+            debug: false,
         }
     }
 }

@@ -1,4 +1,4 @@
-package indie.wistefinch.callforstratagems.socket
+package indie.wistefinch.callforstratagems.network
 
 import java.io.IOException
 import java.io.InputStreamReader
@@ -8,9 +8,9 @@ import java.net.Socket
 import java.util.Scanner
 
 /**
- * Socket client.
+ * App socket client.
  */
-class Client {
+class AppSocket {
 
     /**
      * Main socket.
@@ -30,7 +30,7 @@ class Client {
     /**
      * Whether the socket is connected to the server.
      */
-    private var isConnected: Boolean = false
+    private var connected: Boolean = false
 
     /**
      * Socket operation timeout.
@@ -38,12 +38,17 @@ class Client {
     private var soTimeout: Int = 5000
 
     /**
+     * Whether the socket is connected to the server.
+     */
+    var isConnected: () -> Boolean = { connected }
+
+    /**
      * Connect to the server.
      */
-     fun connect(address: String, port: Int, timeout: Int = 5000):Boolean {
-         soTimeout = timeout
-        if (isConnected) {
-          disconnect()
+    fun connect(address: String, port: Int, timeout: Int = 5000): Boolean {
+        soTimeout = timeout
+        if (connected) {
+            disconnect()
         }
         socket = Socket()
         try {
@@ -54,7 +59,7 @@ class Client {
             return false
         }
         toggleTimeout()
-        isConnected = true
+        connected = true
         return true
     }
 
@@ -62,10 +67,10 @@ class Client {
      * Disconnect the current connection.
      */
     fun disconnect() {
-        if (isConnected) {
+        if (connected) {
             reader.close()
             writer.close()
-            isConnected = false
+            connected = false
             socket.close()
         }
     }
@@ -78,8 +83,8 @@ class Client {
             socket.close()
             reader.close()
             writer.close()
+        } catch (_: Exception) {
         }
-        catch(_: Exception) { }
     }
 
     /**
@@ -102,10 +107,8 @@ class Client {
     fun toggleTimeout(flag: Boolean = true) {
         if (flag) {
             socket.soTimeout = soTimeout
-        }
-        else {
+        } else {
             socket.soTimeout = 0
         }
     }
-
 }

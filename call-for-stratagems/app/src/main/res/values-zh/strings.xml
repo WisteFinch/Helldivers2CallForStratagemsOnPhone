@@ -90,7 +90,7 @@
     <string name="set_info_db_latest">[%1$s] %2$s (最新)</string>
     <string name="set_info_db_empty">空</string>
     <string name="set_info_db_incomplete">不完整</string>
-    <string name="set_info_db_chk">数据库版本（检查更新）</string>
+    <string name="set_info_db_chk">数据库版本（正在检查更新）</string>
     <string name="set_info_db_updatable">数据库版本（可更新）</string>
     <string name="set_info_db_ver_diff">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
     <string name="set_info_db_updt_title">数据库版本（正在更新）</string>
@@ -105,11 +105,11 @@
     <string name="set_info_app_ver">%1$s</string>
     <string name="set_info_app_latest">%1$s (最新)</string>
     <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
-    <string name="set_info_export">备份设置和组合</string>
+    <string name="set_info_export">备份用户数据</string>
     <string name="set_info_export_success">导出成功</string>
     <string name="set_info_export_failed">导出失败：%1$s</string>
     <string name="set_info_export_cancel">导出取消</string>
-    <string name="set_info_import">还原设置和组合</string>
+    <string name="set_info_import">还原用户数据</string>
     <string name="set_info_about">关于</string>
 
     <!-- Network -->
@@ -119,8 +119,8 @@
     <string name="network_connected">已连接</string>
     <string name="network_failed">连接失败</string>
     <string name="network_response_error">服务器响应错误，请检查服务器是否正常运行</string>
-    <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
-    <string name="network_status_1">服务器版本错误，预期%1$s.x，实际%2$s</string>
+    <string name="network_status_error">服务器状态错误，请检查服务器是否正常运行</string>
+    <string name="network_status_1">服务器API版本错误，需要API%1$s</string>
     <string name="network_auth">等待服务器认证，本地sid为%1$s</string>
     <string name="network_auth_failed">认证失败，请重试并在服务器接受认证请求</string>
 

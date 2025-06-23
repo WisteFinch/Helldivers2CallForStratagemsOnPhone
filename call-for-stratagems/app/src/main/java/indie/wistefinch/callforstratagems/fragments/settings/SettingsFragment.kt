@@ -44,17 +44,17 @@ import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
 import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
-import indie.wistefinch.callforstratagems.socket.AddressData
-import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
-import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
-import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
-import indie.wistefinch.callforstratagems.socket.ServerConfigData
-import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
+import indie.wistefinch.callforstratagems.network.AddressData
+import indie.wistefinch.callforstratagems.network.AppClient
+import indie.wistefinch.callforstratagems.network.AppClientEvent
+import indie.wistefinch.callforstratagems.network.SyncConfigAuthData
+import indie.wistefinch.callforstratagems.network.SyncConfigData
+import indie.wistefinch.callforstratagems.network.SyncConfigInputData
+import indie.wistefinch.callforstratagems.network.SyncConfigServerData
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.Util
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -90,6 +90,11 @@ class SettingsFragment : Fragment() {
     private lateinit var appView: View
     private lateinit var aboutView: View
     private lateinit var connView: View
+
+    /**
+     * Check database update coroutine job
+     */
+    private lateinit var checkDBUpdateJob: Job
 
     /**
      * QR code scanner activity launcher
@@ -148,16 +153,28 @@ class SettingsFragment : Fragment() {
             when (result.resultCode) {
                 RESULT_OK -> {
                     val uri = result.data?.data!!
-                    val sync = ServerConfigData(
-                        port = preferences.getString("server_port", "23333")!!.toInt(),
-                        delay = preferences.getString("input_delay", "25")!!.toInt(),
-                        open = preferences.getString("input_open", "ctrl_left")!!,
-                        openType = preferences.getString("input_type_open", "hold")!!,
-                        up = preferences.getString("input_up", "w")!!,
-                        down = preferences.getString("input_down", "s")!!,
-                        left = preferences.getString("input_left", "a")!!,
-                        right = preferences.getString("input_right", "d")!!,
-                        ip = "",
+                    val sync = SyncConfigData(
+                        server = SyncConfigServerData(
+                            port = preferences.getString("server_port", "23333")!!.toInt(),
+                            ip = preferences.getString("sync_ip", "")!!,
+                        ),
+                        input = SyncConfigInputData(
+                            delay = preferences.getString("input_delay", "25")!!.toInt(),
+                            open = preferences.getString("input_open", "ctrl_left")!!,
+                            keytype = preferences.getString("input_type_open", "hold")!!,
+                            up = preferences.getString("input_up", "w")!!,
+                            down = preferences.getString("input_down", "s")!!,
+                            left = preferences.getString("input_left", "a")!!,
+                            right = preferences.getString("input_right", "d")!!,
+                        ),
+                        auth = SyncConfigAuthData(
+                            enabled = preferences.getBoolean("sync_auth", true),
+                            timeout = preferences.getString(
+                                "sync_auth_timeout",
+                                "3"
+                            )!!.toInt()
+                        ),
+                        debug = preferences.getBoolean("sync_debug", true),
                     )
                     val conn = AppSettingsConnData(
                         preferences.getString("tcp_add", "127.0.0.1")!!,
@@ -188,12 +205,14 @@ class SettingsFragment : Fragment() {
                     )
                     val settings = AppSettingsData(conn, ctrl, db)
                     try {
-                        val json = Gson().toJson(BackupFileData(
-                            Constants.API_VERSION,
-                            sync,
-                            settings,
-                            groupViewModel.allItemsSync
-                        ))
+                        val json = Gson().toJson(
+                            BackupFileData(
+                                Constants.API_VERSION,
+                                sync,
+                                settings,
+                                groupViewModel.allItemsSync
+                            )
+                        )
                         val cr = context?.contentResolver!!
                         val os: OutputStream = cr.openOutputStream(uri)!!
                         os.write(json.toByteArray())
@@ -228,11 +247,6 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
-
-    /**
-     * Socket client
-     */
-    private val client = Client()
 
     /**
      * Stratagem view model
@@ -645,99 +659,68 @@ class SettingsFragment : Fragment() {
             }
 
             // Prepare socket and data.
-            val add = binding.setConnAddr.text.toString()
+            val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-            val version = pkgInfo.versionName
+
             // Launch coroutine.
-            val job = lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful, request server status.
-                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                        try {
-                            val res: ReceiveStatusData =
-                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                            // Check the server status.
-                            when (res.status) {
-                                0 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            resources.getText(R.string.dlg_conn_test_success).toString()
-                                        )
-                                    }
-                                }
-
-                                1 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_1),
-                                                version.substring(0, version.lastIndexOf(".")),
-                                                res.ver
-                                            )
-                                        )
-                                    }
-                                }
-
-                                2 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(getString(R.string.network_auth), sid)
-                                        )
-                                    }
-                                    // Request authentication.
-                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                                    client.toggleTimeout(false)
-                                    val auth = Gson().fromJson(
-                                        client.receive(),
-                                        ReceiveAuthData::class.java
-                                    )
-                                    client.toggleTimeout(true)
-                                    withContext(Dispatchers.Main) {
-                                        if (auth.auth) {
-                                            connFinish(
-                                                String.format(getString(R.string.dlg_conn_test_success))
-                                            )
-                                        } else {
-                                            connFinish(
-                                                String.format(getString(R.string.network_auth_failed))
-                                            )
-                                        }
-                                    }
-                                }
-
-                                else -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_error),
-                                                res.status
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppClient.setEventListener { ev, _ ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        when (ev) {
+                            AppClientEvent.CONNECTED -> {
                                 connFinish(
-                                    resources.getText(R.string.network_response_error).toString()
+                                    resources.getText(R.string.dlg_conn_test_success).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.AUTHING -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth), sid)
                                 )
                             }
-                        }
-                    } else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.dlg_conn_test_failed).toString())
+
+                            AppClientEvent.AUTH_FAILED -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth_failed))
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SERVER_ERR -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_error)
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.FAILED -> {
+                                connFinish(
+                                    resources.getText(R.string.dlg_conn_test_failed).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.API_MISMATCH -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_1),
+                                        Constants.API_VERSION.toString()
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            else -> {}
                         }
                     }
-                    // Disconnect.
-                    client.disconnect()
                 }
+                AppClient.initClient(addr, port, sid, 0)
             }
             button.setOnClickListener {
-                job.cancel()
+                AppClient.closeClient()
                 connDialog.hide()
             }
         }
@@ -766,118 +749,99 @@ class SettingsFragment : Fragment() {
             }
 
             // Prepare socket and data.
-            val config = ServerConfigData(
-                port = preferences.getString("server_port", "23333")!!.toInt(),
-                delay = preferences.getString("input_delay", "25")!!.toInt(),
-                open = preferences.getString("input_open", "ctrl_left")!!,
-                openType = preferences.getString("input_type_open", "hold")!!,
-                up = preferences.getString("input_up", "w")!!,
-                down = preferences.getString("input_down", "s")!!,
-                left = preferences.getString("input_left", "a")!!,
-                right = preferences.getString("input_right", "d")!!,
-                ip = "",
+            val config = SyncConfigData(
+                server = SyncConfigServerData(
+                    port = preferences.getString("server_port", "23333")!!.toInt(),
+                    ip = preferences.getString("sync_ip", "")!!,
+                ),
+                input = SyncConfigInputData(
+                    delay = preferences.getString("input_delay", "25")!!.toInt(),
+                    open = preferences.getString("input_open", "ctrl_left")!!,
+                    keytype = preferences.getString("input_type_open", "hold")!!,
+                    up = preferences.getString("input_up", "w")!!,
+                    down = preferences.getString("input_down", "s")!!,
+                    left = preferences.getString("input_left", "a")!!,
+                    right = preferences.getString("input_right", "d")!!,
+                ),
+                auth = SyncConfigAuthData(
+                    enabled = preferences.getBoolean("sync_auth", true),
+                    timeout = preferences.getString(
+                        "sync_auth_timeout",
+                        "3"
+                    )!!.toInt()
+                ),
+                debug = preferences.getBoolean("sync_debug", true),
             )
-            val add = binding.setConnAddr.text.toString()
+            val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-            val version = pkgInfo.versionName
             // Launch coroutine.
-            val job = lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful, request server status.
-                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                        try {
-                            val res: ReceiveStatusData =
-                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                            // Check the server status.
-                            when (res.status) {
-                                0 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            resources.getText(R.string.dlg_conn_test_success).toString()
-                                        )
-                                    }
-                                }
-
-                                1 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_1),
-                                                version.substring(0, version.lastIndexOf(".")),
-                                                res.ver
-                                            )
-                                        )
-                                    }
-                                }
-
-                                2 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(getString(R.string.network_auth), sid)
-                                        )
-                                    }
-                                    // Request authentication.
-                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                                    client.toggleTimeout(false)
-                                    val auth = Gson().fromJson(
-                                        client.receive(),
-                                        ReceiveAuthData::class.java
-                                    )
-                                    client.toggleTimeout(true)
-                                    if (auth.auth) {
-                                        client.send(
-                                            Gson().toJson(SyncConfigPacket(config, auth.token))
-                                                .toString()
-                                        )
-                                        withContext(Dispatchers.Main) {
-                                            connFinish(
-                                                resources.getText(R.string.set_sync_apply_finished)
-                                                    .toString()
-                                            )
-                                        }
-                                    } else {
-                                        withContext(Dispatchers.Main) {
-                                            connFinish(
-                                                String.format(getString(R.string.network_auth_failed))
-                                            )
-                                        }
-                                    }
-                                }
-
-                                else -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_error),
-                                                res.status
-                                            )
-                                        )
-                                    }
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppClient.setEventListener { ev, opt ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        when (ev) {
+                            AppClientEvent.CONNECTED -> {
+                                withContext(Dispatchers.IO) {
+                                    AppClient.optSync(config)
                                 }
                             }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
+
+                            AppClientEvent.AUTHING -> {
                                 connFinish(
-                                    resources.getText(R.string.network_response_error).toString()
+                                    String.format(getString(R.string.network_auth), sid)
                                 )
                             }
-                        }
-                    } else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.dlg_conn_test_failed).toString())
+
+                            AppClientEvent.AUTH_FAILED -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth_failed))
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SERVER_ERR -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_error)
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.FAILED -> {
+                                connFinish(
+                                    resources.getText(R.string.dlg_conn_test_failed).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SENT -> {
+                                if (opt == 4) {
+                                    connFinish(
+                                        resources.getText(R.string.set_sync_apply_finished)
+                                            .toString()
+                                    )
+                                    AppClient.closeClient()
+                                }
+                            }
+
+                            AppClientEvent.API_MISMATCH -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_1),
+                                        Constants.API_VERSION.toString()
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            else -> {}
                         }
                     }
-                    // Disconnect.
-                    client.disconnect()
                 }
+                AppClient.initClient(addr, port, sid, 0)
             }
-
             button.setOnClickListener {
-                job.cancel()
+                AppClient.closeClient()
                 connDialog.hide()
             }
         }
@@ -932,7 +896,7 @@ class SettingsFragment : Fragment() {
 
         // Check database update.
         // Launch coroutine
-        lifecycleScope.launch {
+        checkDBUpdateJob = lifecycleScope.launch {
             checkDBUpdate()
         }
 
@@ -1085,7 +1049,10 @@ class SettingsFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        lifecycleScope.launch {
+                        if (checkDBUpdateJob.isActive) {
+                            checkDBUpdateJob.cancel()
+                        }
+                        checkDBUpdateJob = lifecycleScope.launch {
                             checkDBUpdate()
                         }
                         clearDialog.hide()
@@ -1103,6 +1070,10 @@ class SettingsFragment : Fragment() {
 
             // Update database.
             confirm.setOnClickListener {
+                if (checkDBUpdateJob.isActive) {
+                    checkDBUpdateJob.cancel()
+                }
+
                 dbDialog.hide()
                 preferences.edit().putInt("db_update_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!

@@ -107,11 +107,11 @@
     <string name="set_info_app_ver">%1$s</string>
     <string name="set_info_app_latest">%1$s (latest)</string>
     <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
-    <string name="set_info_export">Backup Settings &amp; Groups</string>
+    <string name="set_info_export">Backup User Data</string>
     <string name="set_info_export_success">Export Successful</string>
     <string name="set_info_export_failed">Export Failed: %1$s</string>
     <string name="set_info_export_cancel">Export Canceled</string>
-    <string name="set_info_import">Restore Settings &amp; Groups</string>
+    <string name="set_info_import">Restore User Data</string>
     <string name="set_info_about">About</string>
 
     <!-- Network -->
@@ -122,8 +122,8 @@
     <string name="network_connected">Connected</string>
     <string name="network_failed">Connect failed</string>
     <string name="network_response_error">Server response error, please check whether the server is running properly</string>
-    <string name="network_status_error">Server status error [%1$d], please check whether the server is running properly</string>
-    <string name="network_status_1">Server version error, expecting %1$s.x, actually %2$s</string>
+    <string name="network_status_error">Server status error, please check whether the server is running properly</string>
+    <string name="network_status_1">Server API version error, request API%1$s</string>
     <string name="network_auth">Waiting for server-side authentication, local sid is %1$s</string>
     <string name="network_auth_failed">Authentication failed, please try again and accept the authentication request on server</string>
 

@@ -23,13 +23,13 @@ pub async fn macros(value: Value, conf: &AppConfig) -> Result<()> {
 
     // 按下打开键
     print(format!("{name}: "));
-    if conf.input.open_type == "hold" {
+    if conf.input.keytype == "hold" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
-    } else if conf.input.open_type == "long_press" {
+    } else if conf.input.keytype == "long_press" {
         execute(Step::Open, InputType::Press, conf).await.unwrap();
         sleep(Duration::from_millis(400)).await;
         execute(Step::Open, InputType::Release, conf).await.unwrap();
-    } else if conf.input.open_type == "double_tap" {
+    } else if conf.input.keytype == "double_tap" {
         execute(Step::Open, InputType::Click, conf).await.unwrap();
         execute(Step::Open, InputType::Click, conf).await.unwrap();
     } else {
@@ -44,7 +44,7 @@ pub async fn macros(value: Value, conf: &AppConfig) -> Result<()> {
     }
 
     // 释放打开键
-    if conf.input.open_type == "hold" {
+    if conf.input.keytype == "hold" {
         execute(Step::Open, InputType::Release, conf).await.unwrap();
     }
     println!();
@@ -53,7 +53,7 @@ pub async fn macros(value: Value, conf: &AppConfig) -> Result<()> {
 }
 
 /// 处理独立输入
-pub async fn independent(value: Value, conf: &AppConfig) -> Result<()> {
+pub async fn input(value: Value, conf: &AppConfig) -> Result<()> {
     let step = match value["step"].as_u64() {
         Some(s) => Step::from_u64(s),
         None => {

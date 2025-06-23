@@ -38,15 +38,15 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
-import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
-import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
-import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
-import indie.wistefinch.callforstratagems.socket.StratagemInputData
-import indie.wistefinch.callforstratagems.socket.StratagemInputPacket
-import indie.wistefinch.callforstratagems.socket.StratagemMacroData
-import indie.wistefinch.callforstratagems.socket.StratagemMacroPacket
+import indie.wistefinch.callforstratagems.network.AppSocket
+import indie.wistefinch.callforstratagems.network.ReceiveAuthData
+import indie.wistefinch.callforstratagems.network.ReceiveStatusData
+import indie.wistefinch.callforstratagems.network.RequestAuthPacket
+import indie.wistefinch.callforstratagems.network.RequestStatusPacket
+import indie.wistefinch.callforstratagems.network.StratagemInputData
+import indie.wistefinch.callforstratagems.network.RequestInputPacket
+import indie.wistefinch.callforstratagems.network.StratagemMacroData
+import indie.wistefinch.callforstratagems.network.RequestMacroPacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -159,7 +159,7 @@ class PlayFragment : Fragment() {
     /**
      * The socket client.
      */
-    private val client = Client()
+    private val appSocket = AppSocket()
 
     /**
      * Whether the socket is connect.
@@ -331,7 +331,7 @@ class PlayFragment : Fragment() {
         setupRecyclerView()
         setupEventListener()
 
-        // Setup client using continue.
+        // Setup client using coroutine.
         lifecycleScope.launch {
             setupClient()
             this.launch {
@@ -649,7 +649,7 @@ class PlayFragment : Fragment() {
                 binding.playConnectStatus2.visibility = View.GONE
             }
             networkLock.withLock {
-                isConnected = client.connect(address, port)
+                isConnected = appSocket.connect(address, port)
             }
             isConnected = checkClient()
 
@@ -682,7 +682,7 @@ class PlayFragment : Fragment() {
                     )
                 }
                 networkLock.withLock {
-                    isConnected = client.connect(address, port)
+                    isConnected = appSocket.connect(address, port)
                 }
                 isConnected = checkClient()
             }
@@ -732,10 +732,10 @@ class PlayFragment : Fragment() {
         networkLock.withLock {
             try {
                 // Send status request.
-                client.send(Gson().toJson(RequestStatusPacket(version)).toString())
+                appSocket.send(Gson().toJson(RequestStatusPacket(Constants.API_VERSION)).toString())
                 // Receive status.
                 val res: ReceiveStatusData =
-                    Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
+                    Gson().fromJson(appSocket.receive(), ReceiveStatusData::class.java)
                 // Check the server status.
                 when (res.status) {
                     0 -> flag = true
@@ -750,10 +750,10 @@ class PlayFragment : Fragment() {
                                 port
                             )
                         }
-                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                        client.toggleTimeout(false)
-                        val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                        client.toggleTimeout(true)
+                        appSocket.send(Gson().toJson(RequestAuthPacket(sid)).toString())
+                        appSocket.toggleTimeout(false)
+                        val auth = Gson().fromJson(appSocket.receive(), ReceiveAuthData::class.java)
+                        appSocket.toggleTimeout(true)
                         if (auth.auth) {
                             token = auth.token
                             flag = true
@@ -809,7 +809,7 @@ class PlayFragment : Fragment() {
         }
         // send stratagem data
         withContext(Dispatchers.IO) {
-            val packet = StratagemMacroPacket(
+            val packet = RequestMacroPacket(
                 StratagemMacroData(
                     when (lang) {
                         "zh-CN" -> stratagemData.nameZh
@@ -822,7 +822,7 @@ class PlayFragment : Fragment() {
 
             if (networkLock.tryLock()) {
                 try {
-                    client.send(Gson().toJson(packet).toString())
+                    appSocket.send(Gson().toJson(packet).toString())
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
@@ -856,7 +856,7 @@ class PlayFragment : Fragment() {
         }
         // Send step data
         withContext(Dispatchers.IO) {
-            val packet = StratagemInputPacket(
+            val packet = RequestInputPacket(
                 StratagemInputData(
                     step,
                     type
@@ -865,7 +865,7 @@ class PlayFragment : Fragment() {
             )
             if (networkLock.tryLock()) {
                 try {
-                    client.send(Gson().toJson(packet).toString())
+                    appSocket.send(Gson().toJson(packet).toString())
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
@@ -888,9 +888,9 @@ class PlayFragment : Fragment() {
 
         // Close client
         if (connectingLock.isLocked) {
-            client.forceClose()
+            appSocket.forceClose()
         } else {
-            client.disconnect()
+            appSocket.disconnect()
         }
 
         super.onDestroy()

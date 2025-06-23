@@ -58,9 +58,19 @@ n_conf_input_down: "Down: "
 n_conf_input_left: "Left: "
 n_conf_input_right: "Right: "
 n_conf_type: "Type"
-n_conf_type_open: "Open Stratagem List: "
+n_conf_type_open: "Open Stratagem List Key Type: "
+n_conf_port: "Port: "
+n_conf_advanced: 'Advanced'
 n_conf_ip: "IP Address: "
 n_conf_ip_auto: "Auto detect"
-n_conf_port: "Port: "
+n_conf_auth: "Client Auth："
+n_conf_auth_timeout: "Auth Timeout："
+n_conf_debug: "Debug Mode："
 n_auth_records: 'Authentication records: '
 n_admin: "If there is no response in the game, you can try restart the server as an administrator"
+warn_api_compatible_1: 'Client is using [API'
+warn_api_compatible_2: '], entering compatibility mode'
+unit_days: 'days'
+unit_ms: 'ms'
+enabled: "Enabled"
+disabled: "Disabled"

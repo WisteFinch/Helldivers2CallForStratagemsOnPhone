@@ -1,14 +1,13 @@
-package indie.wistefinch.callforstratagems.socket
+package indie.wistefinch.callforstratagems.network
 
 import androidx.annotation.Keep
-
 
 /**
  * Request server status.
  */
 @Keep
 data class RequestStatusPacket (
-    var ver: String,
+    var api: Int,
     var opt: Int = 0,
 )
 
@@ -18,7 +17,7 @@ data class RequestStatusPacket (
 @Keep
 data class ReceiveStatusData (
     var status: Int,
-    var ver: String,
+    var api: Int,
 )
 
 /**
@@ -34,7 +33,7 @@ data class StratagemMacroData (
  * Activate stratagem macro.
  */
 @Keep
-data class StratagemMacroPacket (
+data class RequestMacroPacket (
     var macro: StratagemMacroData,
     var token: String,
     var opt: Int = 1,
@@ -53,7 +52,7 @@ data class StratagemInputData (
  * Activate stratagem input.
  */
 @Keep
-data class StratagemInputPacket (
+data class RequestInputPacket (
     var input: StratagemInputData,
     var token: String,
     var opt: Int = 2,
@@ -63,24 +62,43 @@ data class StratagemInputPacket (
  * Server configuration data.
  */
 @Keep
-data class ServerConfigData (
+data class SyncConfigData (
+    var server: SyncConfigServerData,
+    var input: SyncConfigInputData,
+    var auth: SyncConfigAuthData,
+    var debug: Boolean,
+    var records: List<Int> = listOf(),
+)
+
+@Keep
+data class SyncConfigServerData (
     var port: Int,
+    var ip: String,
+)
+
+@Keep
+data class SyncConfigAuthData (
+    var enabled: Boolean,
+    var timeout: Int,
+)
+
+@Keep
+data class SyncConfigInputData (
     var delay: Int,
     var open: String,
-    var openType: String,
+    var keytype: String,
     var up: String,
     var down: String,
     var left: String,
     var right: String,
-    var ip: String,
 )
 
 /**
  * Synchronize server configuration.
  */
 @Keep
-data class SyncConfigPacket (
-    var config: ServerConfigData,
+data class RequestSyncPacket (
+    var config: SyncConfigData,
     var token: String,
     var opt: Int = 4,
 )
