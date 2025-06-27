@@ -11,7 +11,7 @@ import javax.net.ssl.HttpsURLConnection
 /**
  * Provide basic tools。
  */
-class Util {
+class Utils {
     companion object {
         /**
          * Get random string.

@@ -110,6 +110,10 @@
     <string name="set_info_export_failed">导出失败：%1$s</string>
     <string name="set_info_export_cancel">导出取消</string>
     <string name="set_info_import">还原用户数据</string>
+    <string name="set_info_import_success">还原成功</string>
+    <string name="set_info_import_failed">还原失败：%1$s</string>
+    <string name="set_info_import_failed_ver">还原失败：备份文件版本不支持</string>
+    <string name="set_info_import_cancel">还原取消</string>
     <string name="set_info_about">关于</string>
 
     <!-- Network -->

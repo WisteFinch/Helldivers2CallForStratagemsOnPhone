@@ -112,6 +112,10 @@
     <string name="set_info_export_failed">Export Failed: %1$s</string>
     <string name="set_info_export_cancel">Export Canceled</string>
     <string name="set_info_import">Restore User Data</string>
+    <string name="set_info_import_success">Import Successful</string>
+    <string name="set_info_import_failed">Import Failed: %1$s</string>
+    <string name="set_info_import_failed_ver">Import Failed: Backup file version not supported</string>
+    <string name="set_info_import_cancel">Import Canceled</string>
     <string name="set_info_about">About</string>
 
     <!-- Network -->

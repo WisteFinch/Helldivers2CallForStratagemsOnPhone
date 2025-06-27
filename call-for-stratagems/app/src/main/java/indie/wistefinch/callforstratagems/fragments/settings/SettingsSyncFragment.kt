@@ -49,10 +49,10 @@ class SettingsSyncFragment : Fragment() {
         binding.setSyncAuth.isChecked =
             preferences.getBoolean("sync_auth", true)
         binding.setSyncAuthTimeout.setText(
-            preferences.getString(
+            preferences.getInt(
                 "sync_auth_timeout",
-                "3"
-            )
+                3
+            ).toString()
         )
         binding.setSyncDebug.isChecked =
             preferences.getBoolean("sync_debug", false)
@@ -76,12 +76,17 @@ class SettingsSyncFragment : Fragment() {
             }
         }
         binding.setSyncAuthTimeout.addTextChangedListener { text ->
-            with(preferences.edit()) {
-                try {
-                    putString("sync_auth_timeout", max(1, text.toString().toInt()).toString())
+            try {
+                with(preferences.edit()) {
+                    putInt(
+                        "sync_auth_timeout",
+                        max(1, if (text.toString().isEmpty()) 3 else text.toString().toInt())
+                    )
                     apply()
-                } catch (_: Exception) {
-                    putString("sync_auth_timeout", "3")
+                }
+            } catch (_: Exception) {
+                with(preferences.edit()) {
+                    putInt("sync_auth_timeout", 3)
                     apply()
                 }
             }

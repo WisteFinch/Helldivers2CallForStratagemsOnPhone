@@ -334,7 +334,7 @@ class PlayFragment : Fragment() {
     /**
      * Setup client.
      */
-    private suspend fun setupClient() {
+    private fun setupClient() {
         AppClient.setEventListener { ev, _ ->
             lifecycleScope.launch(Dispatchers.Main) {
                 when (ev) {

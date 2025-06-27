@@ -37,13 +37,13 @@ import indie.wistefinch.callforstratagems.data.AppSettingsCtrlData
 import indie.wistefinch.callforstratagems.data.AppSettingsDBData
 import indie.wistefinch.callforstratagems.data.AppSettingsData
 import indie.wistefinch.callforstratagems.data.BackupFileData
+import indie.wistefinch.callforstratagems.data.BackupFileDataUtils
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
-import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.network.AddressData
 import indie.wistefinch.callforstratagems.network.AppClient
 import indie.wistefinch.callforstratagems.network.AppClientEvent
@@ -51,15 +51,18 @@ import indie.wistefinch.callforstratagems.network.SyncConfigAuthData
 import indie.wistefinch.callforstratagems.network.SyncConfigData
 import indie.wistefinch.callforstratagems.network.SyncConfigInputData
 import indie.wistefinch.callforstratagems.network.SyncConfigServerData
+import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.utils.AppButton
-import indie.wistefinch.callforstratagems.utils.Util
+import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 import java.io.OutputStream
 
 
@@ -109,8 +112,8 @@ class SettingsFragment : Fragment() {
                         binding.setConnAddr.setText(add.add)
                         binding.setConnPort.setText(add.port.toString())
                         with(preferences.edit()) {
-                            putString("tcp_add", add.add)
-                            putString("tcp_port", add.port.toString())
+                            putString("conn_addr", add.add)
+                            putInt("conn_port", add.port)
                             apply()
                         }
                         Toast.makeText(
@@ -155,53 +158,53 @@ class SettingsFragment : Fragment() {
                     val uri = result.data?.data!!
                     val sync = SyncConfigData(
                         server = SyncConfigServerData(
-                            port = preferences.getString("server_port", "23333")!!.toInt(),
-                            ip = preferences.getString("sync_ip", "")!!,
+                            port = preferences.getInt("sync_server_port", 23333),
+                            ip = preferences.getString("sync_server_ip", "")!!,
                         ),
                         input = SyncConfigInputData(
-                            delay = preferences.getString("input_delay", "25")!!.toInt(),
-                            open = preferences.getString("input_open", "ctrl_left")!!,
+                            delay = preferences.getInt("sync_input_delay", 25),
+                            open = preferences.getString("sync_input_open", "ctrl_left")!!,
                             keytype = preferences.getString("input_type_open", "hold")!!,
-                            up = preferences.getString("input_up", "w")!!,
-                            down = preferences.getString("input_down", "s")!!,
-                            left = preferences.getString("input_left", "a")!!,
-                            right = preferences.getString("input_right", "d")!!,
+                            up = preferences.getString("sync_input_up", "w")!!,
+                            down = preferences.getString("sync_input_down", "s")!!,
+                            left = preferences.getString("sync_input_left", "a")!!,
+                            right = preferences.getString("sync_input_right", "d")!!,
                         ),
                         auth = SyncConfigAuthData(
                             enabled = preferences.getBoolean("sync_auth", true),
-                            timeout = preferences.getString(
+                            timeout = preferences.getInt(
                                 "sync_auth_timeout",
-                                "3"
-                            )!!.toInt()
+                                3
+                            )
                         ),
                         debug = preferences.getBoolean("sync_debug", true),
                     )
                     val conn = AppSettingsConnData(
-                        preferences.getString("tcp_add", "127.0.0.1")!!,
-                        preferences.getString("tcp_port", "23333")!!.toInt(),
-                        preferences.getString("tcp_retry", "5")!!.toInt()
+                        preferences.getString("conn_addr", "127.0.0.1")!!,
+                        preferences.getInt("conn_port", 23333),
+                        preferences.getInt("conn_retry", 5)
                     )
                     val ctrl = AppSettingsCtrlData(
-                        preferences.getBoolean("enable_simplified_mode", false),
-                        preferences.getBoolean("enable_fastboot_mode", false),
-                        preferences.getBoolean("enable_sfx", false),
-                        preferences.getBoolean("enable_vibrator", false),
+                        preferences.getBoolean("ctrl_simplified", false),
+                        preferences.getBoolean("ctrl_fastboot", false),
+                        preferences.getBoolean("ctrl_sfx", false),
+                        preferences.getBoolean("ctrl_vibrator", false),
+                        preferences.getFloat(
+                            "ctrl_sdt",
+                            100f
+                        ),
+                        preferences.getFloat(
+                            "ctrl_svt",
+                            50f
+                        ),
                         preferences.getString(
-                            "swipe_distance_threshold",
-                            "100"
-                        )!!.toFloat(),
-                        preferences.getString(
-                            "swipe_velocity_threshold",
-                            "50"
-                        )!!.toFloat(),
-                        preferences.getString(
-                            "lang_stratagem",
+                            "ctrl_lang",
                             "auto"
                         )!!
                     )
                     val db = AppSettingsDBData(
-                        preferences.getInt("db_update_channel", 0),
-                        preferences.getString("db_update_channel_custom", "")!!
+                        preferences.getInt("db_channel", 0),
+                        preferences.getString("db_custom", "")!!
                     )
                     val settings = AppSettingsData(conn, ctrl, db)
                     try {
@@ -225,6 +228,119 @@ class SettingsFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             String.format(getString(R.string.set_info_export_failed), e.toString()),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.set_info_export_cancel),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        String.format(getString(R.string.set_info_export_failed), "NULL"),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+    private val requestImportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val uri = result.data?.data!!
+                    try {
+                        // Read file
+                        val cr = context?.contentResolver!!
+                        val os: InputStream = cr.openInputStream(uri)!!
+                        val buffer = ByteArray(1024)
+                        var len: Int
+                        val bos = ByteArrayOutputStream()
+                        while ((os.read(buffer).also { len = it }) != -1) {
+                            bos.write(buffer, 0, len)
+                        }
+                        bos.close()
+                        val bytes = bos.toString()
+                        val json = JSONObject(bytes)
+                        val data: BackupFileData = when (json.getInt("ver")) {
+                            1 -> {
+                                BackupFileDataUtils.fromVer1(bytes)
+                            }
+
+                            else -> {
+                                BackupFileData(ver = -1)
+                            }
+                        }
+                        // Restore data
+                        if (data.ver != -1) {
+                            val sync = data.sync
+                            val set = data.settings
+                            val groups = data.groups
+                            val server = sync.server
+                            val input = sync.input
+                            val auth = sync.auth
+                            val ctrl = set.ctrl
+                            val conn = set.conn
+                            val db = set.db
+
+                            with(preferences.edit()) {
+                                putInt("sync_server_port", server.port)
+                                putString("sync_server_ip", server.ip)
+                                putInt("sync_input_delay", input.delay)
+                                putString("sync_input_open", input.open)
+                                putString("sync_input_up", input.up)
+                                putString("sync_input_down", input.down)
+                                putString("sync_input_left", input.left)
+                                putString("sync_input_right", input.right)
+                                putBoolean("sync_auth", auth.enabled)
+                                putInt("sync_auth_timeout", auth.timeout)
+                                putBoolean("sync_debug", sync.debug)
+                                putString("conn_addr", conn.addr)
+                                putInt("conn_port", conn.port)
+                                putInt("conn_retry", conn.retry)
+                                putBoolean("ctrl_simplified", ctrl.simplified)
+                                putBoolean("ctrl_fastboot", ctrl.fastboot)
+                                putBoolean("ctrl_sfx", ctrl.sfx)
+                                putBoolean("ctrl_vibrator", ctrl.vibrator)
+                                putFloat("ctrl_sdt", ctrl.sdt)
+                                putFloat("ctrl_svt", ctrl.svt)
+                                putString("ctrl_lang", ctrl.lang)
+                                putInt("db_channel", db.channel)
+                                putString("db_custom", db.custom)
+                                apply()
+                            }
+
+                            // Restore group database
+                            for (g in groups) {
+                                groupViewModel.addItem(g.title, g.list, g.dbName)
+                            }
+
+                            // Refresh content
+                            setupContent()
+
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.set_info_export_success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.set_info_import_failed_ver),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            requireContext(),
+                            String.format(getString(R.string.set_info_import_failed), e.toString()),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -328,16 +444,16 @@ class SettingsFragment : Fragment() {
      */
     private fun setupContent() {
         // Connection
-        binding.setConnAddr.setText(preferences.getString("tcp_add", "127.0.0.1"))
-        binding.setConnPort.setText(preferences.getString("tcp_port", "23333"))
-        binding.setConnRetry.setText(preferences.getString("tcp_retry", "5"))
+        binding.setConnAddr.setText(preferences.getString("conn_addr", "127.0.0.1"))
+        binding.setConnPort.setText(preferences.getInt("conn_port", 23333).toString())
+        binding.setConnRetry.setText(preferences.getInt("conn_retry", 5).toString())
         // Sync
-        binding.setSyncPort.setText(preferences.getString("server_port", "23333"))
-        binding.setSyncDelay.setText(preferences.getString("input_delay", "25"))
+        binding.setSyncPort.setText(preferences.getInt("sync_server_port", 23333).toString())
+        binding.setSyncDelay.setText(preferences.getInt("sync_input_delay", 25).toString())
         binding.setSyncInputOpen.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_open",
+                    "sync_input_open",
                     "ctrl_left"
                 )
             )
@@ -353,7 +469,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputUp.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_up",
+                    "sync_input_up",
                     "w"
                 )
             )
@@ -361,7 +477,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputDown.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_down",
+                    "sync_input_down",
                     "s"
                 )
             )
@@ -369,7 +485,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputLeft.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_left",
+                    "sync_input_left",
                     "a"
                 )
             )
@@ -377,7 +493,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputRight.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_right",
+                    "sync_input_right",
                     "d"
                 )
             )
@@ -387,29 +503,29 @@ class SettingsFragment : Fragment() {
         }
         // Control
         binding.setCtrlSimplifiedMode.isChecked =
-            preferences.getBoolean("enable_simplified_mode", false)
+            preferences.getBoolean("ctrl_simplified", false)
         binding.setCtrlFastbootMode.isChecked =
-            preferences.getBoolean("enable_fastboot_mode", false)
+            preferences.getBoolean("ctrl_fastboot", false)
         binding.setCtrlSfx.isChecked =
-            preferences.getBoolean("enable_sfx", false)
+            preferences.getBoolean("ctrl_sfx", false)
         binding.setCtrlVibrator.isChecked =
-            preferences.getBoolean("enable_vibrator", false)
+            preferences.getBoolean("ctrl_vibrator", false)
         binding.setCtrlGstSwpDistanceThreshold.setText(
-            preferences.getString(
-                "swipe_distance_threshold",
-                "100"
-            )
+            preferences.getFloat(
+                "ctrl_sdt",
+                100f
+            ).toString()
         )
         binding.setCtrlGstSwpVelocityThreshold.setText(
-            preferences.getString(
-                "swipe_velocity_threshold",
-                "50"
-            )
+            preferences.getFloat(
+                "ctrl_svt",
+                50f
+            ).toString()
         )
         binding.setCtrlLangStratagem.setSelection(
             langValues.indexOf(
                 preferences.getString(
-                    "lang_stratagem",
+                    "ctrl_lang",
                     "auto"
                 )
             )
@@ -446,32 +562,41 @@ class SettingsFragment : Fragment() {
         // Connection
         binding.setConnAddr.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_add", text.toString())
+                putString("conn_addr", text.toString().trim())
                 apply()
             }
         }
         binding.setConnPort.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_port", text.toString())
+                putInt(
+                    "conn_port",
+                    if (text.toString().isEmpty()) 23333 else text.toString().toInt()
+                )
                 apply()
             }
         }
         binding.setConnRetry.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_retry", text.toString())
+                putInt("conn_retry", if (text.toString().isEmpty()) 5 else text.toString().toInt())
                 apply()
             }
         }
         // Sync
         binding.setSyncPort.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("server_port", text.toString())
+                putInt(
+                    "sync_server_port",
+                    if (text.toString().isEmpty()) 23333 else text.toString().toInt()
+                )
                 apply()
             }
         }
         binding.setSyncDelay.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("input_delay", text.toString())
+                putInt(
+                    "sync_input_delay",
+                    if (text.toString().isEmpty()) 25 else text.toString().toInt()
+                )
                 apply()
             }
         }
@@ -484,7 +609,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_open", inputValues[pos])
+                        putString("sync_input_open", inputValues[pos])
                         apply()
                     }
                 }
@@ -517,7 +642,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_up", inputValues[pos])
+                        putString("sync_input_up", inputValues[pos])
                         apply()
                     }
                 }
@@ -533,7 +658,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_down", inputValues[pos])
+                        putString("sync_input_down", inputValues[pos])
                         apply()
                     }
                 }
@@ -549,7 +674,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_left", inputValues[pos])
+                        putString("sync_input_left", inputValues[pos])
                         apply()
                     }
                 }
@@ -565,7 +690,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_right", inputValues[pos])
+                        putString("sync_input_right", inputValues[pos])
                         apply()
                     }
                 }
@@ -575,37 +700,43 @@ class SettingsFragment : Fragment() {
         // Control
         binding.setCtrlSimplifiedMode.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_simplified_mode", isChecked)
+                putBoolean("ctrl_simplified", isChecked)
                 apply()
             }
         }
         binding.setCtrlFastbootMode.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_fastboot_mode", isChecked)
+                putBoolean("ctrl_fastboot", isChecked)
                 apply()
             }
         }
         binding.setCtrlSfx.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_sfx", isChecked)
+                putBoolean("ctrl_sfx", isChecked)
                 apply()
             }
         }
         binding.setCtrlVibrator.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_vibrator", isChecked)
+                putBoolean("ctrl_vibrator", isChecked)
                 apply()
             }
         }
         binding.setCtrlGstSwpDistanceThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("swipe_distance_threshold", text.toString())
+                putFloat(
+                    "ctrl_sdt",
+                    if (text.toString().isEmpty()) 100f else text.toString().toFloat()
+                )
                 apply()
             }
         }
         binding.setCtrlGstSwpVelocityThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("swipe_velocity_threshold", text.toString())
+                putFloat(
+                    "ctrl_svt",
+                    if (text.toString().isEmpty()) 50f else text.toString().toFloat()
+                )
                 apply()
             }
         }
@@ -618,7 +749,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("lang_stratagem", langValues[pos])
+                        putString("ctrl_lang", langValues[pos])
                         apply()
                     }
                 }
@@ -751,24 +882,24 @@ class SettingsFragment : Fragment() {
             // Prepare socket and data.
             val config = SyncConfigData(
                 server = SyncConfigServerData(
-                    port = preferences.getString("server_port", "23333")!!.toInt(),
-                    ip = preferences.getString("sync_ip", "")!!,
+                    port = preferences.getInt("sync_server_port", 23333),
+                    ip = preferences.getString("sync_server_ip", "")!!,
                 ),
                 input = SyncConfigInputData(
-                    delay = preferences.getString("input_delay", "25")!!.toInt(),
-                    open = preferences.getString("input_open", "ctrl_left")!!,
+                    delay = preferences.getInt("sync_input_delay", 25),
+                    open = preferences.getString("sync_input_open", "ctrl_left")!!,
                     keytype = preferences.getString("input_type_open", "hold")!!,
-                    up = preferences.getString("input_up", "w")!!,
-                    down = preferences.getString("input_down", "s")!!,
-                    left = preferences.getString("input_left", "a")!!,
-                    right = preferences.getString("input_right", "d")!!,
+                    up = preferences.getString("sync_input_up", "w")!!,
+                    down = preferences.getString("sync_input_down", "s")!!,
+                    left = preferences.getString("sync_input_left", "a")!!,
+                    right = preferences.getString("sync_input_right", "d")!!,
                 ),
                 auth = SyncConfigAuthData(
                     enabled = preferences.getBoolean("sync_auth", true),
-                    timeout = preferences.getString(
+                    timeout = preferences.getInt(
                         "sync_auth_timeout",
-                        "3"
-                    )!!.toInt()
+                        3
+                    )
                 ),
                 debug = preferences.getBoolean("sync_debug", true),
             )
@@ -906,7 +1037,7 @@ class SettingsFragment : Fragment() {
             binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_chk))
             try {
                 val json =
-                    JSONObject(Util.downloadToStr(Constants.URL_APP_RELEASE_API))
+                    JSONObject(Utils.downloadToStr(Constants.URL_APP_RELEASE_API))
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
@@ -991,7 +1122,7 @@ class SettingsFragment : Fragment() {
             val cancel = dbView.findViewById<AppButton>(R.id.db_update_cancel)
             val clear = dbView.findViewById<AppButton>(R.id.db_update_clear)
             val custom = dbView.findViewById<EditText>(R.id.db_update_custom_input)
-            var channel = preferences.getInt("db_update_channel", 0)
+            var channel = preferences.getInt("db_channel", 0)
 
             radioGroup.check(
                 when (channel) {
@@ -1001,7 +1132,7 @@ class SettingsFragment : Fragment() {
                     else -> R.id.db_update_hd2
                 }
             )
-            custom.setText(preferences.getString("db_update_channel_custom", ""))
+            custom.setText(preferences.getString("db_custom", ""))
             custom.isEnabled = channel == 2
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -1016,7 +1147,7 @@ class SettingsFragment : Fragment() {
 
             // Set custom url.
             custom.addTextChangedListener {
-                preferences.edit().putString("db_update_channel_custom", custom.text.toString())
+                preferences.edit().putString("db_custom", custom.text.toString().trim())
                     .apply()
             }
 
@@ -1038,7 +1169,7 @@ class SettingsFragment : Fragment() {
                         preferences.edit().putString("db_version", "0").apply()
                         preferences.edit().putString("db_name", getString(R.string.default_string))
                             .apply()
-                        preferences.edit().putInt("db_update_channel", 0).apply()
+                        preferences.edit().putInt("db_channel", 0).apply()
                         channel = 0
                         radioGroup.check(R.id.db_update_hd2)
                         stratagemViewModel.deleteAll()
@@ -1075,7 +1206,7 @@ class SettingsFragment : Fragment() {
                 }
 
                 dbDialog.hide()
-                preferences.edit().putInt("db_update_channel", channel).apply()
+                preferences.edit().putInt("db_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!
                 dbName =
                     preferences.getString("db_name", Constants.ID_DB_HD2)!!
@@ -1083,10 +1214,10 @@ class SettingsFragment : Fragment() {
                 preferences.edit()
                     .putString("db_name", resources.getString(R.string.default_string)).apply()
 
-                var url: String = when (preferences.getInt("db_update_channel", 0)) {
+                var url: String = when (preferences.getInt("db_channel", 0)) {
                     0 -> Constants.URL_DB_HD2
                     1 -> Constants.URL_DB_HD
-                    2 -> preferences.getString("db_update_channel_custom", "")!!
+                    2 -> preferences.getString("db_custom", "")!!
                     else -> Constants.URL_DB_HD2
                 }
                 if (url.isEmpty()) {
@@ -1108,7 +1239,7 @@ class SettingsFragment : Fragment() {
                         preferences.edit().putString("db_version", "1").apply()
 
                         // Download index.
-                        val indexObj = JSONObject(Util.downloadToStr(url + "index.json"))
+                        val indexObj = JSONObject(Utils.downloadToStr(url + "index.json"))
                         val date = indexObj.getString("date")
                         val dbUrl = url + indexObj.getString("db_path")
                         val iconsUrl = url + indexObj.getString("icons_path")
@@ -1133,7 +1264,7 @@ class SettingsFragment : Fragment() {
                             )
                             binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
                         }
-                        val dbObj = JSONObject(Util.downloadToStr(dbUrl))
+                        val dbObj = JSONObject(Utils.downloadToStr(dbUrl))
                         // Regenerate database.
                         stratagemViewModel.deleteAll()
                         val rows = dbObj.getJSONArray("objects")
@@ -1182,7 +1313,7 @@ class SettingsFragment : Fragment() {
                                 )
                                 binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
                             }
-                            Util.download(
+                            Utils.download(
                                 iconsUrl + iconsList[i] + ".svg",
                                 iconsPath + iconsList[i] + ".svg",
                                 false
@@ -1222,6 +1353,14 @@ class SettingsFragment : Fragment() {
             }
             requestExportLauncher.launch(intent)
         }
+
+        binding.setInfoImport.setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+            }
+            requestImportLauncher.launch(intent)
+        }
     }
 
     /**
@@ -1230,10 +1369,10 @@ class SettingsFragment : Fragment() {
     private suspend fun checkDBUpdate() {
         binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_chk))
         try {
-            var url: String = when (preferences.getInt("db_update_channel", 0)) {
+            var url: String = when (preferences.getInt("db_channel", 0)) {
                 0 -> Constants.URL_DB_HD2
                 1 -> Constants.URL_DB_HD
-                2 -> preferences.getString("db_update_channel_custom", "")!!
+                2 -> preferences.getString("db_custom", "")!!
                 else -> Constants.URL_DB_HD2
             }
             if (url.isEmpty()) {
@@ -1243,7 +1382,7 @@ class SettingsFragment : Fragment() {
                 url = "$url/"
             }
 
-            val json = JSONObject(Util.downloadToStr(url + "index.json"))
+            val json = JSONObject(Utils.downloadToStr(url + "index.json"))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {

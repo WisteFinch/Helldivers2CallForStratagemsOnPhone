@@ -63,34 +63,34 @@ data class RequestInputPacket (
  */
 @Keep
 data class SyncConfigData (
-    var server: SyncConfigServerData,
-    var input: SyncConfigInputData,
-    var auth: SyncConfigAuthData,
-    var debug: Boolean,
+    var server: SyncConfigServerData = SyncConfigServerData(),
+    var input: SyncConfigInputData = SyncConfigInputData(),
+    var auth: SyncConfigAuthData = SyncConfigAuthData(),
+    var debug: Boolean = false,
     var records: List<Int> = listOf(),
 )
 
 @Keep
 data class SyncConfigServerData (
-    var port: Int,
-    var ip: String,
+    var port: Int = 23333,
+    var ip: String = "",
 )
 
 @Keep
 data class SyncConfigAuthData (
-    var enabled: Boolean,
-    var timeout: Int,
+    var enabled: Boolean = true,
+    var timeout: Int = 3,
 )
 
 @Keep
 data class SyncConfigInputData (
-    var delay: Int,
-    var open: String,
-    var keytype: String,
-    var up: String,
-    var down: String,
-    var left: String,
-    var right: String,
+    var delay: Int = 25,
+    var open: String = "ctrl_left",
+    var keytype: String = "hold",
+    var up: String = "w",
+    var down: String = "s",
+    var left: String = "a",
+    var right: String = "d",
 )
 
 /**
