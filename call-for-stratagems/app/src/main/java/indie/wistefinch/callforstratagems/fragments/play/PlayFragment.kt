@@ -16,7 +16,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
@@ -28,7 +27,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.MainActivity
@@ -38,20 +36,14 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
+import indie.wistefinch.callforstratagems.network.AppClient
+import indie.wistefinch.callforstratagems.network.AppClientEvent
 import indie.wistefinch.callforstratagems.network.AppSocket
-import indie.wistefinch.callforstratagems.network.ReceiveAuthData
-import indie.wistefinch.callforstratagems.network.ReceiveStatusData
-import indie.wistefinch.callforstratagems.network.RequestAuthPacket
-import indie.wistefinch.callforstratagems.network.RequestStatusPacket
 import indie.wistefinch.callforstratagems.network.StratagemInputData
-import indie.wistefinch.callforstratagems.network.RequestInputPacket
 import indie.wistefinch.callforstratagems.network.StratagemMacroData
-import indie.wistefinch.callforstratagems.network.RequestMacroPacket
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Vector
 import kotlin.math.abs
@@ -334,14 +326,102 @@ class PlayFragment : Fragment() {
         // Setup client using coroutine.
         lifecycleScope.launch {
             setupClient()
-            this.launch {
-                withContext(Dispatchers.IO) {
-                    clientKeepAlive()
-                }
-            }
         }
 
         return view
+    }
+
+    /**
+     * Setup client.
+     */
+    private suspend fun setupClient() {
+        AppClient.setEventListener { ev, _ ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                when (ev) {
+                    AppClientEvent.CONNECTED -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(getString(R.string.network_connected)),
+                            address,
+                            port
+                        )
+                        binding.playConnectStatus1.visibility = View.GONE
+                        binding.playConnectStatus2.visibility = View.VISIBLE
+                        binding.playConnectStatus2.setImageResource(R.drawable.ic_circle)
+                        binding.playConnectStatus2.drawable.setTintList(
+                            context?.resources?.getColorStateList(
+                                R.color.green,
+                                context?.theme
+                            )
+                        )
+                    }
+
+                    AppClientEvent.CONNECTING -> {
+                        if (AppClient.retriedTimes() > 0) {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(
+                                    getString(R.string.network_retry),
+                                    AppClient.retriedTimes(),
+                                    retryLimit
+                                ),
+                                address,
+                                port
+                            )
+                        }
+                        else {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(getString(R.string.network_connecting)),
+                                address,
+                                port
+                            )
+                            binding.playConnectStatus1.visibility = View.VISIBLE
+                            binding.playConnectStatus2.visibility = View.GONE
+                        }
+                    }
+
+                    AppClientEvent.AUTHING -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(getString(R.string.network_auth), sid),
+                            address,
+                            port
+                        )
+                    }
+
+                    AppClientEvent.RETRYING -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(
+                                getString(R.string.network_waiting),
+                                AppClient.retriedTimes(),
+                                retryLimit
+                            ),
+                            address,
+                            port
+                        )
+                    }
+
+                    AppClientEvent.FAILED -> {
+                        if (AppClient.retriedTimes() == retryLimit) {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(getString(R.string.network_failed)),
+                                address,
+                                port
+                            )
+                            binding.playConnectStatus1.visibility = View.GONE
+                            binding.playConnectStatus2.visibility = View.VISIBLE
+                            binding.playConnectStatus2.setImageResource(R.drawable.ic_alert)
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+        AppClient.initClient(address, port, sid, retryLimit)
     }
 
     /**
@@ -558,8 +638,11 @@ class PlayFragment : Fragment() {
                     sfxPool.play(sfxStep, 1f, 1f, 0, 0, 1f)
                 }
                 if (enableVibrator) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(100
-                        , DEFAULT_AMPLITUDE))
+                    vibrator.vibrate(
+                        VibrationEffect.createOneShot(
+                            100, DEFAULT_AMPLITUDE
+                        )
+                    )
                 }
             } else {
                 // Play sfx
@@ -631,162 +714,6 @@ class PlayFragment : Fragment() {
     }
 
     /**
-     * Setup the tcp client.
-     */
-    private suspend fun setupClient() {
-        connectingLock.lock()
-        var tryTimes = 0
-        withContext(Dispatchers.IO) {
-            // Initial connection.
-            withContext(Dispatchers.Main) {
-                binding.playConnectTitle.text = String.format(
-                    getString(R.string.network_addr_suffix),
-                    String.format(getString(R.string.network_connecting)),
-                    address,
-                    port
-                )
-                binding.playConnectStatus1.visibility = View.VISIBLE
-                binding.playConnectStatus2.visibility = View.GONE
-            }
-            networkLock.withLock {
-                isConnected = appSocket.connect(address, port)
-            }
-            isConnected = checkClient()
-
-            // If the connection is not successful, retry.
-            while (!isConnected && tryTimes < 5) {
-                withContext(Dispatchers.Main) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_addr_suffix),
-                        String.format(
-                            getString(R.string.network_waiting),
-                            tryTimes,
-                            retryLimit
-                        ),
-                        address,
-                        port
-                    )
-                }
-                tryTimes++
-                delay(2000)
-                withContext(Dispatchers.Main) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_addr_suffix),
-                        String.format(
-                            getString(R.string.network_retry),
-                            tryTimes,
-                            retryLimit
-                        ),
-                        address,
-                        port
-                    )
-                }
-                networkLock.withLock {
-                    isConnected = appSocket.connect(address, port)
-                }
-                isConnected = checkClient()
-            }
-
-            // Set connection status.
-            withContext(Dispatchers.Main) {
-                if (isConnected) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_addr_suffix),
-                        String.format(getString(R.string.network_connected)),
-                        address,
-                        port
-                    )
-                    binding.playConnectStatus1.visibility = View.GONE
-                    binding.playConnectStatus2.visibility = View.VISIBLE
-                    binding.playConnectStatus2.setImageResource(R.drawable.ic_circle)
-                    binding.playConnectStatus2.drawable.setTintList(
-                        context?.resources?.getColorStateList(
-                            R.color.green,
-                            context?.theme
-                        )
-                    )
-                } else {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_addr_suffix),
-                        String.format(getString(R.string.network_failed)),
-                        address,
-                        port
-                    )
-                    binding.playConnectStatus1.visibility = View.GONE
-                    binding.playConnectStatus2.visibility = View.VISIBLE
-                    binding.playConnectStatus2.setImageResource(R.drawable.ic_alert)
-                }
-            }
-        }
-        connectingLock.unlock()
-    }
-
-    /**
-     * Check if the client is valid by sending heartbeat package.
-     */
-    private suspend fun checkClient(): Boolean {
-        if (!isConnected) {
-            return false
-        }
-        var flag: Boolean
-        networkLock.withLock {
-            try {
-                // Send status request.
-                appSocket.send(Gson().toJson(RequestStatusPacket(Constants.API_VERSION)).toString())
-                // Receive status.
-                val res: ReceiveStatusData =
-                    Gson().fromJson(appSocket.receive(), ReceiveStatusData::class.java)
-                // Check the server status.
-                when (res.status) {
-                    0 -> flag = true
-                    1 -> flag = false
-                    2 -> {
-                        // Request authentication.
-                        withContext(Dispatchers.Main) {
-                            binding.playConnectTitle.text = String.format(
-                                getString(R.string.network_addr_suffix),
-                                String.format(getString(R.string.network_auth), sid),
-                                address,
-                                port
-                            )
-                        }
-                        appSocket.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                        appSocket.toggleTimeout(false)
-                        val auth = Gson().fromJson(appSocket.receive(), ReceiveAuthData::class.java)
-                        appSocket.toggleTimeout(true)
-                        if (auth.auth) {
-                            token = auth.token
-                            flag = true
-                        } else {
-                            flag = false
-                        }
-                    }
-
-                    else -> flag = false
-                }
-            } catch (_: Exception) { // Json convert error & socket timeout.
-                flag = false
-            }
-        }
-        return flag
-    }
-
-    /**
-     * Check if the client is valid every 10s, if not, reconnect.
-     */
-    private suspend fun clientKeepAlive() {
-        while (true) {
-            delay(10000)
-            if (isConnected && !connectingLock.isLocked) {
-                val tmp = checkClient()
-                if (!tmp && !connectingLock.isLocked) {
-                    setupClient()
-                }
-            }
-        }
-    }
-
-    /**
      * Activate stratagem, send stratagem data to the server.
      */
     private suspend fun activateStratagem(stratagemData: StratagemData) {
@@ -797,39 +724,17 @@ class PlayFragment : Fragment() {
         if (enableVibrator) {
             vibrator.vibrate(VibrationEffect.createOneShot(200, DEFAULT_AMPLITUDE))
         }
-        // Check and restart the client
-        if (!isConnected) {
-            if (connectingLock.isLocked) {
-                return
-            }
-            setupClient()
-            if (!isConnected) {
-                return
-            }
-        }
-        // send stratagem data
+        // Send stratagem data
         withContext(Dispatchers.IO) {
-            val packet = RequestMacroPacket(
+            AppClient.optMacro(
                 StratagemMacroData(
                     when (lang) {
                         "zh-CN" -> stratagemData.nameZh
                         else -> stratagemData.name
                     },
                     stratagemData.steps
-                ),
-                token
+                )
             )
-
-            if (networkLock.tryLock()) {
-                try {
-                    appSocket.send(Gson().toJson(packet).toString())
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                networkLock.unlock()
-            }
         }
     }
 
@@ -844,35 +749,14 @@ class PlayFragment : Fragment() {
         if (enableVibrator) {
             vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
         }
-        // Check and restart the client
-        if (!isConnected) {
-            if (connectingLock.isLocked) {
-                return
-            }
-            setupClient()
-            if (!isConnected) {
-                return
-            }
-        }
         // Send step data
         withContext(Dispatchers.IO) {
-            val packet = RequestInputPacket(
+            AppClient.optInput(
                 StratagemInputData(
                     step,
                     type
-                ),
-                token
+                )
             )
-            if (networkLock.tryLock()) {
-                try {
-                    appSocket.send(Gson().toJson(packet).toString())
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                networkLock.unlock()
-            }
         }
     }
 
@@ -887,11 +771,7 @@ class PlayFragment : Fragment() {
         view?.keepScreenOn = false
 
         // Close client
-        if (connectingLock.isLocked) {
-            appSocket.forceClose()
-        } else {
-            appSocket.disconnect()
-        }
+        AppClient.closeClient()
 
         super.onDestroy()
     }

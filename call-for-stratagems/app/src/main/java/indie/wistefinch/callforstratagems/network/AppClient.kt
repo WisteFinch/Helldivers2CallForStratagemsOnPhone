@@ -108,6 +108,12 @@ object AppClient {
     var isConnected: () -> Boolean = { connected }
 
     /**
+     * Connect retried times.
+     */
+    var retriedTimes: () -> Int = { retried }
+
+
+    /**
      * Init app client.
      */
     fun initClient(addr: String, port: Int, sid: String, retry: Int = 5, timeout: Int = 5000) {
@@ -161,10 +167,10 @@ object AppClient {
 
                 // If the connection is not successful, retry.
                 while (!connected && retried < retry && isActive) {
-                    retried++
                     emitEvent(AppClientEvent.RETRYING)
                     delay(2000)
                     // Connect to server
+                    retried++
                     emitEvent(AppClientEvent.CONNECTING)
                     networkLock.withLock {
                         socket.connect(addr, port, timeout)

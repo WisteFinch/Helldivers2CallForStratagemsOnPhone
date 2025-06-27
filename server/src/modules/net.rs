@@ -79,7 +79,6 @@ pub async fn run(mut debug: bool, mut disable_auth: bool) -> Result<()> {
             .into_iter()
             .filter(|x| x.time.abs_diff(current_time) <= auth_timeout)
             .collect::<Vec<Auth>>();
-        println!("{}", filtered.len());
         save_auth(&filtered).await;
     }
 
@@ -330,12 +329,12 @@ async fn handle_status(client: &mut TcpStream, is_authed: bool, debug: bool) -> 
     // 检查认证
     if is_authed {
         res = format!(
-            "{{\"status\":{},\"api\":{SERVER_API_VERSION}}}\n",
+            "{{\"api\":{SERVER_API_VERSION},\"status\":{}}}\n",
             Status::Success
         );
     } else {
         res = format!(
-            "{{\"status\":{},\"api\":{SERVER_API_VERSION}}}\n",
+            "{{\"api\":{SERVER_API_VERSION},\"status\":{}}}\n",
             Status::Unauthorized
         );
     }
