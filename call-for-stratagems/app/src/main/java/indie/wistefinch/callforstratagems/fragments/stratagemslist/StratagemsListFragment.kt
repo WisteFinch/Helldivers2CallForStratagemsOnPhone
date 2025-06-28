@@ -55,7 +55,7 @@ class StratagemsListFragment : Fragment() {
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val dbName =
             preference.getString("db_name", Constants.ID_DB_HD2)!!
-        var lang = preference.getString("lang_stratagem", "auto")!!
+        var lang = preference.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }

@@ -27,5 +27,7 @@
     <color name="buttonTextHint">@color/textSecondary</color>
     <color name="caret">@color/highlight</color>
     <color name="scrollbarTrack">#606162</color>
+    <color name="playBackgroundPrimary">#182B3E</color>
+    <color name="playBackgroundSecondary">#42859c</color>
 
 </resources>

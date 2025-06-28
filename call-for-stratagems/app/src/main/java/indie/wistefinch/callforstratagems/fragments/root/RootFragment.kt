@@ -213,10 +213,10 @@ class RootFragment : Fragment() {
             sharedViewModel.checkIfDbIsEmpty(data)
             adapter.setData(
                 data,
-                preferences.getBoolean("enable_fastboot_mode", false)
+                preferences.getBoolean("ctrl_fastboot", false)
             )
         }
-        if (!preferences.getBoolean("enable_fastboot_mode", false)) {
+        if (!preferences.getBoolean("ctrl_fastboot", false)) {
             val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
             val helper = ItemTouchHelper(callback)
             helper.attachToRecyclerView(recyclerView)

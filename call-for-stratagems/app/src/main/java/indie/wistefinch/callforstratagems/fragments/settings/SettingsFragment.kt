@@ -186,6 +186,7 @@ class SettingsFragment : Fragment() {
                     )
                     val ctrl = AppSettingsCtrlData(
                         preferences.getBoolean("ctrl_simplified", false),
+                        preferences.getInt("ctrl_stratagem_size", 100),
                         preferences.getBoolean("ctrl_fastboot", false),
                         preferences.getBoolean("ctrl_sfx", false),
                         preferences.getBoolean("ctrl_vibrator", false),
@@ -306,6 +307,7 @@ class SettingsFragment : Fragment() {
                                 putInt("conn_port", conn.port)
                                 putInt("conn_retry", conn.retry)
                                 putBoolean("ctrl_simplified", ctrl.simplified)
+                                putInt("ctrl_stratagem_size", ctrl.stratagemSize)
                                 putBoolean("ctrl_fastboot", ctrl.fastboot)
                                 putBoolean("ctrl_sfx", ctrl.sfx)
                                 putBoolean("ctrl_vibrator", ctrl.vibrator)
@@ -504,6 +506,12 @@ class SettingsFragment : Fragment() {
         // Control
         binding.setCtrlSimplifiedMode.isChecked =
             preferences.getBoolean("ctrl_simplified", false)
+        binding.setCtrlSimplifiedStratagemSize.setText(
+            preferences.getInt(
+                "ctrl_stratagem_size",
+                100
+            ).toString()
+        )
         binding.setCtrlFastbootMode.isChecked =
             preferences.getBoolean("ctrl_fastboot", false)
         binding.setCtrlSfx.isChecked =
@@ -701,6 +709,15 @@ class SettingsFragment : Fragment() {
         binding.setCtrlSimplifiedMode.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
                 putBoolean("ctrl_simplified", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlSimplifiedStratagemSize.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putInt(
+                    "ctrl_stratagem_size",
+                    if (text.toString().isEmpty()) 100 else text.toString().toInt()
+                )
                 apply()
             }
         }

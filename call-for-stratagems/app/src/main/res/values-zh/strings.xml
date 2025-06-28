@@ -73,6 +73,7 @@
     <string name="set_ctrl_hdr">控制</string>
     <string name="set_ctrl_simplified_mode">启用精简模式</string>
     <string name="set_ctrl_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
+    <string name="set_ctrl_simplified_stratagem_size">精简模式战备按钮尺寸</string>
     <string name="set_ctrl_lang_stratagem">语言：战略配备名称</string>
     <string name="set_ctrl_gst_swp_distance_threshold">手势距离阈值</string>
     <string name="set_ctrl_gst_swp_velocity_threshold">手势速度阈值</string>

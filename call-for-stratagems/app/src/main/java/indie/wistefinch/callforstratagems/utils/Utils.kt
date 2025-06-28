@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.utils
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -84,6 +85,10 @@ class Utils {
                 }
             }
             return str
+        }
+
+        fun dpToPx(context: Context, dps: Int): Int {
+            return Math.round(context.resources.displayMetrics.density * dps)
         }
     }
 }

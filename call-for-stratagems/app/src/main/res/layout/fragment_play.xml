@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#42859c"
+    android:background="@color/playBackgroundSecondary"
     android:keepScreenOn="true"
-    tools:context=".fragments.play.PlayFragment">
+    tools:context=".fragments.play.PlayFragment"
+    android:id="@+id/play_root">
 
     <ImageView
         android:id="@+id/play_bg_cross"
@@ -15,6 +16,7 @@
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         android:src="@drawable/cross_bg"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +30,7 @@
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:src="@drawable/play_bg_mask"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -2,6 +2,7 @@ package indie.wistefinch.callforstratagems.fragments.play
 
 import android.app.Service
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.graphics.Rect
 import android.media.AudioAttributes
 import android.media.AudioAttributes.USAGE_GAME
@@ -42,6 +43,7 @@ import indie.wistefinch.callforstratagems.network.AppSocket
 import indie.wistefinch.callforstratagems.network.StratagemInputData
 import indie.wistefinch.callforstratagems.network.StratagemMacroData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
@@ -234,16 +236,16 @@ class PlayFragment : Fragment() {
     ): View {
         // Get preference.
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
-        velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
-        enableSimplifiedMode = preferences.getBoolean("enable_simplified_mode", false)
-        enableSfx = preferences.getBoolean("enable_sfx", false)
-        enableVibrator = preferences.getBoolean("enable_vibrator", false)
-        address = preferences.getString("tcp_add", "127.0.0.1")!!
-        port = preferences.getString("tcp_port", "23333")?.toInt()!!
-        retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
-        sid = preferences.getString("sid", "0")!!
-        lang = preferences.getString("lang_stratagem", "auto")!!
+        distanceThreshold = preferences.getFloat("ctrl_sdt", 100f).toDouble()
+        velocityThreshold = preferences.getFloat("ctrl_svt", 50f).toDouble()
+        enableSimplifiedMode = preferences.getBoolean("ctrl_simplified", false)
+        enableSfx = preferences.getBoolean("ctrl_sfx", false)
+        enableVibrator = preferences.getBoolean("ctrl_vibrator", false)
+        address = preferences.getString("conn_addr", "127.0.0.1")!!
+        port = preferences.getInt("conn_port", 23333)
+        retryLimit = preferences.getInt("conn_retry", 5)
+        sid = preferences.getString("sid", "NULL")!!
+        lang = preferences.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
@@ -291,6 +293,7 @@ class PlayFragment : Fragment() {
             binding.playBgCross.visibility = View.GONE
             binding.playBgMask.visibility = View.GONE
             binding.playSimplifiedScrollView.visibility = View.VISIBLE
+            binding.playRoot.setBackgroundColor(requireContext().getColor(R.color.playBackgroundPrimary))
         }
 
         // Init runtime.
@@ -368,8 +371,7 @@ class PlayFragment : Fragment() {
                                 address,
                                 port
                             )
-                        }
-                        else {
+                        } else {
                             binding.playConnectTitle.text = String.format(
                                 getString(R.string.network_addr_suffix),
                                 String.format(getString(R.string.network_connecting)),
@@ -433,7 +435,7 @@ class PlayFragment : Fragment() {
             // Setup simplified stratagem recycler view.
             val stratagemView = binding.playSimplifiedRecyclerView
             stratagemView.adapter = stratagemSimplifiedAdapter
-            stratagemView.autoFitColumns(100)
+            stratagemView.autoFitColumns(preference.getInt("ctrl_stratagem_size", 100))
             // Retrieve stratagem entry from database and check the validation.
             val list: Vector<StratagemData> = Vector()
             for (i in groupData.list) {
@@ -446,7 +448,8 @@ class PlayFragment : Fragment() {
                 preference.getString(
                     "db_name",
                     Constants.ID_DB_HD2
-                )!!
+                )!!,
+                preference.getInt("ctrl_stratagem_size", 100)
             )
             // Setup click listener.
             stratagemSimplifiedAdapter.onItemClick = { data ->
@@ -627,6 +630,27 @@ class PlayFragment : Fragment() {
         if (isFreeInput) { // In free input mode, activate step independently.
             lifecycleScope.launch {
                 activateStep(dir, 0)
+                when (dir) {
+                    1 -> binding.playFreeInputUp.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                    2 -> binding.playFreeInputDown.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                    3 -> binding.playFreeInputLeft.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                    4 -> binding.playFreeInputRight.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                }
+                delay(200)
+                when (dir) {
+                    1 -> binding.playFreeInputUp.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                    2 -> binding.playFreeInputDown.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                    3 -> binding.playFreeInputLeft.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                    4 -> binding.playFreeInputRight.drawable
+                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                }
             }
         } else if (itemSelected) { // In normal mode, record input.
             if (dir == stepsList[currentStepPos]) {
@@ -689,7 +713,10 @@ class PlayFragment : Fragment() {
      */
     private fun swipeToActivate(recyclerView: RecyclerView) {
         val callback =
-            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
+            object : ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,

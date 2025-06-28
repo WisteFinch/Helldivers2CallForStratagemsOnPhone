@@ -159,7 +159,7 @@ class EditGroupFragment : Fragment() {
         // Init data.
         val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        var lang: String = preference.getString("lang_stratagem", "auto")!!
+        var lang: String = preference.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }

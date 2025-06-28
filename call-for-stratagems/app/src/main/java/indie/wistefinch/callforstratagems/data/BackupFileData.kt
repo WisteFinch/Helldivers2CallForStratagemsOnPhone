@@ -30,6 +30,7 @@ data class AppSettingsConnData(
 
 data class AppSettingsCtrlData(
     var simplified: Boolean = false,
+    var stratagemSize: Int = 100,
     var fastboot: Boolean = false,
     var sfx: Boolean = false,
     var vibrator: Boolean = false,
