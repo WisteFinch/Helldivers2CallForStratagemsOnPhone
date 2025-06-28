@@ -2,7 +2,6 @@ package indie.wistefinch.callforstratagems.fragments.play
 
 import android.app.Service
 import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.graphics.Rect
 import android.media.AudioAttributes
 import android.media.AudioAttributes.USAGE_GAME
@@ -39,13 +38,11 @@ import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFacto
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
 import indie.wistefinch.callforstratagems.network.AppClient
 import indie.wistefinch.callforstratagems.network.AppClientEvent
-import indie.wistefinch.callforstratagems.network.AppSocket
 import indie.wistefinch.callforstratagems.network.StratagemInputData
 import indie.wistefinch.callforstratagems.network.StratagemMacroData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import java.util.Vector
 import kotlin.math.abs
@@ -149,31 +146,6 @@ class PlayFragment : Fragment() {
      */
     private var enableVibrator: Boolean = false
 
-    // Runtime variables for socket.
-    /**
-     * The socket client.
-     */
-    private val appSocket = AppSocket()
-
-    /**
-     * Whether the socket is connect.
-     */
-    private var isConnected: Boolean = false
-
-    /**
-     * Reflect whether network communication is currently in progress.
-     *
-     * Lock during any network communication.
-     */
-    private var networkLock = Mutex()
-
-    /**
-     * Reflect whether it is currently attempting to connect to the server.
-     *
-     * Lock during the connect process.
-     */
-    private var connectingLock = Mutex()
-
     /**
      * Server address. Get from the preference.
      */
@@ -193,11 +165,6 @@ class PlayFragment : Fragment() {
      * Device secure id.
      */
     private lateinit var sid: String
-
-    /**
-     * Socket authentication token.
-     */
-    private var token: String = "NULL"
 
     /**
      * Language of stratagem name.
@@ -285,15 +252,18 @@ class PlayFragment : Fragment() {
         // Check simplified mode
         if (enableSimplifiedMode) {
             binding.playBlank.visibility = View.GONE
-            binding.playBanner.visibility = View.GONE
+            binding.playBanner.visibility = View.INVISIBLE
             binding.playMode.visibility = View.GONE
             binding.playExit.visibility = View.GONE
+            binding.playFreeInputTitle.visibility = View.INVISIBLE
+            binding.playFreeInputImage.visibility = View.INVISIBLE
             binding.playStratagemScrollView.visibility = View.GONE
             binding.playGesture.visibility = View.GONE
             binding.playBgCross.visibility = View.GONE
             binding.playBgMask.visibility = View.GONE
             binding.playSimplifiedScrollView.visibility = View.VISIBLE
             binding.playRoot.setBackgroundColor(requireContext().getColor(R.color.playBackgroundPrimary))
+            binding.playModeFAB.visibility = View.VISIBLE
         }
 
         // Init runtime.
@@ -502,6 +472,9 @@ class PlayFragment : Fragment() {
         binding.playMode.setOnClickListener {
             setFreeInputMode(!isFreeInput)
         }
+        binding.playModeFAB.setOnClickListener {
+            setFreeInputMode(!isFreeInput)
+        }
 
         // Setup gesture detector.
         // Override the detector.
@@ -595,11 +568,30 @@ class PlayFragment : Fragment() {
      */
     private fun setFreeInputMode(flag: Boolean) {
         if (flag) {
-            binding.playStratagemScrollView.visibility = View.INVISIBLE
-            binding.playBlank.visibility = View.INVISIBLE
-            binding.playStratagemTitle.visibility = View.INVISIBLE
-            binding.playStepsScrollView.visibility = View.INVISIBLE
-            binding.playFreeInput.visibility = View.VISIBLE
+            if (enableSimplifiedMode) {
+                binding.playSimplifiedScrollView.visibility = View.INVISIBLE
+                binding.playGesture.visibility = View.VISIBLE
+                binding.playModeFAB.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.highlight,
+                            requireContext().theme
+                        )
+                    )
+            } else {
+                binding.playStratagemScrollView.visibility = View.INVISIBLE
+                binding.playBlank.visibility = View.INVISIBLE
+                binding.playStratagemTitle.visibility = View.INVISIBLE
+                binding.playStepsScrollView.visibility = View.INVISIBLE
+                binding.playMode.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.highlight,
+                            requireContext().theme
+                        )
+                    )
+            }
+            binding.playFreeInputTitle.visibility = View.VISIBLE
             binding.playFreeInputImage.visibility = View.VISIBLE
             if (!isFreeInput) {
                 lifecycleScope.launch {
@@ -607,11 +599,30 @@ class PlayFragment : Fragment() {
                 }
             }
         } else {
-            binding.playStratagemScrollView.visibility = View.VISIBLE
-            binding.playBlank.visibility = View.VISIBLE
-            binding.playStratagemTitle.visibility = View.INVISIBLE
-            binding.playStepsScrollView.visibility = View.INVISIBLE
-            binding.playFreeInput.visibility = View.INVISIBLE
+            if (enableSimplifiedMode) {
+                binding.playSimplifiedScrollView.visibility = View.VISIBLE
+                binding.playGesture.visibility = View.GONE
+                binding.playModeFAB.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.white,
+                            requireContext().theme
+                        )
+                    )
+            } else {
+                binding.playStratagemScrollView.visibility = View.VISIBLE
+                binding.playBlank.visibility = View.VISIBLE
+                binding.playStratagemTitle.visibility = View.INVISIBLE
+                binding.playStepsScrollView.visibility = View.INVISIBLE
+                binding.playMode.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.white,
+                            requireContext().theme
+                        )
+                    )
+            }
+            binding.playFreeInputTitle.visibility = View.INVISIBLE
             binding.playFreeInputImage.visibility = View.INVISIBLE
             if (isFreeInput) {
                 lifecycleScope.launch {
@@ -632,24 +643,70 @@ class PlayFragment : Fragment() {
                 activateStep(dir, 0)
                 when (dir) {
                     1 -> binding.playFreeInputUp.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
                     2 -> binding.playFreeInputDown.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
                     3 -> binding.playFreeInputLeft.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
                     4 -> binding.playFreeInputRight.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.highlight, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
                 }
                 delay(200)
                 when (dir) {
                     1 -> binding.playFreeInputUp.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
                     2 -> binding.playFreeInputDown.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
                     3 -> binding.playFreeInputLeft.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
                     4 -> binding.playFreeInputRight.drawable
-                        .setTintList(requireContext().resources.getColorStateList(R.color.white, requireContext().theme))
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
                 }
             }
         } else if (itemSelected) { // In normal mode, record input.

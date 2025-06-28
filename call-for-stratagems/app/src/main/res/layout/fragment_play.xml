@@ -42,7 +42,8 @@
         android:layout_margin="1dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/play_status">
 
         <indie.wistefinch.callforstratagems.utils.AppLoading
             android:id="@+id/play_connect_status_1"
@@ -96,14 +97,14 @@
         android:gravity="center"
         android:text="@string/play_blank"
         android:textColor="@color/textPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_banner"
         tools:ignore="VisualLintOverlap" />
 
     <TextView
-        android:id="@+id/play_freeInput"
+        android:id="@+id/play_freeInput_title"
         style="@style/AppPlayText"
         android:layout_width="wrap_content"
         android:layout_height="64sp"
@@ -131,7 +132,7 @@
         android:layout_width="wrap_content"
         android:layout_height="64dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title">
@@ -149,11 +150,11 @@
         android:layout_width="192dp"
         android:layout_height="192dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_freeInput"
+        app:layout_constraintTop_toBottomOf="@+id/play_freeInput_title"
         app:layout_constraintVertical_bias="0.5">
 
 
@@ -222,11 +223,9 @@
         android:id="@+id/play_simplified_scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginHorizontal="16dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -281,6 +280,21 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_edit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+    <ImageButton
+        android:id="@+id/play_mode_FAB"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/play_mode"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_edit"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
