@@ -15,7 +15,7 @@
         android:layout_margin="5dp">
 
         <TextView
-            android:id="@+id/db_update_title"
+            android:id="@+id/dlg_db_update_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -60,12 +60,12 @@
                     android:layout_marginHorizontal="10dp">
 
                     <RadioGroup
-                        android:id="@+id/db_update_group"
+                        android:id="@+id/dlg_db_update_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <RadioButton
-                            android:id="@+id/db_update_hd2"
+                            android:id="@+id/dlg_db_update_hd2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_db_updt_channel_hd2"
@@ -73,7 +73,7 @@
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
-                            android:id="@+id/db_update_hd"
+                            android:id="@+id/dlg_db_update_hd"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_db_updt_channel_hd"
@@ -81,7 +81,7 @@
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
-                            android:id="@+id/db_update_custom"
+                            android:id="@+id/dlg_db_update_custom"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_db_updt_channel_custom"
@@ -91,7 +91,7 @@
                     </RadioGroup>
 
                     <EditText
-                        android:id="@+id/db_update_custom_input"
+                        android:id="@+id/dlg_db_update_custom_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:importantForAutofill="no"
@@ -116,7 +116,7 @@
             android:layout_marginBottom="5dp">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/db_update_clear"
+                android:id="@+id/dlg_db_update_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 app:text="@string/dlg_db_updt_clear"/>
@@ -127,14 +127,14 @@
                 android:gravity="end">
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/db_update_cancel"
+                    android:id="@+id/dlg_db_update_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
                     app:text="@string/dlg_comm_cancel"/>
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/db_update_confirm"
+                    android:id="@+id/dlg_db_update_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     app:text="@string/dlg_comm_confirm"/>

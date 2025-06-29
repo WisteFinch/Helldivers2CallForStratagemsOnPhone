@@ -22,7 +22,7 @@
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
-                android:id="@+id/dialog_info_icon"
+                android:id="@+id/dlg_info_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
@@ -30,7 +30,7 @@
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/dialog_info_title"
+                android:id="@+id/dlg_info_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -68,7 +68,7 @@
                 tools:ignore="UselessParent">
 
                 <TextView
-                    android:id="@+id/dialog_info_msg"
+                    android:id="@+id/dlg_info_msg"
                     android:theme="@style/AppText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
             android:layout_marginBottom="5dp">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/dialog_info_button3"
+                android:id="@+id/dlg_info_button3"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:visibility="gone"
@@ -98,14 +98,14 @@
                 android:gravity="end">
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button2"
+                    android:id="@+id/dlg_info_button2"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
                     app:text="@string/dlg_comm_cancel"/>
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button1"
+                    android:id="@+id/dlg_info_button1"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     app:text="@string/dlg_comm_confirm"/>

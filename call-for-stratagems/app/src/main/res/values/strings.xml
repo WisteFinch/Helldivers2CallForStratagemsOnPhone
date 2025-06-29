@@ -115,11 +115,13 @@
     <string name="set_info_db_chk">Database Version (Checking)</string>
     <string name="set_info_db_updatable">Database Version (Updatable)</string>
     <string name="set_info_db_ver_diff">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
-    <string name="set_info_db_updt_title">Database Version (Updating)</string>
-    <string name="set_info_db_updt_idx">Downloading index…</string>
-    <string name="set_info_db_updt_db">[%1$s] Downloading database…</string>
-    <string name="set_info_db_updt_icons">[%1$s] Downloading icons… (%2$d/%3$d)</string>
-    <string name="set_info_db_updt_complete">[%1$s] Update complete, please restart the app</string>
+    <string name="set_info_db_updt_title">Updating Database</string>
+    <string name="set_info_db_updt_title2">Updating Database: %1$s</string>
+    <string name="set_info_db_updt_idx">Fetching database index</string>
+    <string name="set_info_db_updt_db">Fetching database</string>
+    <string name="set_info_db_updt_icons">(%1$d/%2$d) Downloading icons</string>
+    <string name="set_info_db_updt_icons_item">%1$d%% %2$s</string>
+    <string name="set_info_db_updt_complete">Update complete, please restart the app</string>
     <string name="set_info_db_updt_failed">Update failed, please try again</string>
     <string name="set_info_app">App Version</string>
     <string name="set_info_app_chk">App Version (Checking)</string>
@@ -168,7 +170,7 @@
     <string name="dlg_conn_test_failed">Connect failed, please check the network settings</string>
 
     <!-- ASR Models Dialog -->
-    <string name="dlg_asr_models">Select Language Model</string>
+    <string name="dlg_asr_model_title">Select Language Model</string>
     <string name="dlg_asr_model_en">English</string>
     <string name="dlg_asr_model_zh">Chinese</string>
     <string name="dlg_asr_model_custom">Custom</string>

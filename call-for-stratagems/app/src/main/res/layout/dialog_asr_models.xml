@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_gravity="start"
-            android:text="@string/dlg_asr_models"
+            android:text="@string/dlg_asr_model_title"
             style="@style/AppTextTitle"
             android:textSize="20sp"
             android:visibility="visible" />
@@ -59,12 +59,12 @@
                     android:layout_marginHorizontal="10dp">
 
                     <RadioGroup
-                        android:id="@+id/asr_model_group"
+                        android:id="@+id/dlg_asr_model_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <RadioButton
-                            android:id="@+id/asr_model_en"
+                            android:id="@+id/dlg_asr_model_en"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_asr_model_en"
@@ -72,7 +72,7 @@
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
-                            android:id="@+id/asr_model_zh"
+                            android:id="@+id/dlg_asr_model_zh"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_asr_model_zh"
@@ -80,7 +80,7 @@
                             tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
-                            android:id="@+id/asr_model_custom"
+                            android:id="@+id/dlg_asr_model_custom"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/dlg_asr_model_custom"
@@ -90,7 +90,7 @@
                     </RadioGroup>
 
                     <EditText
-                        android:id="@+id/asr_model_custom_input"
+                        android:id="@+id/dlg_asr_model_custom_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:importantForAutofill="no"
@@ -115,7 +115,7 @@
             android:layout_marginBottom="5dp">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/asr_model_clear"
+                android:id="@+id/dlg_asr_model_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 app:text="@string/dlg_asr_model_clear"/>
@@ -126,14 +126,14 @@
                 android:gravity="end">
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/asr_model_cancel"
+                    android:id="@+id/dlg_asr_model_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
                     app:text="@string/dlg_comm_cancel"/>
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/asr_model_confirm"
+                    android:id="@+id/dlg_asr_model_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     app:text="@string/dlg_comm_confirm"/>

@@ -116,18 +116,18 @@ class SettingsAsrFragment : Fragment() {
             val clearView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
             clearDialog.setView(clearView)
 
-            val radioGroup = modelView.findViewById<RadioGroup>(R.id.asr_model_group)
-            val confirm = modelView.findViewById<AppButton>(R.id.asr_model_confirm)
-            val cancel = modelView.findViewById<AppButton>(R.id.asr_model_cancel)
-            val clear = modelView.findViewById<AppButton>(R.id.asr_model_clear)
-            val custom = modelView.findViewById<EditText>(R.id.asr_model_custom_input)
+            val radioGroup = modelView.findViewById<RadioGroup>(R.id.dlg_asr_model_group)
+            val confirm = modelView.findViewById<AppButton>(R.id.dlg_asr_model_confirm)
+            val cancel = modelView.findViewById<AppButton>(R.id.dlg_asr_model_cancel)
+            val clear = modelView.findViewById<AppButton>(R.id.dlg_asr_model_clear)
+            val custom = modelView.findViewById<EditText>(R.id.dlg_asr_model_custom_input)
             var model = preferences.getInt("ctrl_asr_model", -1)
 
             radioGroup.check(
                 when (model) {
-                    0 -> R.id.asr_model_en
-                    1 -> R.id.asr_model_zh
-                    2 -> R.id.asr_model_custom
+                    0 -> R.id.dlg_asr_model_en
+                    1 -> R.id.dlg_asr_model_zh
+                    2 -> R.id.dlg_asr_model_custom
                     else -> -1
                 }
             )
@@ -136,9 +136,9 @@ class SettingsAsrFragment : Fragment() {
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 model = when (checkedId) {
-                    R.id.asr_model_en -> 0
-                    R.id.asr_model_zh -> 1
-                    R.id.asr_model_custom -> 2
+                    R.id.dlg_asr_model_en -> 0
+                    R.id.dlg_asr_model_zh -> 1
+                    R.id.dlg_asr_model_custom -> 2
                     else -> -1
                 }
                 custom.isEnabled = model == 2

@@ -113,11 +113,13 @@
     <string name="set_info_db_chk">数据库版本（正在检查更新）</string>
     <string name="set_info_db_updatable">数据库版本（可更新）</string>
     <string name="set_info_db_ver_diff">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
-    <string name="set_info_db_updt_title">数据库版本（正在更新）</string>
-    <string name="set_info_db_updt_idx">下载索引…</string>
-    <string name="set_info_db_updt_db">[%1$s] 下载数据库…</string>
-    <string name="set_info_db_updt_icons">[%1$s] 下载图标… (%2$d/%3$d)</string>
-    <string name="set_info_db_updt_complete">[%1$s] 更新完成，请重启程序</string>
+    <string name="set_info_db_updt_title">更新数据库</string>
+    <string name="set_info_db_updt_title2">更新数据库：%1$s</string>
+    <string name="set_info_db_updt_idx">获取数据库索引</string>
+    <string name="set_info_db_updt_db">获取数据库</string>
+    <string name="set_info_db_updt_icons">(%1$d/%2$d) 下载图标文件</string>
+    <string name="set_info_db_updt_icons_item">%1$d%% %2$s</string>
+    <string name="set_info_db_updt_complete">更新完成，请重启软件</string>
     <string name="set_info_db_updt_failed">更新失败，请重试</string>
     <string name="set_info_app">软件版本</string>
     <string name="set_info_app_chk">软件版本（检查更新）</string>
@@ -165,7 +167,7 @@
     <string name="dlg_conn_test_failed">连接失败，请检查网络设置</string>
 
     <!-- ASR Models Dialog -->
-    <string name="dlg_asr_models">选择语言模型</string>
+    <string name="dlg_asr_model_title">选择语言模型</string>
     <string name="dlg_asr_model_en">英语</string>
     <string name="dlg_asr_model_zh">中文</string>
     <string name="dlg_asr_model_custom">自定义</string>

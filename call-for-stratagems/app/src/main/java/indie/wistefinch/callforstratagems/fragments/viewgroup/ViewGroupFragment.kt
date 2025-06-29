@@ -89,20 +89,20 @@ class ViewGroupFragment : Fragment() {
             dialog.setView(dialogView)
             dialog.show()
 
-            dialogView.findViewById<ImageView>(R.id.dialog_info_icon).setImageResource(R.drawable.ic_alert)
-            dialogView.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.dlg_delete_title)
-            dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
+            dialogView.findViewById<ImageView>(R.id.dlg_info_icon).setImageResource(R.drawable.ic_alert)
+            dialogView.findViewById<TextView>(R.id.dlg_info_title).setText(R.string.dlg_delete_title)
+            dialogView.findViewById<TextView>(R.id.dlg_info_msg).text = String.format(
                 getString(R.string.dlg_delete_desc),
                 currentItem.title
             )
-            val button1 = dialogView.findViewById<AppButton>(R.id.dialog_info_button1)
+            val button1 = dialogView.findViewById<AppButton>(R.id.dlg_info_button1)
             button1.setAlert(true)
             button1.setOnClickListener {
                 groupViewModel.deleteItem(currentItem)
                 findNavController().popBackStack(R.id.rootFragment, false)
                 dialog.hide()
             }
-            dialogView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+            dialogView.findViewById<AppButton>(R.id.dlg_info_button2).setOnClickListener {
                 dialog.hide()
             }
         }
@@ -127,17 +127,17 @@ class ViewGroupFragment : Fragment() {
             dialog.setView(dialogView)
             dialog.show()
 
-            dialogView.findViewById<TextView>(R.id.dialog_info_title)
+            dialogView.findViewById<TextView>(R.id.dlg_info_title)
                 .setText(R.string.dlg_group_db_not_match_title)
-            dialogView.findViewById<TextView>(R.id.dialog_info_msg).text = String.format(
+            dialogView.findViewById<TextView>(R.id.dlg_info_msg).text = String.format(
                 getString(R.string.dlg_group_db_not_match_desc),
                 currentItem.dbName,
                 dbName
             )
-            dialogView.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+            dialogView.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
                 dialog.hide()
             }
-            val button2 = dialogView.findViewById<AppButton>(R.id.dialog_info_button2)
+            val button2 = dialogView.findViewById<AppButton>(R.id.dlg_info_button2)
             button2.setTitle(resources.getString(R.string.dlg_comm_settings))
             button2.setOnClickListener {
                 val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))

@@ -85,21 +85,21 @@ class RootFragment : Fragment() {
             dialog.setView(view)
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title)
+            view.findViewById<TextView>(R.id.dlg_info_title)
                 .setText(R.string.dlg_db_incomplete_title)
-            view.findViewById<TextView>(R.id.dialog_info_msg)
+            view.findViewById<TextView>(R.id.dlg_info_msg)
                 .setText(R.string.dlg_db_incomplete_desc)
-            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+            view.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
                 dialog.hide()
             }
-            val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
+            val button2 = view.findViewById<AppButton>(R.id.dlg_info_button2)
             button2.setTitle(resources.getString(R.string.dlg_comm_settings))
             button2.setOnClickListener {
                 val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
                 findNavController().navigate(R.id.settingsFragment, bundle)
                 dialog.hide()
             }
-            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            val button3 = view.findViewById<AppButton>(R.id.dlg_info_button3)
             button3.visibility = VISIBLE
             button3.setTitle(resources.getString(R.string.dlg_comm_ignore))
             button3.setAlert(true)
@@ -124,16 +124,16 @@ class RootFragment : Fragment() {
             }
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).text =
+            view.findViewById<TextView>(R.id.dlg_info_title).text =
                 String.format(resources.getString(R.string.dlg_welcome_title), ver)
-            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.dlg_welcome_desc)
-            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+            view.findViewById<TextView>(R.id.dlg_info_msg).setText(R.string.dlg_welcome_desc)
+            view.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
                 dialog.hide()
             }
             @SuppressLint("CutPasteId")
-            view.findViewById<AppButton>(R.id.dialog_info_button2).visibility = GONE
-            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            view.findViewById<AppButton>(R.id.dlg_info_button2).visibility = GONE
+            val button3 = view.findViewById<AppButton>(R.id.dlg_info_button3)
             button3.visibility = VISIBLE
             button3.setTitle(resources.getString(R.string.dlg_welcome_usage))
             button3.setOnClickListener {

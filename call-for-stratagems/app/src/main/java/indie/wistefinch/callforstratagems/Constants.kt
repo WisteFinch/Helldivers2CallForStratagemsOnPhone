@@ -12,6 +12,8 @@ object Constants {
     const val URL_APP_USAGE: String = "https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/usage.md"
     const val URL_DB_HD2: String = "https://cfsdb-hd2.wistefinch.site"
     const val URL_DB_HD: String = "https://cfsdb-hd.wistefinch.site"
+    const val URL_ASR_MODEL_EN: String = "https://cfs-asr.wistefinch.site/en.json"
+    const val URL_ASR_MODEL_ZH: String = "https://cfs-asr.wistefinch.site/zh.json"
     const val ID_DB_HD2: String = "hd2_db"
     const val ID_DB_HD: String = "hd_db"
 
