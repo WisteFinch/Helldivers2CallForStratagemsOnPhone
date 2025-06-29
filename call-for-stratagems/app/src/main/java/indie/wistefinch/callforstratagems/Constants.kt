@@ -4,6 +4,7 @@ object Constants {
     const val API_VERSION: Int = 6
 
     const val PATH_DB_ICONS: String = "/icons/"
+    const val PATH_ASR_MODELS: String = "/models/"
     const val URL_APP_REPO: String = "https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone"
     const val URL_APP_RELEASE: String = "https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest"
     const val URL_APP_RELEASE_API: String = "https://api.github.com/repos/WisteFinch/Helldivers2CallForStratagemsOnPhone/releases/latest"

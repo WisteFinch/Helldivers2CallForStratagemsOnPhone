@@ -34,8 +34,8 @@ data class AppSettingsCtrlData(
     var fastboot: Boolean = false,
     var sfx: Boolean = false,
     var vibrator: Boolean = false,
-    var sdt: Float = 100f,
-    var svt: Float = 50f,
+    var sdt: Int = 100,
+    var svt: Int = 50,
     var lang: String = "en",
 )
 

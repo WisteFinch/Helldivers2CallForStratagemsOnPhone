@@ -21,6 +21,13 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters += listOf("arm64-v8a")
+            // Add support for x86_64 devices
+            // abiFilters += listOf("x86_64")
+        }
     }
 
     buildTypes {
@@ -64,6 +71,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidsvg.aar)
     implementation(libs.zxing.lite)
+    implementation(libs.okhttp)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -53,6 +54,7 @@ import indie.wistefinch.callforstratagems.network.SyncConfigInputData
 import indie.wistefinch.callforstratagems.network.SyncConfigServerData
 import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.utils.AppButton
+import indie.wistefinch.callforstratagems.utils.DownloadService
 import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -121,7 +123,8 @@ class SettingsFragment : Fragment() {
                             getString(R.string.tcp_scan_success),
                             Toast.LENGTH_SHORT
                         ).show()
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        Log.e("[Settings] QRCode Scanner", e.toString())
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.tcp_scan_failed),
@@ -190,13 +193,13 @@ class SettingsFragment : Fragment() {
                         preferences.getBoolean("ctrl_fastboot", false),
                         preferences.getBoolean("ctrl_sfx", false),
                         preferences.getBoolean("ctrl_vibrator", false),
-                        preferences.getFloat(
+                        preferences.getInt(
                             "ctrl_sdt",
-                            100f
+                            100
                         ),
-                        preferences.getFloat(
+                        preferences.getInt(
                             "ctrl_svt",
-                            50f
+                            50
                         ),
                         preferences.getString(
                             "ctrl_lang",
@@ -226,6 +229,7 @@ class SettingsFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: Exception) {
+                        Log.e("[Settings] Export User Data", e.toString())
                         Toast.makeText(
                             requireContext(),
                             String.format(getString(R.string.set_info_export_failed), e.toString()),
@@ -311,8 +315,8 @@ class SettingsFragment : Fragment() {
                                 putBoolean("ctrl_fastboot", ctrl.fastboot)
                                 putBoolean("ctrl_sfx", ctrl.sfx)
                                 putBoolean("ctrl_vibrator", ctrl.vibrator)
-                                putFloat("ctrl_sdt", ctrl.sdt)
-                                putFloat("ctrl_svt", ctrl.svt)
+                                putInt("ctrl_sdt", ctrl.sdt)
+                                putInt("ctrl_svt", ctrl.svt)
                                 putString("ctrl_lang", ctrl.lang)
                                 putInt("db_channel", db.channel)
                                 putString("db_custom", db.custom)
@@ -340,6 +344,7 @@ class SettingsFragment : Fragment() {
                             ).show()
                         }
                     } catch (e: Exception) {
+                        Log.e("[Settings] Import User Data", e.toString())
                         Toast.makeText(
                             requireContext(),
                             String.format(getString(R.string.set_info_import_failed), e.toString()),
@@ -519,15 +524,15 @@ class SettingsFragment : Fragment() {
         binding.setCtrlVibrator.isChecked =
             preferences.getBoolean("ctrl_vibrator", false)
         binding.setCtrlGstSwpDistanceThreshold.setText(
-            preferences.getFloat(
+            preferences.getInt(
                 "ctrl_sdt",
-                100f
+                100
             ).toString()
         )
         binding.setCtrlGstSwpVelocityThreshold.setText(
-            preferences.getFloat(
+            preferences.getInt(
                 "ctrl_svt",
-                50f
+                50
             ).toString()
         )
         binding.setCtrlLangStratagem.setSelection(
@@ -538,6 +543,9 @@ class SettingsFragment : Fragment() {
                 )
             )
         )
+        binding.setCtrlAsr.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_settingsASRFragment)
+        }
         // Info
         // Set database version
         binding.setInfoDb.setHint(
@@ -578,14 +586,14 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "conn_port",
-                    if (text.toString().isEmpty()) 23333 else text.toString().toInt()
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(0, 65535)
                 )
                 apply()
             }
         }
         binding.setConnRetry.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putInt("conn_retry", if (text.toString().isEmpty()) 5 else text.toString().toInt())
+                putInt("conn_retry", (if (text.toString().isEmpty()) 5 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE))
                 apply()
             }
         }
@@ -594,7 +602,7 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "sync_server_port",
-                    if (text.toString().isEmpty()) 23333 else text.toString().toInt()
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(0, 65535)
                 )
                 apply()
             }
@@ -603,7 +611,7 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "sync_input_delay",
-                    if (text.toString().isEmpty()) 25 else text.toString().toInt()
+                    (if (text.toString().isEmpty()) 25 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
                 )
                 apply()
             }
@@ -716,7 +724,7 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "ctrl_stratagem_size",
-                    if (text.toString().isEmpty()) 100 else text.toString().toInt()
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(1, 1000)
                 )
                 apply()
             }
@@ -741,18 +749,18 @@ class SettingsFragment : Fragment() {
         }
         binding.setCtrlGstSwpDistanceThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putFloat(
+                putInt(
                     "ctrl_sdt",
-                    if (text.toString().isEmpty()) 100f else text.toString().toFloat()
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
                 )
                 apply()
             }
         }
         binding.setCtrlGstSwpVelocityThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putFloat(
+                putInt(
                     "ctrl_svt",
-                    if (text.toString().isEmpty()) 50f else text.toString().toFloat()
+                    (if (text.toString().isEmpty()) 50 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
                 )
                 apply()
             }
@@ -1053,8 +1061,7 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_chk))
             try {
-                val json =
-                    JSONObject(Utils.downloadToStr(Constants.URL_APP_RELEASE_API))
+                val json = JSONObject(DownloadService(Constants.URL_APP_RELEASE_API).downloadAsStr())
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
@@ -1116,7 +1123,8 @@ class SettingsFragment : Fragment() {
                             }
                     }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("[Settings] Check App Ver", e.toString())
                 withContext(Dispatchers.Main) {
                     binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app))
                 }
@@ -1256,7 +1264,7 @@ class SettingsFragment : Fragment() {
                         preferences.edit().putString("db_version", "1").apply()
 
                         // Download index.
-                        val indexObj = JSONObject(Utils.downloadToStr(url + "index.json"))
+                        val indexObj = JSONObject(DownloadService(url + "index.json").downloadAsStr())
                         val date = indexObj.getString("date")
                         val dbUrl = url + indexObj.getString("db_path")
                         val iconsUrl = url + indexObj.getString("icons_path")
@@ -1281,7 +1289,7 @@ class SettingsFragment : Fragment() {
                             )
                             binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updt_title))
                         }
-                        val dbObj = JSONObject(Utils.downloadToStr(dbUrl))
+                        val dbObj = JSONObject(DownloadService(dbUrl).downloadAsStr())
                         // Regenerate database.
                         stratagemViewModel.deleteAll()
                         val rows = dbObj.getJSONArray("objects")
@@ -1347,6 +1355,7 @@ class SettingsFragment : Fragment() {
                             )
                         }
                     } catch (e: Exception) {
+                        Log.e("[Settings] Update DB", e.toString())
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
                         withContext(Dispatchers.Main) {
                             binding.setInfoDb.setHint(resources.getString(R.string.set_info_db_updt_failed))
@@ -1399,7 +1408,7 @@ class SettingsFragment : Fragment() {
                 url = "$url/"
             }
 
-            val json = JSONObject(Utils.downloadToStr(url + "index.json"))
+            val json = JSONObject(DownloadService(url + "index.json").downloadAsStr())
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {
@@ -1433,7 +1442,8 @@ class SettingsFragment : Fragment() {
                     )
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e("[Settings] Check DB Ver", e.toString())
             withContext(Dispatchers.Main) {
                 binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
             }

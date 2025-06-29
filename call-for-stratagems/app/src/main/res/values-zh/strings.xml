@@ -50,12 +50,13 @@
     <string name="set_sync_port">端口</string>
     <string name="set_sync_delay">输入延迟</string>
     <string name="set_sync_input_open">输入：打开战略配备列表</string>
-    <string name="set_sync_advance">高级选项</string>
+    <string name="set_sync_advance_hdr">高级选项</string>
     <string name="set_sync_advance_alert">修改下列设置可能降低服务器稳定性</string>
     <string name="set_sync_apply">应用配置至服务器</string>
     <string name="set_sync_apply_finished">请在服务器上接受请求，然后重启服务器来应用配置</string>
     <string name="set_unit_ms">毫秒</string>
     <string name="set_unit_day">天</string>
+    <string name="set_unit_percentage">%</string>
     <string name="set_sync_type_open">类型：打开战略配备列表</string>
     <string name="set_sync_input_up">输入：上</string>
     <string name="set_sync_input_down">输入：下</string>
@@ -85,6 +86,24 @@
     <string name="set_ctrl_sfx_desc">启用按键输入和战备激活的音效</string>
     <string name="set_ctrl_vibrator">启用震动</string>
     <string name="set_ctrl_vibrator_desc">启用按键输入和战备激活的震动</string>
+    <string name="set_ctrl_asr_hdr">语音识别</string>
+    <string name="set_ctrl_asr_alert">实验性功能</string>
+    <string name="set_ctrl_asr_alert_desc">启用语音识别将增加发热和耗电量</string>
+    <string name="set_ctrl_asr_models">选择语言模型</string>
+    <string name="set_ctrl_asr_model_null">未选择模型</string>
+    <string name="set_ctrl_asr_model_enabled">启用的模型：[%1$s]</string>
+    <string name="set_ctrl_asr_enable">启用语音识别</string>
+    <string name="set_ctrl_asr_enable_success">模型准备就绪</string>
+    <string name="set_ctrl_asr_enable_failed">禁用：未选择模型</string>
+    <string name="set_ctrl_asr_similarity">识别相似度阈值</string>
+    <string name="set_ctrl_asr_similarity_desc">当识别文本与目标文本相似度大于阈值时，激活相似度最大的战备</string>
+    <string name="set_ctrl_asr_gpu">启用硬件加速</string>
+    <string name="set_ctrl_asr_gpu_desc">使用GPU运行模型</string>
+    <string name="set_ctrl_asr_activate">配置激活词</string>
+    <string name="set_ctrl_asr_activate_desc">识别到特定语句后，激活语音识别功能</string>
+    <string name="set_ctrl_asr_words">配置识别词</string>
+    <string name="set_ctrl_asr_words_desc">为每个战备指定识别语句</string>
+    <string name="set_ctrl_asr_test">识别测试</string>
     <string name="set_info_hdr">信息</string>
     <string name="set_info_db">数据库版本</string>
     <string name="set_info_db_ver">[%1$s] %2$s</string>
@@ -145,6 +164,15 @@
     <string name="dlg_conn_test_success">成功</string>
     <string name="dlg_conn_test_failed">连接失败，请检查网络设置</string>
 
+    <!-- ASR Models Dialog -->
+    <string name="dlg_asr_models">选择语言模型</string>
+    <string name="dlg_asr_model_en">英语</string>
+    <string name="dlg_asr_model_zh">中文</string>
+    <string name="dlg_asr_model_custom">自定义</string>
+    <string name="dlg_asr_model_custom_url">自定义模型索引地址</string>
+    <string name="dlg_asr_model_clear">清除缓存</string>
+    <string name="dlg_asr_model_clear_desc">清除缓存的模型文件</string>
+
     <!-- DB Update Dialog -->
     <string name="dlg_db_updt_title">选择数据库渠道</string>
     <string name="dlg_db_updt_channel_hd2">绝地潜兵2</string>
@@ -177,7 +205,7 @@
 
     <!-- About Dialog -->
     <string name="dlg_about_title">呼叫战略配备 v%1$s</string>
-    <string name="dlg_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
+    <string name="dlg_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314\n\tsherpa-ncnn - k2-fsa</string>
     <string name="dlg_about_usage">用法</string>
     <string name="dlg_about_license">许可证</string>
     <string name="dlg_about_repo">项目仓库</string>

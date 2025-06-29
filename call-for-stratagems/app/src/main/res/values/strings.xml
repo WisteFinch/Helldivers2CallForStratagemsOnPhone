@@ -52,12 +52,13 @@
     <string name="set_sync_port">Port</string>
     <string name="set_sync_delay">Input Interval Time</string>
     <string name="set_sync_input_open">Input: Open Stratagems List</string>
-    <string name="set_sync_advance">Advanced Options</string>
+    <string name="set_sync_advance_hdr">Advanced Options</string>
     <string name="set_sync_advance_alert">Modifying the following settings may reduce server stability</string>
     <string name="set_sync_apply">Apply Configuration to Server</string>
     <string name="set_sync_apply_finished">Please accept the request on the server, then restart the server to apply the configuration</string>
     <string name="set_unit_ms">ms</string>
     <string name="set_unit_day">days</string>
+    <string name="set_unit_percentage">%</string>
     <string name="set_sync_type_open">Type: Open Stratagems List</string>
     <string name="set_sync_input_up">Input: Up</string>
     <string name="set_sync_input_down">Input: Down</string>
@@ -87,6 +88,24 @@
     <string name="set_ctrl_sfx_desc">Enable sound effects for step input and stratagem activation</string>
     <string name="set_ctrl_vibrator">Enable Vibrator</string>
     <string name="set_ctrl_vibrator_desc">Enable vibrator for step input and stratagem activation</string>
+    <string name="set_ctrl_asr_hdr">Speech Recognition</string>
+    <string name="set_ctrl_asr_alert">Experimental Features</string>
+    <string name="set_ctrl_asr_alert_desc">Enabling speech recognition will increase heating and power consumption</string>
+    <string name="set_ctrl_asr_models">Select Language Model</string>
+    <string name="set_ctrl_asr_model_null">No model selected</string>
+    <string name="set_ctrl_asr_model_enabled">Enabled model: [%1$s]</string>
+    <string name="set_ctrl_asr_enable">Enable Speech Recognition</string>
+    <string name="set_ctrl_asr_enable_success">Model ready</string>
+    <string name="set_ctrl_asr_enable_failed">Disabled: no model selected</string>
+    <string name="set_ctrl_asr_similarity">Similarity Threshold</string>
+    <string name="set_ctrl_asr_similarity_desc">If the similarity between the recognized text and the target text exceeds the threshold, the most similar stratagem will be activated</string>
+    <string name="set_ctrl_asr_gpu">Enable Hardware Acceleration</string>
+    <string name="set_ctrl_asr_gpu_desc">Run model on GPU</string>
+    <string name="set_ctrl_asr_activate">Configure Activation Words</string>
+    <string name="set_ctrl_asr_activate_desc">Upon recognizing the specified word, activate the speech recognition function</string>
+    <string name="set_ctrl_asr_words">Configure Recognition Words</string>
+    <string name="set_ctrl_asr_words_desc">Assign recognition words for each stratagem</string>
+    <string name="set_ctrl_asr_test">Recognition Test</string>
     <string name="set_info_hdr">Info</string>
     <string name="set_info_db">Database Version</string>
     <string name="set_info_db_ver">[%1$s] %2$s</string>
@@ -148,6 +167,15 @@
     <string name="dlg_conn_test_success">Success</string>
     <string name="dlg_conn_test_failed">Connect failed, please check the network settings</string>
 
+    <!-- ASR Models Dialog -->
+    <string name="dlg_asr_models">Select Language Model</string>
+    <string name="dlg_asr_model_en">English</string>
+    <string name="dlg_asr_model_zh">Chinese</string>
+    <string name="dlg_asr_model_custom">Custom</string>
+    <string name="dlg_asr_model_custom_url">Custom Model Index URL</string>
+    <string name="dlg_asr_model_clear">Clear Cache</string>
+    <string name="dlg_asr_model_clear_desc">Clear cached model files</string>
+
     <!-- DB Update Dialog -->
     <string name="dlg_db_updt_title">Select Database Channel</string>
     <string name="dlg_db_updt_channel_hd2">Helldivers 2</string>
@@ -180,7 +208,7 @@
 
     <!-- About Dialog -->
     <string name="dlg_about_title">CallForStratagems v%1$s</string>
-    <string name="dlg_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
+    <string name="dlg_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314\n\tsherpa-ncnn - k2-fsa</string>
     <string name="dlg_about_usage">Usage</string>
     <string name="dlg_about_license">License</string>
     <string name="dlg_about_repo">Project Repo</string>

@@ -43,7 +43,7 @@
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/set_sync_hdr"
+            android:text="@string/set_sync_advance_hdr"
             android:textSize="24sp"
             android:theme="@style/AppTextTitle" />
 
@@ -69,38 +69,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:background="@color/backgroundPrimary"
-                        android:contentDescription="@string/default_string"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/stripes"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="@string/set_sync_advance"
-                        android:theme="@style/AppTitle"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="5dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

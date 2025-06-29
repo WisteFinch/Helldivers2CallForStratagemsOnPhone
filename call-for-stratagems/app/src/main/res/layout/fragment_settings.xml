@@ -563,7 +563,7 @@
                     android:id="@+id/set_sync_advance"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    app:text="@string/set_sync_advance" />
+                    app:text="@string/set_sync_advance_hdr" />
 
                 <Space
                     android:layout_width="match_parent"
@@ -976,6 +976,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
+                <indie.wistefinch.callforstratagems.utils.AppButton
+                    android:id="@+id/set_ctrl_asr"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:text="@string/set_ctrl_asr_hdr" />
 
             </LinearLayout>
 

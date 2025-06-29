@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsSyncBinding
-import kotlin.math.max
 
 class SettingsSyncFragment : Fragment() {
     // View binding.
@@ -80,7 +79,7 @@ class SettingsSyncFragment : Fragment() {
                 with(preferences.edit()) {
                     putInt(
                         "sync_auth_timeout",
-                        max(1, if (text.toString().isEmpty()) 3 else text.toString().toInt())
+                        (if (text.toString().isEmpty()) 3 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
                     )
                     apply()
                 }

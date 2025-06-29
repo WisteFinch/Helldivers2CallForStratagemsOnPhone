@@ -203,8 +203,8 @@ class PlayFragment : Fragment() {
     ): View {
         // Get preference.
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        distanceThreshold = preferences.getFloat("ctrl_sdt", 100f).toDouble()
-        velocityThreshold = preferences.getFloat("ctrl_svt", 50f).toDouble()
+        distanceThreshold = preferences.getInt("ctrl_sdt", 100).toDouble()
+        velocityThreshold = preferences.getInt("ctrl_svt", 50).toDouble()
         enableSimplifiedMode = preferences.getBoolean("ctrl_simplified", false)
         enableSfx = preferences.getBoolean("ctrl_sfx", false)
         enableVibrator = preferences.getBoolean("ctrl_vibrator", false)
