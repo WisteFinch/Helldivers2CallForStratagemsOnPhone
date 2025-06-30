@@ -19,6 +19,10 @@ class DownloadService(
         job = scope.launch(Dispatchers.IO) {
             try {
                 val file = File(path)
+                val dlFile = File("$path.download")
+                if (dlFile.exists()) {
+                    dlFile.delete()
+                }
                 if (!file.getParentFile()?.exists()!!) {
                     file.getParentFile()?.mkdirs()
                 }
@@ -37,7 +41,9 @@ class DownloadService(
                         val body = response.body ?: throw Exception("Err: Body empty")
                         val totalLength = body.contentLength()
 
-                        val outputStream = FileOutputStream(file)
+                        Log.i("[DownloadService]", "$url -> $path ($totalLength)")
+
+                        val outputStream = FileOutputStream(dlFile)
                         val inputStream: InputStream = body.byteStream()
 
                         val buffer = ByteArray(8 * 1024)
@@ -52,7 +58,7 @@ class DownloadService(
                                     downloaded += bytesRead
 
                                     val currentTime = System.currentTimeMillis()
-                                    if (currentTime - lastUpdateTime >= 500 || downloaded == totalLength) {
+                                    if (currentTime - lastUpdateTime >= 200 || downloaded == totalLength) {
                                         withContext(Dispatchers.Main) {
                                             onProgress(downloaded, totalLength)
                                         }
@@ -61,6 +67,7 @@ class DownloadService(
                                 }
                             }
                         }
+                        dlFile.renameTo(file)
                         withContext(Dispatchers.Main) {
                             if (isActive) onProgress(downloaded, totalLength)
                             if (isActive) onComplete()

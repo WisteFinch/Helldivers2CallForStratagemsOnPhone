@@ -12,6 +12,7 @@ import indie.wistefinch.callforstratagems.R
 class AppProgressBar : ConstraintLayout {
     private var textView: TextView
     private var progressView: ProgressBar
+    private var hintView: TextView
 
     constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0)
     constructor(context: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
@@ -22,6 +23,7 @@ class AppProgressBar : ConstraintLayout {
         val views = LayoutInflater.from(context).inflate(R.layout.layout_app_progress_bar, this, true)
         textView = views.findViewById(R.id.app_progress_bar_text)
         progressView = views.findViewById(R.id.app_progress_bar_value)
+        hintView = views.findViewById(R.id.app_progress_bar_hint)
 
         val attrs = context.obtainStyledAttributes(attributeSet, R.styleable.AppProgressBar)
         if (attrs.hasValue(R.styleable.AppProgressBar_title)) {
@@ -43,5 +45,13 @@ class AppProgressBar : ConstraintLayout {
 
     fun setValue(value: Int) {
         progressView.progress = value
+    }
+    fun enableHint(flag: Boolean = true) {
+        hintView.visibility = if (flag) VISIBLE else GONE
+        hintView.text = null
+    }
+
+    fun setHint(txt: String) {
+        hintView.text = txt
     }
 }

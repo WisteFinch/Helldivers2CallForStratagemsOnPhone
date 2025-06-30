@@ -2,19 +2,37 @@ package indie.wistefinch.callforstratagems.fragments.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.RadioGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import indie.wistefinch.callforstratagems.Constants
+import indie.wistefinch.callforstratagems.Constants.PATH_ASR_MODELS
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsAsrBinding
 import indie.wistefinch.callforstratagems.utils.AppButton
+import indie.wistefinch.callforstratagems.utils.AppProgressBar
+import indie.wistefinch.callforstratagems.utils.DownloadService
+import indie.wistefinch.callforstratagems.utils.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.File
 
 class SettingsAsrFragment : Fragment() {
     // View binding.
@@ -41,7 +59,7 @@ class SettingsAsrFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        preferences = requireContext().let { PreferenceManager.getDefaultSharedPreferences(it) }
 
         // Setup dialogs
         modelDialog = AlertDialog.Builder(requireContext()).create()
@@ -51,6 +69,8 @@ class SettingsAsrFragment : Fragment() {
         setupContent()
         setupEventListener()
 
+        checkAsrModelStatus()
+
         return view
     }
 
@@ -58,7 +78,7 @@ class SettingsAsrFragment : Fragment() {
      * Setup the content of the views
      */
     private fun setupContent() {
-        binding.setCtrlAsr.isChecked = preferences.getBoolean("ctrl_asr_enabled", false)
+        binding.setCtrlAsrSwitch.isChecked = preferences.getBoolean("ctrl_asr_enabled", false)
         binding.setCtrlAsrSimilarity.setText(
             preferences.getInt(
                 "ctrl_asr_similarity",
@@ -73,7 +93,7 @@ class SettingsAsrFragment : Fragment() {
      * Setup event listener
      */
     private fun setupEventListener() {
-        binding.setCtrlAsr.setOnCheckedChangeListener { _, isChecked ->
+        binding.setCtrlAsrSwitch.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
                 putBoolean("ctrl_asr_enabled", isChecked)
                 apply()
@@ -153,6 +173,32 @@ class SettingsAsrFragment : Fragment() {
             // Clear cache.
             clear.setAlert(true)
             clear.setOnClickListener {
+                if (!clearDialog.isShowing) {
+                    clearDialog.show()
+
+                    val title = clearView.findViewById<TextView>(R.id.dlg_info_title)
+                    title.setText(R.string.dlg_asr_model_clear)
+                    clearView.findViewById<TextView>(R.id.dlg_info_msg)
+                        .setText(R.string.dlg_asr_model_clear_desc)
+                    val button1 = clearView.findViewById<AppButton>(R.id.dlg_info_button1)
+                    button1.setAlert(true)
+                    button1.setOnClickListener {
+                        val path = requireContext().filesDir.path + PATH_ASR_MODELS
+                        File(path).deleteRecursively()
+
+                        Toast.makeText(
+                            context,
+                            getString(R.string.toast_complete),
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        checkAsrModelStatus()
+                        clearDialog.hide()
+                    }
+                    clearView.findViewById<AppButton>(R.id.dlg_info_button2).setOnClickListener {
+                        clearDialog.hide()
+                    }
+                }
             }
 
             // Cancel.
@@ -160,10 +206,253 @@ class SettingsAsrFragment : Fragment() {
                 modelDialog.hide()
             }
 
-            // Select model.
-            confirm.setOnClickListener {
+            // Select model
+            confirm.setOnClickListener Confirm@{
                 modelDialog.hide()
+
+                // Get index url.
+                val rawUrl = when (model) {
+                    0 -> Constants.URL_ASR_MODEL_EN
+                    1 -> Constants.URL_ASR_MODEL_ZH
+                    2 -> preferences.getString("ctrl_asr_custom", "")!!
+                    else -> return@Confirm
+                }
+                val parsedUrl = Utils.parseUrl(rawUrl)
+
+                // Init download dialog.
+                val downloadDialog = AlertDialog.Builder(requireContext()).create()
+                val downloadView: View =
+                    View.inflate(requireContext(), R.layout.dialog_download, null)
+                downloadDialog.setView(downloadView)
+                downloadDialog.setCanceledOnTouchOutside(false)
+                val indexView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_index)
+                val filesView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_files)
+                val titleView = downloadView.findViewById<TextView>(R.id.dlg_download_title)
+                val idxTxtView = downloadView.findViewById<TextView>(R.id.dlg_download_index_text)
+                val totalPB =
+                    downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_total)
+                val itemPB = downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_item)
+                val infoView = downloadView.findViewById<TextView>(R.id.dlg_download_info)
+                val buttonView = downloadView.findViewById<AppButton>(R.id.dlg_download_button)
+                itemPB.enableHint()
+
+                // Download model.
+                val downloadJob = lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        withContext(Dispatchers.Main) {
+                            filesView.visibility = GONE
+                            indexView.visibility = VISIBLE
+                            titleView.setText(R.string.set_ctrl_asr_model_dl_title)
+                            idxTxtView.setText(R.string.set_ctrl_asr_model_dl_idx)
+                            downloadDialog.show()
+                        }
+
+                        // Download index.
+                        ensureActive()
+                        val indexObj =
+                            JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
+                        val name = indexObj.getString("name")
+                        val nameEn = indexObj.getString("nameEn")
+                        val nameZh = indexObj.getString("nameZh")
+                        val modelsPath = requireContext().filesDir.path + PATH_ASR_MODELS + "$name/"
+                        val displayName =
+                            when (requireContext().resources.configuration.locales.get(0)
+                                .toLanguageTag()) {
+                                "zh-CN" -> nameZh
+                                else -> nameEn
+                            }
+                        val downloadInfo = listOf(
+                            listOf(
+                                indexObj.getString("encoderParam"),
+                                "encoder_jit_trace-pnnx.ncnn.param"
+                            ),
+                            listOf(
+                                indexObj.getString("encoderBin"),
+                                "encoder_jit_trace-pnnx.ncnn.bin"
+                            ),
+                            listOf(
+                                indexObj.getString("decoderParam"),
+                                "decoder_jit_trace-pnnx.ncnn.param"
+                            ),
+                            listOf(
+                                indexObj.getString("decoderBin"),
+                                "decoder_jit_trace-pnnx.ncnn.bin"
+                            ),
+                            listOf(
+                                indexObj.getString("joinerParam"),
+                                "joiner_jit_trace-pnnx.ncnn.param"
+                            ),
+                            listOf(
+                                indexObj.getString("joinerBin"),
+                                "joiner_jit_trace-pnnx.ncnn.bin"
+                            ),
+                            listOf(indexObj.getString("tokens"), "tokens.txt"),
+                        )
+
+                        // Download model files.
+                        ensureActive()
+                        var index = 0
+                        withContext(Dispatchers.Main) {
+                            filesView.visibility = VISIBLE
+                            indexView.visibility = GONE
+                            titleView.text = String.format(
+                                getString(R.string.set_ctrl_asr_model_dl_title2),
+                                displayName
+                            )
+                            totalPB.setText(
+                                String.format(
+                                    getString(R.string.set_ctrl_asr_model_dl_files),
+                                    index + 1,
+                                    downloadInfo.size
+                                )
+                            )
+                            totalPB.setValue((index.toFloat() / downloadInfo.size * 100).toInt())
+                            itemPB.setText(parsedUrl.dir + downloadInfo[index][0])
+                            itemPB.setHint(
+                                String.format(
+                                    getString(R.string.set_ctrl_asr_model_dl_item),
+                                    0,
+                                    "0",
+                                    "?"
+                                )
+                            )
+                            itemPB.setValue(0)
+                        }
+                        val service = DownloadService()
+                        service.onComplete = {
+                            ensureActive()
+                            index++
+                            if (index == downloadInfo.size) {
+                                preferences.edit().putInt("ctrl_asr_model", model).apply()
+                                preferences.edit().putString("asr_model_name", name).apply()
+                                preferences.edit().putString("asr_model_name_en", nameEn).apply()
+                                preferences.edit().putString("asr_model_name_zh", nameZh).apply()
+                                buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                                buttonView.setOnClickListener {
+                                    downloadDialog.hide()
+                                }
+                                filesView.visibility = GONE
+                                infoView.visibility = VISIBLE
+                                infoView.setText(R.string.set_ctrl_asr_model_dl_complete)
+                                checkAsrModelStatus()
+                            } else {
+                                totalPB.setText(
+                                    String.format(
+                                        getString(R.string.set_ctrl_asr_model_dl_files),
+                                        index + 1,
+                                        downloadInfo.size
+                                    )
+                                )
+                                totalPB.setValue((index.toFloat() / downloadInfo.size * 100).toInt())
+                                service.downloadToFile(
+                                    parsedUrl.dir + downloadInfo[index][0],
+                                    modelsPath + downloadInfo[index][1],
+                                    this
+                                )
+                            }
+                        }
+                        service.onProgress = { d, t ->
+                            val p = if (t.toInt() == -1) 0 else (d.toFloat() / t * 100).toInt()
+                            itemPB.setText(parsedUrl.dir + downloadInfo[index][0])
+                            itemPB.setHint(
+                                String.format(
+                                    getString(R.string.set_ctrl_asr_model_dl_item),
+                                    p,
+                                    d.toString(),
+                                    if (t.toInt() == -1) "?" else t.toString()
+                                )
+                            )
+                            itemPB.setValue(p)
+                        }
+                        service.onError = { e ->
+                            Log.e("[Settings ASR] Download Model", e.toString())
+                            buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                            buttonView.setOnClickListener {
+                                downloadDialog.hide()
+                            }
+                            indexView.visibility = GONE
+                            filesView.visibility = GONE
+                            infoView.visibility = VISIBLE
+                            infoView.text = String.format(
+                                getString(R.string.set_ctrl_asr_model_dl_failed),
+                                e.toString()
+                            )
+                        }
+                        service.downloadToFile(
+                            parsedUrl.dir + downloadInfo[index][0],
+                            modelsPath + downloadInfo[index][1],
+                            this
+                        )
+                    } catch (e: Exception) {
+                        Log.e("[Settings ASR] Download Model", e.toString())
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                            buttonView.setOnClickListener {
+                                downloadDialog.hide()
+                            }
+                            indexView.visibility = GONE
+                            filesView.visibility = GONE
+                            infoView.visibility = VISIBLE
+                            infoView.text = String.format(
+                                getString(R.string.set_ctrl_asr_model_dl_failed),
+                                e.toString()
+                            )
+                        }
+                        preferences.edit().putBoolean("hint_db_incomplete", false).apply()
+                    }
+                }
+
+                buttonView.setOnClickListener {
+                    downloadDialog.hide()
+                    downloadJob.cancel()
+                }
+
+                downloadDialog.setOnCancelListener {
+                    downloadJob.cancel()
+                }
             }
         }
+    }
+
+    /**
+     * Check ASR Model Status
+     */
+    private fun checkAsrModelStatus() {
+        var flag = 0 // 0-null, 1-complete, 2-incomplete
+        val name = preferences.getString("asr_model_name", "")!!
+        val nameEn = preferences.getString("asr_model_name_en", name)!!
+        val nameZh = preferences.getString("asr_model_name_zh", name)!!
+        val displayName =
+            when (requireContext().resources.configuration.locales.get(0).toLanguageTag()) {
+                "zh-CN" -> nameZh
+                else -> nameEn
+            }
+        if (name.isNotEmpty()) {
+            flag = if (Utils.checkAsrModelFiles(requireContext(), name)) 1 else 2
+        }
+
+        binding.setCtrlAsrModels.setHint(
+            when (flag) {
+                1 -> String.format(getString(R.string.set_ctrl_asr_model_ready), displayName)
+                2 -> String.format(getString(R.string.set_ctrl_asr_model_incomplete), displayName)
+                else -> getString(R.string.set_ctrl_asr_model_null)
+            }
+        )
+        binding.setCtrlAsrSwitch.isEnabled = flag == 1
+        binding.setCtrlAsrSwitchHint.setText(
+            if (flag == 1) {
+                R.string.set_ctrl_asr_enable_success
+            } else {
+                R.string.set_ctrl_asr_enable_failed
+            }
+        )
+        binding.setCtrlAsrTest.setEnable(flag == 1)
+        binding.setCtrlAsrTest.setHint(
+            if (flag == 1) {
+                getString(R.string.set_ctrl_asr_enable_success)
+            } else {
+                getString(R.string.set_ctrl_asr_enable_failed)
+            }
+        )
     }
 }

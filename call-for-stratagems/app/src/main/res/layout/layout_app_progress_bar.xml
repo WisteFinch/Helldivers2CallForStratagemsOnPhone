@@ -10,21 +10,21 @@
         android:id="@+id/app_progress_bar_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:paddingHorizontal="2dp"
         android:text="@string/default_string"
         android:theme="@style/AppText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="TextContrastCheck"
-        android:ellipsize="marquee"
-        android:maxLines="1"
-        android:paddingHorizontal="2dp"/>
+        tools:ignore="TextContrastCheck" />
 
     <ProgressBar
         android:id="@+id/app_progress_bar_value"
         style="@style/AppProgressBar"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="25dp"
         android:layout_marginBottom="1dp"
         android:background="@drawable/dialog_bg"
         android:padding="4dp"
@@ -33,5 +33,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/app_progress_bar_text" />
+
+    <TextView
+        android:id="@+id/app_progress_bar_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
+        android:text="@string/default_string"
+        android:theme="@style/AppTextHint"
+        app:layout_constraintBottom_toBottomOf="@id/app_progress_bar_value"
+        app:layout_constraintEnd_toEndOf="@id/app_progress_bar_value"
+        app:layout_constraintStart_toStartOf="@id/app_progress_bar_value"
+        app:layout_constraintTop_toTopOf="@id/app_progress_bar_value"
+        tools:ignore="TextContrastCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

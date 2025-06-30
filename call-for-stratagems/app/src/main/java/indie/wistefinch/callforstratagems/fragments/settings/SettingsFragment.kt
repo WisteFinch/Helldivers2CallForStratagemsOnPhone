@@ -32,6 +32,7 @@ import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
 import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.Constants
+import indie.wistefinch.callforstratagems.Constants.PATH_DB_ICONS
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.AppSettingsConnData
 import indie.wistefinch.callforstratagems.data.AppSettingsCtrlData
@@ -56,6 +57,7 @@ import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.AppProgressBar
 import indie.wistefinch.callforstratagems.utils.DownloadService
+import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -221,7 +223,7 @@ class SettingsFragment : Fragment() {
                                 groupViewModel.allItemsSync
                             )
                         )
-                        val cr = context?.contentResolver!!
+                        val cr = requireContext().contentResolver
                         val os: OutputStream = cr.openOutputStream(uri)!!
                         os.write(json.toByteArray())
                         Toast.makeText(
@@ -264,7 +266,7 @@ class SettingsFragment : Fragment() {
                     val uri = result.data?.data!!
                     try {
                         // Read file
-                        val cr = context?.contentResolver!!
+                        val cr = requireContext().contentResolver
                         val os: InputStream = cr.openInputStream(uri)!!
                         val buffer = ByteArray(1024)
                         var len: Int
@@ -377,7 +379,7 @@ class SettingsFragment : Fragment() {
      */
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
-            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+            (requireActivity().application as CFSApplication).stratagemDb.stratagemDao()
         )
     }
 
@@ -386,7 +388,7 @@ class SettingsFragment : Fragment() {
      */
     private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
-            (activity?.application as CFSApplication).groupDb.groupDao()
+            (requireActivity().application as CFSApplication).groupDb.groupDao()
         )
     }
 
@@ -403,7 +405,7 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        preferences = requireContext().let { PreferenceManager.getDefaultSharedPreferences(it) }
         sid = preferences.getString("sid", "0")!!
         dbVer = preferences.getString("db_version", "0")!!
         dbName = preferences.getString("db_name", Constants.ID_DB_HD2)!!
@@ -561,8 +563,8 @@ class SettingsFragment : Fragment() {
             )
         )
         // Set app version.
-        val pkgName = context?.packageName!!
-        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        val pkgName = requireContext().packageName
+        val pkgInfo = requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
         binding.setInfoApp.setHint(
             String.format(
                 getString(R.string.set_info_app_ver),
@@ -1010,8 +1012,8 @@ class SettingsFragment : Fragment() {
             }
             aboutDialog.show()
 
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+            val pkgName = requireContext().packageName
+            val pkgInfo = requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
             val curVer = pkgInfo.versionName
 
             aboutView.findViewById<TextView>(R.id.dlg_info_title).text = String.format(
@@ -1066,9 +1068,9 @@ class SettingsFragment : Fragment() {
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
-                    val pkgName = context?.packageName!!
+                    val pkgName = requireContext().packageName
                     val pkgInfo =
-                        context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+                        requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
                     val curVer = pkgInfo.versionName
                     val title: String
                     if (curVer != newVer) {
@@ -1190,7 +1192,7 @@ class SettingsFragment : Fragment() {
                     val button1 = clearView.findViewById<AppButton>(R.id.dlg_info_button1)
                     button1.setAlert(true)
                     button1.setOnClickListener {
-                        val path = context?.filesDir?.path + "/icons"
+                        val path = requireContext().filesDir.path + PATH_DB_ICONS
                         File(path).deleteRecursively()
                         preferences.edit().putString("db_version", "0").apply()
                         preferences.edit().putString("db_name", getString(R.string.default_string))
@@ -1238,18 +1240,17 @@ class SettingsFragment : Fragment() {
                 preferences.edit()
                     .putString("db_name", resources.getString(R.string.default_string)).apply()
 
-                var url: String = when (preferences.getInt("db_channel", 0)) {
+                // Get index url.
+                var rawUrl: String = when (preferences.getInt("db_channel", 0)) {
                     0 -> Constants.URL_DB_HD2
                     1 -> Constants.URL_DB_HD
                     2 -> preferences.getString("db_custom", "")!!
                     else -> Constants.URL_DB_HD2
                 }
-                if (url.isEmpty()) {
-                    url = getString(R.string.default_string)
+                if (rawUrl.isEmpty()) {
+                    rawUrl = getString(R.string.default_string)
                 }
-                if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
-                    url = "$url/"
-                }
+                val parsedUrl = Utils.parseUrl(rawUrl, "index.json")
 
                 // Init download dialog.
                 val downloadDialog = AlertDialog.Builder(requireContext()).create()
@@ -1264,6 +1265,7 @@ class SettingsFragment : Fragment() {
                 val itemPB = downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_item)
                 val infoView = downloadView.findViewById<TextView>(R.id.dlg_download_info)
                 val buttonView = downloadView.findViewById<AppButton>(R.id.dlg_download_button)
+                itemPB.enableHint()
 
                 var isFinished = false
 
@@ -1287,15 +1289,15 @@ class SettingsFragment : Fragment() {
 
                         // Download index.
                         ensureActive()
-                        val indexObj = JSONObject(DownloadService().downloadAsStr(url + "index.json"))
+                        val indexObj = JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
                         val date = indexObj.getString("date")
-                        val dbUrl = url + indexObj.getString("db_path")
-                        val iconsUrl = url + indexObj.getString("icons_path")
+                        val dbUrl = parsedUrl.dir + indexObj.getString("db_path")
+                        val iconsUrl = parsedUrl.dir + indexObj.getString("icons_path")
                         val iconsList: MutableList<String> = emptyList<String>().toMutableList()
                         val name = indexObj.getString("name")
                         val nameEn = indexObj.getString("nameEn")
                         val nameZh = indexObj.getString("nameZh")
-                        val iconsPath = context?.filesDir?.path + "/icons/$name/"
+                        val iconsPath = requireContext().filesDir.path + PATH_DB_ICONS + "$name/"
                         val displayName = when (requireContext().resources.configuration.locales.get(0).toLanguageTag()) {
                             "zh-CN" -> nameZh
                             else -> nameEn
@@ -1357,11 +1359,13 @@ class SettingsFragment : Fragment() {
                             indexView.visibility = GONE
                             totalPB.setText(String.format(getString(R.string.set_info_db_updt_icons), index + 1, iconsList.size))
                             totalPB.setValue((index.toFloat() / iconsList.size * 100).toInt())
-                            itemPB.setText(String.format(getString(R.string.set_info_db_updt_icons_item), 0, iconsUrl + iconsList[index] + ".svg"))
+                            itemPB.setText(iconsUrl + iconsList[index] + ".svg")
+                            itemPB.setHint(String.format(getString(R.string.set_info_db_updt_icons_item), 0, "0", "?"))
                             itemPB.setValue(0)
                         }
                         val service = DownloadService()
                         service.onComplete = {
+                            ensureActive()
                             index++
                             if (index == iconsList.size) {
                                 preferences.edit().putString("db_version", date).apply()
@@ -1386,7 +1390,8 @@ class SettingsFragment : Fragment() {
                         }
                         service.onProgress = {d, t->
                             val p = if(t.toInt() == -1) 0 else (d.toFloat() / t *100).toInt()
-                            itemPB.setText(String.format(getString(R.string.set_info_db_updt_icons_item), p, iconsUrl + iconsList[index] + ".svg"))
+                            itemPB.setText(iconsUrl + iconsList[index] + ".svg")
+                            itemPB.setHint(String.format(getString(R.string.set_info_db_updt_icons_item), p, d.toString(), if(t.toInt() == -1) "?" else t.toString()))
                             itemPB.setValue(p)
                         }
                         service.onError = { e ->
@@ -1398,7 +1403,7 @@ class SettingsFragment : Fragment() {
                             indexView.visibility = GONE
                             filesView.visibility = GONE
                             infoView.visibility = VISIBLE
-                            infoView.text = e.toString()
+                            infoView.text = String.format(getString(R.string.set_info_db_updt_failed), e.toString())
                         }
                         service.downloadToFile(iconsUrl + iconsList[index] + ".svg", iconsPath + iconsList[index] + ".svg", this)
                     } catch (e: Exception) {
@@ -1411,7 +1416,7 @@ class SettingsFragment : Fragment() {
                             indexView.visibility = GONE
                             filesView.visibility = GONE
                             infoView.visibility = VISIBLE
-                            infoView.text = e.toString()
+                            infoView.text = String.format(getString(R.string.set_info_db_updt_failed), e.toString())
                         }
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
@@ -1482,20 +1487,19 @@ class SettingsFragment : Fragment() {
             )
         )
         try {
-            var url: String = when (preferences.getInt("db_channel", 0)) {
+            // Get index url.
+            var rawUrl: String = when (preferences.getInt("db_channel", 0)) {
                 0 -> Constants.URL_DB_HD2
                 1 -> Constants.URL_DB_HD
                 2 -> preferences.getString("db_custom", "")!!
                 else -> Constants.URL_DB_HD2
             }
-            if (url.isEmpty()) {
-                url = getString(R.string.default_string)
+            if (rawUrl.isEmpty()) {
+                rawUrl = getString(R.string.default_string)
             }
-            if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
-                url = "$url/"
-            }
+            val parsedUrl = Utils.parseUrl(rawUrl, "index.json")
 
-            val json = JSONObject(DownloadService().downloadAsStr(url + "index.json"))
+            val json = JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {

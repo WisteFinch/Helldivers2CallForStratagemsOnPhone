@@ -144,6 +144,7 @@
                         android:theme="@style/AppText" />
 
                     <TextView
+                        android:id="@+id/set_ctrl_asr_switch_hint"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/default_string"
@@ -157,7 +158,7 @@
                     tools:ignore="TooManyViews" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/set_ctrl_asr"
+                    android:id="@+id/set_ctrl_asr_switch"
                     android:layout_width="75dp"
                     android:layout_height="35dp"
                     app:trackTint="@color/switch_color"

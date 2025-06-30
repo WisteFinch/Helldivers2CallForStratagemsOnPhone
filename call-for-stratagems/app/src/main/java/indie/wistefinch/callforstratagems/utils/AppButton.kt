@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import indie.wistefinch.callforstratagems.R
@@ -17,7 +16,8 @@ class AppButton : ConstraintLayout {
     private var iconView: ImageView
     private var borderTopView: View
     private var borderBottomView: View
-    private var bgView: LinearLayout
+    private var bgView: ImageView
+    private var views: View
 
     constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0)
     constructor(context: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
@@ -25,7 +25,7 @@ class AppButton : ConstraintLayout {
         attributeSet,
         defStyleAttr
     ) {
-        val views = LayoutInflater.from(context).inflate(R.layout.layout_app_button, this, true)
+        views = LayoutInflater.from(context).inflate(R.layout.layout_app_button, this, true)
         titleView = views.findViewById(R.id.app_button_text)
         hintView = views.findViewById(R.id.app_button_hint)
         iconView = views.findViewById(R.id.app_button_icon)
@@ -49,7 +49,8 @@ class AppButton : ConstraintLayout {
         }
         if (attrs.hasValue(R.styleable.AppButton_iconWidth)) {
             iconView.visibility = VISIBLE
-            iconView.layoutParams.width = attrs.getDimension(R.styleable.AppButton_iconWidth, 50f).toInt()
+            iconView.layoutParams.width =
+                attrs.getDimension(R.styleable.AppButton_iconWidth, 50f).toInt()
         }
 
         borderTopView.setBackgroundResource(R.drawable.clickable_bg_top)
@@ -112,5 +113,10 @@ class AppButton : ConstraintLayout {
         if (flag) {
             titleView.setTextColor(resources.getColor(R.color.buttonTextAlert, context.theme))
         }
+    }
+
+    fun setEnable(flag: Boolean = true) {
+        views.isEnabled = flag
+        bgView.isEnabled = flag
     }
 }

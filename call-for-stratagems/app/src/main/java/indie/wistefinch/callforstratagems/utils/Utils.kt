@@ -1,12 +1,10 @@
 package indie.wistefinch.callforstratagems.utils
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import indie.wistefinch.callforstratagems.Constants.PATH_ASR_MODELS
 import java.io.File
 import java.net.URL
 import java.util.Random
-import javax.net.ssl.HttpsURLConnection
 
 
 /**
@@ -29,66 +27,64 @@ class Utils {
             return sb.toString()
         }
 
+
+        data class UrlParts(val dir: String, val fileName: String)
+
         /**
-         * Download file.
+         * For the given URL, retrieve the directory URL.
          */
-        suspend fun download(url: String, path: String, deleteIfExist: Boolean = true) {
-            withContext(Dispatchers.IO) {
-                val connection: HttpsURLConnection ?
-                try {
-                    val file = File(path)
-                    if (!file.getParentFile()?.exists()!!) {
-                        file.getParentFile()?.mkdirs()
-                    }
-                    if (file.exists()) {
-                        if (deleteIfExist) {
-                            file.delete()
-                        }
-                        else {
-                            return@withContext
-                        }
-                    }
-                    connection = (URL(url).openConnection() as HttpsURLConnection).apply {
-                        requestMethod = "GET"
-                        connectTimeout = 10 * 1000
-                        readTimeout = 10 * 1000
-                    }
-                    val bytes = connection.inputStream.readBytes()
-                    connection.inputStream.close()
-                    file.writeBytes(bytes)
-                }
-                catch (e: Exception) {
-                    throw e
-                }
+        @JvmStatic
+        fun parseUrl(urlStr: String, defaultFileName: String = ""): UrlParts {
+            val url = URL(urlStr)
+            val path = url.path
+
+            val isFile = path.contains(".") && !path.endsWith("/")
+            var fileName = if (isFile) path.substringAfterLast("/") else ""
+            if (fileName.isEmpty() && defaultFileName.isNotEmpty()) {
+                fileName = defaultFileName
             }
+
+            val dirPath = when {
+                path.endsWith("/") -> path
+                isFile -> path.substringBeforeLast("/") + "/"
+                else -> "$path/"
+            }
+
+            val portPart = if (url.port != -1 && url.port != url.defaultPort) ":${url.port}" else ""
+            val directoryUrl = "${url.protocol}://${url.host}$portPart$dirPath"
+
+            return UrlParts(directoryUrl, fileName)
         }
 
         /**
-         * Download file and convert to string.
+         * Convert dip to px
          */
-        suspend fun downloadToStr(url: String): String {
-            var str = ""
-            withContext(Dispatchers.IO) {
-                val connection: HttpsURLConnection ?
-                try {
-                    connection = (URL(url).openConnection() as HttpsURLConnection).apply {
-                        requestMethod = "GET"
-                        connectTimeout = 10 * 1000
-                        readTimeout = 10 * 1000
-                    }
-                    val bytes = connection.inputStream.readBytes()
-                    connection.inputStream.close()
-                    str = bytes.decodeToString()
-                }
-                catch (e: Exception) {
-                    throw e
-                }
-            }
-            return str
-        }
-
+        @JvmStatic
         fun dpToPx(context: Context, dps: Int): Int {
             return Math.round(context.resources.displayMetrics.density * dps)
+        }
+
+        /**
+         * Check whether ths ASR model file is complete.
+         */
+        @JvmStatic
+        fun checkAsrModelFiles(context: Context, name: String): Boolean {
+            val modelsPath = context.filesDir.path + PATH_ASR_MODELS + "$name/"
+            val files = listOf(
+                "encoder_jit_trace-pnnx.ncnn.param",
+                "encoder_jit_trace-pnnx.ncnn.bin",
+                "decoder_jit_trace-pnnx.ncnn.param",
+                "decoder_jit_trace-pnnx.ncnn.bin",
+                "joiner_jit_trace-pnnx.ncnn.param",
+                "joiner_jit_trace-pnnx.ncnn.bin",
+                "tokens.txt"
+            )
+            for (i in files) {
+                if (!File(modelsPath + i).exists()) {
+                    return false
+                }
+            }
+            return true
         }
     }
 }
