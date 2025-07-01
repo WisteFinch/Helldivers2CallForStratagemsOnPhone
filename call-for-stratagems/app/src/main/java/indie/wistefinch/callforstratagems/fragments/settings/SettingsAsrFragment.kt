@@ -9,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -22,9 +23,11 @@ import androidx.preference.PreferenceManager
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.Constants.PATH_ASR_MODELS
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.asr.AsrService
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsAsrBinding
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.AppProgressBar
+import indie.wistefinch.callforstratagems.utils.DialogEditList
 import indie.wistefinch.callforstratagems.utils.DownloadService
 import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +88,7 @@ class SettingsAsrFragment : Fragment() {
                 50
             ).toString()
         )
-        binding.setCtrlAsrGpu.isChecked = preferences.getBoolean("ctrl_asr_gpu", false)
+        binding.setCtrlAsrGpu.isChecked = preferences.getBoolean("ctrl_asr_gpu", true)
     }
 
 
@@ -165,8 +168,8 @@ class SettingsAsrFragment : Fragment() {
             }
 
             // Set custom url.
-            custom.addTextChangedListener {
-                preferences.edit().putString("ctrl_asr_custom", custom.text.toString().trim())
+            custom.addTextChangedListener { txt->
+                preferences.edit().putString("ctrl_asr_custom", txt.toString().trim())
                     .apply()
             }
 
@@ -412,6 +415,75 @@ class SettingsAsrFragment : Fragment() {
                 }
             }
         }
+
+        // Edit activation words.
+        binding.setCtrlAsrActivate.setOnClickListener {
+            var list: List<String> = emptyList()
+            list = Utils.getPreferenceList(preferences, "ctrl_asr_activate")
+            val dialog = DialogEditList(
+                requireContext(),
+                requireActivity(),
+                list,
+                getString(R.string.set_ctrl_asr_activate_edit)
+            )
+            dialog.onEditFinished { data ->
+                val res: MutableList<String> = emptyList<String>().toMutableList()
+                for (i in data) {
+                    if (i.isNotBlank()) {
+                        res.add(i)
+                    }
+                }
+                Utils.setPreferenceList(preferences, "ctrl_asr_activate", res)
+            }
+        }
+
+        // Test ASR.
+        binding.setCtrlAsrTest.setOnClickListener {
+            // Setup dialog.
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val view: View = View.inflate(requireContext(), R.layout.dialog_info, null)
+            dialog.setView(view)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+
+            view.findViewById<TextView>(R.id.dlg_info_title)
+                .setText(R.string.set_ctrl_asr_test)
+            val textView = view.findViewById<TextView>(R.id.dlg_info_msg)
+            textView.setText(R.string.asr_model_loading)
+            view.findViewById<ImageView>(R.id.dlg_info_icon).setImageResource(R.drawable.ic_mic)
+            view.findViewById<AppButton>(R.id.dlg_info_button2).visibility = GONE
+            view.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
+                dialog.cancel()
+            }
+
+            dialog.setOnCancelListener {
+                AsrService.destroyModel()
+            }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                AsrService.initModel(name = preferences.getString("asr_model_name", "")!!,
+                    context = requireContext(),
+                    activity = requireActivity(),
+                    onError = { e ->
+                        textView.setText(
+                            when (e) {
+                                AsrService.ASRErrType.ASR_MODEL_INIT_FAILED -> R.string.asr_model_init_failed
+                                AsrService.ASRErrType.ASR_MODEL_FILE_CHECK_FAILED -> R.string.asr_model_file_check_failed
+                                AsrService.ASRErrType.ASR_MIC_PERMISSION_DENIED -> R.string.asr_mic_permission_denied
+                            }
+                        )
+                    },
+                    onProcess = { txt ->
+                        if (txt.isNotBlank()) {
+                            textView.text = txt
+                        }
+                    },
+                    onStarted = {
+                        textView.text = null
+                    })
+                AsrService.startRecord(requireContext(), requireActivity())
+            }
+        }
     }
 
     /**
@@ -428,7 +500,7 @@ class SettingsAsrFragment : Fragment() {
                 else -> nameEn
             }
         if (name.isNotEmpty()) {
-            flag = if (Utils.checkAsrModelFiles(requireContext(), name)) 1 else 2
+            flag = if (AsrService.checkAsrModelFiles(requireContext(), name)) 1 else 2
         }
 
         binding.setCtrlAsrModels.setHint(

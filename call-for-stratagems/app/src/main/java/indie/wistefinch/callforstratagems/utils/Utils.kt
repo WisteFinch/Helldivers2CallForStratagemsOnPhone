@@ -1,8 +1,8 @@
 package indie.wistefinch.callforstratagems.utils
 
 import android.content.Context
-import indie.wistefinch.callforstratagems.Constants.PATH_ASR_MODELS
-import java.io.File
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import java.net.URL
 import java.util.Random
 
@@ -65,26 +65,29 @@ class Utils {
         }
 
         /**
-         * Check whether ths ASR model file is complete.
+         * Get List Form Preferences
          */
         @JvmStatic
-        fun checkAsrModelFiles(context: Context, name: String): Boolean {
-            val modelsPath = context.filesDir.path + PATH_ASR_MODELS + "$name/"
-            val files = listOf(
-                "encoder_jit_trace-pnnx.ncnn.param",
-                "encoder_jit_trace-pnnx.ncnn.bin",
-                "decoder_jit_trace-pnnx.ncnn.param",
-                "decoder_jit_trace-pnnx.ncnn.bin",
-                "joiner_jit_trace-pnnx.ncnn.param",
-                "joiner_jit_trace-pnnx.ncnn.bin",
-                "tokens.txt"
-            )
-            for (i in files) {
-                if (!File(modelsPath + i).exists()) {
-                    return false
+        fun getPreferenceList(p: SharedPreferences, key: String): List<String> {
+            val count = p.getInt("${key}_count", 0)
+            val list: MutableList<String> = emptyList<String>().toMutableList()
+            for (i in 1..count) {
+                list.add(p.getString("${key}_${i}", "")!!)
+            }
+            return list
+        }
+
+        /**
+         * Set List to Preferences
+         */
+        @JvmStatic
+        fun setPreferenceList(p: SharedPreferences, key: String, list: List<String>) {
+            p.edit {
+                putInt("${key}_count", list.count())
+                for (i in 1..list.count()) {
+                    putString("${key}_${i}", list[i - 1])
                 }
             }
-            return true
         }
     }
 }

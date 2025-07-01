@@ -22,20 +22,19 @@
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
-                android:id="@+id/dlg_info_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_info"
+                android:src="@drawable/ic_edit"
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/dlg_info_title"
+                android:id="@+id/dlg_edit_list_title"
                 style="@style/AppTextTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:text="@string/default_string"
+                android:text="@string/dlg_edit_list_title"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -61,24 +60,15 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <ScrollView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/dlg_edit_list_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:fadeScrollbars="false"
                 android:gravity="center"
                 android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
                 android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
-                tools:ignore="UselessParent">
-
-                <TextView
-                    android:id="@+id/dlg_info_msg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:text="@string/default_string"
-                    android:theme="@style/AppText" />
-
-            </ScrollView>
+                android:scrollbars="vertical" />
 
         </LinearLayout>
 
@@ -102,14 +92,14 @@
                 android:gravity="end">
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dlg_info_button2"
+                    android:id="@+id/dlg_edit_list_add"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
-                    app:text="@string/dlg_comm_cancel" />
+                    app:text="@string/dlg_edit_list_add" />
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dlg_info_button1"
+                    android:id="@+id/dlg_edit_list_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     app:text="@string/dlg_comm_confirm" />

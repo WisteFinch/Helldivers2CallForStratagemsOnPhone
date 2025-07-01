@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidsvg.aar)
     implementation(libs.zxing.lite)
     implementation(libs.okhttp)
+    implementation(libs.commons.text)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

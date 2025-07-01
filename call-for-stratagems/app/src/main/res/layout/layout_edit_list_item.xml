@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp">
+
+    <EditText
+        android:id="@+id/edit_list_item_input"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="5dp"
+        android:layout_weight="1"
+        android:background="@drawable/edit_view_bg"
+        android:theme="@style/AppEditText"
+        tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+    <indie.wistefinch.callforstratagems.utils.AppButton
+        android:id="@+id/edit_list_item_delete"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:icon="@drawable/ic_clear" />
+
+</LinearLayout>

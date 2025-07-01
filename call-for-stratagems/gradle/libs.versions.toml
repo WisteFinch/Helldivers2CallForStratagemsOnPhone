@@ -18,6 +18,7 @@ gson = "2.13.1"
 androidsvgAar = "1.4"
 zxingLite = "3.2.0"
 squareupOkhttp = "4.12.0"
+commonsText = "1.13.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.10.1" }
@@ -39,6 +40,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 androidsvg-aar = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvgAar" }
 zxing-lite = { group = "com.github.jenly1314", name = "zxing-lite", version.ref = "zxingLite" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "squareupOkhttp" }
+commons-text = { group = "org.apache.commons", name = "commons-text", version.ref = "commonsText" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

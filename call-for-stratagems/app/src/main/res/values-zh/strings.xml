@@ -108,6 +108,7 @@
     <string name="set_ctrl_asr_gpu">启用硬件加速</string>
     <string name="set_ctrl_asr_gpu_desc">使用GPU运行模型</string>
     <string name="set_ctrl_asr_activate">配置激活词</string>
+    <string name="set_ctrl_asr_activate_edit">激活词</string>
     <string name="set_ctrl_asr_activate_desc">识别到特定语句后，激活语音识别功能</string>
     <string name="set_ctrl_asr_words">配置识别词</string>
     <string name="set_ctrl_asr_words_desc">为每个战备指定识别语句</string>
@@ -219,6 +220,17 @@
     <string name="dlg_about_usage">用法</string>
     <string name="dlg_about_license">许可证</string>
     <string name="dlg_about_repo">项目仓库</string>
+
+    <!-- Edit List Dialog-->
+    <string name="dlg_edit_list_title">编辑：%1$s</string>
+    <string name="dlg_edit_list_add">新增</string>
+
+    <!-- ASR -->
+    <string name="asr_model_init_failed">Model ini</string>
+    <string name="asr_model_file_check_failed">模型文件不完整</string>
+    <string name="asr_mic_permission_denied">未授予录音权限</string>
+    <string name="asr_model_loading">加载模型中</string>
+    <string name="asr_model_ready">模型就绪</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>

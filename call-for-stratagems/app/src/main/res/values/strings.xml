@@ -110,6 +110,7 @@
     <string name="set_ctrl_asr_gpu">Enable Hardware Acceleration</string>
     <string name="set_ctrl_asr_gpu_desc">Run model on GPU</string>
     <string name="set_ctrl_asr_activate">Configure Activation Words</string>
+    <string name="set_ctrl_asr_activate_edit">Activation Words</string>
     <string name="set_ctrl_asr_activate_desc">Upon recognizing the specified word, activate the speech recognition function</string>
     <string name="set_ctrl_asr_words">Configure Recognition Words</string>
     <string name="set_ctrl_asr_words_desc">Assign recognition words for each stratagem</string>
@@ -222,6 +223,17 @@
     <string name="dlg_about_usage">Usage</string>
     <string name="dlg_about_license">License</string>
     <string name="dlg_about_repo">Project Repo</string>
+
+    <!-- Edit List Dialog-->
+    <string name="dlg_edit_list_title">Edit: %1$s</string>
+    <string name="dlg_edit_list_add">Add</string>
+
+    <!-- ASR -->
+    <string name="asr_model_init_failed">Failed to initialize model</string>
+    <string name="asr_model_file_check_failed">Model files are incomplete</string>
+    <string name="asr_mic_permission_denied">Microphone access permission denied</string>
+    <string name="asr_model_loading">Loading model</string>
+    <string name="asr_model_ready">Model ready</string>
 
     <!-- Toast -->
     <string name="toast_complete">Complete</string>
