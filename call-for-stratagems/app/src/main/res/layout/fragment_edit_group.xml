@@ -72,7 +72,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="5dp"
             android:autofillHints="@string/editGroup_title"
-            android:background="@color/backgroundSecondary"
+            android:background="@drawable/edit_text_view_bg"
             android:gravity="center"
             android:hint="@string/editGroup_title_hint"
             android:inputType="text"

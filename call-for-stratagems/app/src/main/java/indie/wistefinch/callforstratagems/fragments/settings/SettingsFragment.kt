@@ -1161,7 +1161,6 @@ class SettingsFragment : Fragment() {
                 }
             )
             custom.setText(preferences.getString("db_custom", ""))
-            custom.isEnabled = channel == 2
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 channel = when (checkedId) {
@@ -1170,7 +1169,6 @@ class SettingsFragment : Fragment() {
                     R.id.dlg_db_update_custom -> 2
                     else -> 0
                 }
-                custom.isEnabled = channel == 2
             }
 
             // Set custom url.

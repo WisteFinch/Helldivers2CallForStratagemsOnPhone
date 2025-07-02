@@ -68,7 +68,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -141,7 +142,7 @@
                         android:width="150dp"
                         android:autofillHints=""
                         android:hint="@string/set_sync_ip_auto"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:theme="@style/AppEditText"
                         tools:ignore="DuplicateSpeakableTextCheck,TextContrastCheck,TextFields,TouchTargetSizeCheck" />
 
@@ -238,7 +239,7 @@
                         android:layout_height="wrap_content"
                         android:width="75dp"
                         android:autofillHints="25"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />

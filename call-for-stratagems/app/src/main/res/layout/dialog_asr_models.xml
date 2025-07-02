@@ -41,8 +41,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginHorizontal="10dp"
             android:layout_weight="1"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <ScrollView
@@ -97,9 +97,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:width="150dp"
-                        android:background="@color/backgroundSecondary"
                         android:hint="@string/dlg_asr_model_custom_url"
                         android:importantForAutofill="no"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="text"
                         android:theme="@style/AppEditText"
                         tools:ignore="TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />

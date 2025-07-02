@@ -128,7 +128,7 @@
                         android:layout_height="wrap_content"
                         android:width="150dp"
                         android:autofillHints="127.0.0.1"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:hint="@string/set_conn_addr"
                         android:inputType="text"
                         android:theme="@style/AppEditText"
@@ -144,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="23333"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:hint="@string/set_conn_port"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
@@ -182,7 +182,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="5"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="TouchTargetSizeCheck,TextContrastCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
@@ -291,7 +291,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="23333"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:hint="@string/set_sync_port"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
@@ -328,7 +328,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="25"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
@@ -573,7 +573,8 @@
                     android:id="@+id/set_sync_apply"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    app:text="@string/set_sync_apply" />
+                    app:text="@string/set_sync_apply"
+                    tools:ignore="TooManyViews" />
 
             </LinearLayout>
 
@@ -693,7 +694,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="100"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
@@ -737,7 +738,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/set_ctrl_fastboot_mode_desc"
-                            android:theme="@style/AppTextHint" />
+                            android:theme="@style/AppTextHint"
+                            tools:ignore="VisualLintLongText" />
 
                     </LinearLayout>
 
@@ -874,7 +876,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="25"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
@@ -920,7 +922,7 @@
                         android:layout_height="wrap_content"
                         android:width="100dp"
                         android:autofillHints="25"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:inputType="number"
                         android:theme="@style/AppEditText"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />

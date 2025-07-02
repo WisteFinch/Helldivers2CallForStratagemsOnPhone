@@ -99,7 +99,7 @@
                         android:layout_height="match_parent"
                         android:importantForAutofill="no"
                         android:width="150dp"
-                        android:background="@color/backgroundSecondary"
+                        android:background="@drawable/edit_text_view_bg"
                         android:hint="@string/dlg_db_updt_channel_custom_url"
                         android:inputType="text"
                         android:theme="@style/AppEditText"

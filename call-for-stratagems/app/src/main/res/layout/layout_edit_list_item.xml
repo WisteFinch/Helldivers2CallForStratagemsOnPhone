@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="5dp"
         android:layout_weight="1"
-        android:background="@drawable/edit_view_bg"
+        android:background="@drawable/edit_text_view_bg"
         android:theme="@style/AppEditText"
         tools:ignore="Autofill,LabelFor,TextFields,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 

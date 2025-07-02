@@ -210,7 +210,7 @@
                     android:layout_height="wrap_content"
                     android:width="75dp"
                     android:autofillHints="25"
-                    android:background="@color/backgroundSecondary"
+                    android:background="@drawable/edit_text_view_bg"
                     android:inputType="number"
                     android:theme="@style/AppEditText"
                     tools:ignore="LabelFor,SpeakableTextPresentCheck,TouchTargetSizeCheck" />

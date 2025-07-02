@@ -155,7 +155,6 @@ class SettingsAsrFragment : Fragment() {
                 }
             )
             custom.setText(preferences.getString("ctrl_asr_custom", ""))
-            custom.isEnabled = model == 2
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 model = when (checkedId) {
@@ -164,7 +163,6 @@ class SettingsAsrFragment : Fragment() {
                     R.id.dlg_asr_model_custom -> 2
                     else -> -1
                 }
-                custom.isEnabled = model == 2
             }
 
             // Set custom url.
