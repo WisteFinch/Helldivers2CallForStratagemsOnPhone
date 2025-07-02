@@ -97,7 +97,7 @@
     <string name="set_ctrl_asr_model_dl_title2">更新数据库：%1$s</string>
     <string name="set_ctrl_asr_model_dl_idx">获取数据库索引</string>
     <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载图标文件</string>
-    <string name="set_ctrl_asr_model_dl_item">%1$d%% %2$s/%3$s</string>
+    <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_ctrl_asr_model_dl_complete">更新完成</string>
     <string name="set_ctrl_asr_model_dl_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
     <string name="set_ctrl_asr_enable">启用语音识别</string>
@@ -110,8 +110,8 @@
     <string name="set_ctrl_asr_activate">配置激活词</string>
     <string name="set_ctrl_asr_activate_edit">激活词</string>
     <string name="set_ctrl_asr_activate_desc">识别到特定语句后，激活语音识别功能</string>
-    <string name="set_ctrl_asr_words">配置识别词</string>
-    <string name="set_ctrl_asr_words_desc">为每个战备指定识别语句</string>
+    <string name="set_ctrl_asr_keywords">配置识别关键词</string>
+    <string name="set_ctrl_asr_keywords_desc">为每个战备指定识别语句</string>
     <string name="set_ctrl_asr_test">识别测试</string>
     <string name="set_info_hdr">信息</string>
     <string name="set_info_db">数据库版本</string>
@@ -127,7 +127,7 @@
     <string name="set_info_db_updt_idx">获取数据库索引</string>
     <string name="set_info_db_updt_db">获取数据库</string>
     <string name="set_info_db_updt_icons">(%1$d/%2$d) 下载图标文件</string>
-    <string name="set_info_db_updt_icons_item">%1$d%% %2$s/%3$s</string>
+    <string name="set_info_db_updt_icons_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_info_db_updt_complete">更新完成</string>
     <string name="set_info_db_updt_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
     <string name="set_info_app">软件版本</string>
@@ -146,6 +146,9 @@
     <string name="set_info_import_failed_ver">还原失败：备份文件版本不支持</string>
     <string name="set_info_import_cancel">还原取消</string>
     <string name="set_info_about">关于</string>
+
+    <!-- Utils -->
+    <string name="utils_parse_url_failed">解析地址失败：%1$s</string>
 
     <!-- Network -->
     <string name="network_connecting">连接中…</string>
@@ -224,6 +227,10 @@
     <!-- Edit List Dialog-->
     <string name="dlg_edit_list_title">编辑：%1$s</string>
     <string name="dlg_edit_list_add">新增</string>
+
+    <!-- Stratagem Info Dialog-->
+    <string name="dlg_stratagem_info_keyword_empty">未设置识别关键词</string>
+    <string name="dlg_stratagem_info_keyword">识别关键词：\n%1$s</string>
 
     <!-- ASR -->
     <string name="asr_model_init_failed">Model ini</string>

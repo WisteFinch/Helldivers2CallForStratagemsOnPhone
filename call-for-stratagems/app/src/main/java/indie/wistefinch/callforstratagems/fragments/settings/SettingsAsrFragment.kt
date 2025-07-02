@@ -27,7 +27,7 @@ import indie.wistefinch.callforstratagems.asr.AsrService
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsAsrBinding
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.AppProgressBar
-import indie.wistefinch.callforstratagems.utils.DialogEditList
+import indie.wistefinch.callforstratagems.utils.EditListDialog
 import indie.wistefinch.callforstratagems.utils.DownloadService
 import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -166,7 +166,7 @@ class SettingsAsrFragment : Fragment() {
             }
 
             // Set custom url.
-            custom.addTextChangedListener { txt->
+            custom.addTextChangedListener { txt ->
                 preferences.edit().putString("ctrl_asr_custom", txt.toString().trim())
                     .apply()
             }
@@ -212,13 +212,15 @@ class SettingsAsrFragment : Fragment() {
                 modelDialog.hide()
 
                 // Get index url.
-                val rawUrl = when (model) {
+                var rawUrl = when (model) {
                     0 -> Constants.URL_ASR_MODEL_EN
                     1 -> Constants.URL_ASR_MODEL_ZH
                     2 -> preferences.getString("ctrl_asr_custom", "")!!
                     else -> return@Confirm
                 }
-                val parsedUrl = Utils.parseUrl(rawUrl)
+                if (rawUrl.isEmpty()) {
+                    rawUrl = getString(R.string.default_string)
+                }
 
                 // Init download dialog.
                 val downloadDialog = AlertDialog.Builder(requireContext()).create()
@@ -237,17 +239,34 @@ class SettingsAsrFragment : Fragment() {
                 val buttonView = downloadView.findViewById<AppButton>(R.id.dlg_download_button)
                 itemPB.enableHint()
 
+                filesView.visibility = GONE
+                indexView.visibility = VISIBLE
+                titleView.setText(R.string.set_ctrl_asr_model_dl_title)
+                idxTxtView.setText(R.string.set_ctrl_asr_model_dl_idx)
+                downloadDialog.show()
+
+                val parsedUrl: Utils.Companion.UrlParts
+                try {
+                    parsedUrl = Utils.parseUrl(rawUrl, "index.json")
+                } catch (e: Exception) {
+                    Log.e("[Settings] Update DB", e.toString())
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                        buttonView.setOnClickListener {
+                            downloadDialog.hide()
+                        }
+                        indexView.visibility = GONE
+                        filesView.visibility = GONE
+                        infoView.visibility = VISIBLE
+                        infoView.text =
+                            String.format(getString(R.string.utils_parse_url_failed), rawUrl)
+                    }
+                    return@Confirm
+                }
+
                 // Download model.
                 val downloadJob = lifecycleScope.launch(Dispatchers.IO) {
                     try {
-                        withContext(Dispatchers.Main) {
-                            filesView.visibility = GONE
-                            indexView.visibility = VISIBLE
-                            titleView.setText(R.string.set_ctrl_asr_model_dl_title)
-                            idxTxtView.setText(R.string.set_ctrl_asr_model_dl_idx)
-                            downloadDialog.show()
-                        }
-
                         // Download index.
                         ensureActive()
                         val indexObj =
@@ -312,7 +331,7 @@ class SettingsAsrFragment : Fragment() {
                             itemPB.setHint(
                                 String.format(
                                     getString(R.string.set_ctrl_asr_model_dl_item),
-                                    0,
+                                    0f,
                                     "0",
                                     "?"
                                 )
@@ -353,7 +372,7 @@ class SettingsAsrFragment : Fragment() {
                             }
                         }
                         service.onProgress = { d, t ->
-                            val p = if (t.toInt() == -1) 0 else (d.toFloat() / t * 100).toInt()
+                            val p = if (t.toInt() == -1) 0f else (d.toFloat() / t * 100)
                             itemPB.setText(parsedUrl.dir + downloadInfo[index][0])
                             itemPB.setHint(
                                 String.format(
@@ -363,7 +382,7 @@ class SettingsAsrFragment : Fragment() {
                                     if (t.toInt() == -1) "?" else t.toString()
                                 )
                             )
-                            itemPB.setValue(p)
+                            itemPB.setValue(p.toInt())
                         }
                         service.onError = { e ->
                             Log.e("[Settings ASR] Download Model", e.toString())
@@ -416,9 +435,8 @@ class SettingsAsrFragment : Fragment() {
 
         // Edit activation words.
         binding.setCtrlAsrActivate.setOnClickListener {
-            var list: List<String> = emptyList()
-            list = Utils.getPreferenceList(preferences, "ctrl_asr_activate")
-            val dialog = DialogEditList(
+            val list = Utils.getPreferenceList(preferences, "ctrl_asr_activate")
+            val dialog = EditListDialog(
                 requireContext(),
                 requireActivity(),
                 list,

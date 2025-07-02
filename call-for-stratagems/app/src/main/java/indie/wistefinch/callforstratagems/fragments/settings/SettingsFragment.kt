@@ -589,14 +589,23 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "conn_port",
-                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(0, 65535)
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(
+                        0,
+                        65535
+                    )
                 )
                 apply()
             }
         }
         binding.setConnRetry.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putInt("conn_retry", (if (text.toString().isEmpty()) 5 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE))
+                putInt(
+                    "conn_retry",
+                    (if (text.toString().isEmpty()) 5 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
+                )
                 apply()
             }
         }
@@ -605,7 +614,10 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "sync_server_port",
-                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(0, 65535)
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(
+                        0,
+                        65535
+                    )
                 )
                 apply()
             }
@@ -614,7 +626,10 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "sync_input_delay",
-                    (if (text.toString().isEmpty()) 25 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
+                    (if (text.toString().isEmpty()) 25 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
                 )
                 apply()
             }
@@ -727,7 +742,10 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "ctrl_stratagem_size",
-                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(1, 1000)
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(
+                        1,
+                        1000
+                    )
                 )
                 apply()
             }
@@ -754,7 +772,10 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "ctrl_sdt",
-                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
                 )
                 apply()
             }
@@ -763,7 +784,10 @@ class SettingsFragment : Fragment() {
             with(preferences.edit()) {
                 putInt(
                     "ctrl_svt",
-                    (if (text.toString().isEmpty()) 50 else text.toString().toInt()).coerceIn(0, Int.MAX_VALUE)
+                    (if (text.toString().isEmpty()) 50 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
                 )
                 apply()
             }
@@ -1013,7 +1037,8 @@ class SettingsFragment : Fragment() {
             aboutDialog.show()
 
             val pkgName = requireContext().packageName
-            val pkgInfo = requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
+            val pkgInfo =
+                requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
             val curVer = pkgInfo.versionName
 
             aboutView.findViewById<TextView>(R.id.dlg_info_title).text = String.format(
@@ -1064,13 +1089,17 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_chk))
             try {
-                val json = JSONObject(DownloadService().downloadAsStr(Constants.URL_APP_RELEASE_API))
+                val json =
+                    JSONObject(DownloadService().downloadAsStr(Constants.URL_APP_RELEASE_API))
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
                     val pkgName = requireContext().packageName
                     val pkgInfo =
-                        requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
+                        requireContext().applicationContext.packageManager.getPackageInfo(
+                            pkgName,
+                            0
+                        )
                     val curVer = pkgInfo.versionName
                     val title: String
                     if (curVer != newVer) {
@@ -1224,7 +1253,7 @@ class SettingsFragment : Fragment() {
             }
 
             // Update database.
-            confirm.setOnClickListener {
+            confirm.setOnClickListener confirm@{
                 if (checkDBUpdateJob.isActive) {
                     checkDBUpdateJob.cancel()
                 }
@@ -1248,36 +1277,54 @@ class SettingsFragment : Fragment() {
                 if (rawUrl.isEmpty()) {
                     rawUrl = getString(R.string.default_string)
                 }
-                val parsedUrl = Utils.parseUrl(rawUrl, "index.json")
 
                 // Init download dialog.
                 val downloadDialog = AlertDialog.Builder(requireContext()).create()
-                val downloadView: View = View.inflate(requireContext(), R.layout.dialog_download, null)
+                val downloadView: View =
+                    View.inflate(requireContext(), R.layout.dialog_download, null)
                 downloadDialog.setView(downloadView)
                 downloadDialog.setCanceledOnTouchOutside(false)
                 val indexView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_index)
                 val filesView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_files)
                 val titleView = downloadView.findViewById<TextView>(R.id.dlg_download_title)
                 val idxTxtView = downloadView.findViewById<TextView>(R.id.dlg_download_index_text)
-                val totalPB = downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_total)
+                val totalPB =
+                    downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_total)
                 val itemPB = downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_item)
                 val infoView = downloadView.findViewById<TextView>(R.id.dlg_download_info)
                 val buttonView = downloadView.findViewById<AppButton>(R.id.dlg_download_button)
                 itemPB.enableHint()
 
+                filesView.visibility = GONE
+                indexView.visibility = VISIBLE
+                titleView.setText(R.string.set_info_db_updt_title)
+                idxTxtView.setText(R.string.set_info_db_updt_idx)
+                downloadDialog.show()
+
                 var isFinished = false
+
+                val parsedUrl: Utils.Companion.UrlParts
+                try {
+                    parsedUrl = Utils.parseUrl(rawUrl, "index.json")
+                } catch (e: Exception) {
+                    Log.e("[Settings] Update DB", e.toString())
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                        buttonView.setOnClickListener {
+                            downloadDialog.hide()
+                        }
+                        indexView.visibility = GONE
+                        filesView.visibility = GONE
+                        infoView.visibility = VISIBLE
+                        infoView.text =
+                            String.format(getString(R.string.utils_parse_url_failed), rawUrl)
+                    }
+                    return@confirm
+                }
 
                 // Download database.
                 val downloadJob = lifecycleScope.launch(Dispatchers.IO) {
                     try {
-                        withContext(Dispatchers.Main) {
-                            filesView.visibility = GONE
-                            indexView.visibility = VISIBLE
-                            titleView.setText(R.string.set_info_db_updt_title)
-                            idxTxtView.setText(R.string.set_info_db_updt_idx)
-                            downloadDialog.show()
-                        }
-
                         preferences.edit().putString("db_version", "1").apply()
                         withContext(Dispatchers.Main) {
                             binding.setInfoDb.setHint(
@@ -1287,7 +1334,8 @@ class SettingsFragment : Fragment() {
 
                         // Download index.
                         ensureActive()
-                        val indexObj = JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
+                        val indexObj =
+                            JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
                         val date = indexObj.getString("date")
                         val dbUrl = parsedUrl.dir + indexObj.getString("db_path")
                         val iconsUrl = parsedUrl.dir + indexObj.getString("icons_path")
@@ -1296,10 +1344,12 @@ class SettingsFragment : Fragment() {
                         val nameEn = indexObj.getString("nameEn")
                         val nameZh = indexObj.getString("nameZh")
                         val iconsPath = requireContext().filesDir.path + PATH_DB_ICONS + "$name/"
-                        val displayName = when (requireContext().resources.configuration.locales.get(0).toLanguageTag()) {
-                            "zh-CN" -> nameZh
-                            else -> nameEn
-                        }
+                        val displayName =
+                            when (requireContext().resources.configuration.locales.get(0)
+                                .toLanguageTag()) {
+                                "zh-CN" -> nameZh
+                                else -> nameEn
+                            }
 
                         // Analyze the index.
                         preferences.edit().putString("db_name", name).apply()
@@ -1308,7 +1358,10 @@ class SettingsFragment : Fragment() {
 
                         // Download database.
                         withContext(Dispatchers.Main) {
-                            titleView.text = String.format(getString(R.string.set_info_db_updt_title2), displayName)
+                            titleView.text = String.format(
+                                getString(R.string.set_info_db_updt_title2),
+                                displayName
+                            )
                             idxTxtView.setText(R.string.set_info_db_updt_db)
                         }
                         ensureActive()
@@ -1355,10 +1408,23 @@ class SettingsFragment : Fragment() {
                         withContext(Dispatchers.Main) {
                             filesView.visibility = VISIBLE
                             indexView.visibility = GONE
-                            totalPB.setText(String.format(getString(R.string.set_info_db_updt_icons), index + 1, iconsList.size))
+                            totalPB.setText(
+                                String.format(
+                                    getString(R.string.set_info_db_updt_icons),
+                                    index + 1,
+                                    iconsList.size
+                                )
+                            )
                             totalPB.setValue((index.toFloat() / iconsList.size * 100).toInt())
                             itemPB.setText(iconsUrl + iconsList[index] + ".svg")
-                            itemPB.setHint(String.format(getString(R.string.set_info_db_updt_icons_item), 0, "0", "?"))
+                            itemPB.setHint(
+                                String.format(
+                                    getString(R.string.set_info_db_updt_icons_item),
+                                    0f,
+                                    "0",
+                                    "?"
+                                )
+                            )
                             itemPB.setValue(0)
                         }
                         val service = DownloadService()
@@ -1381,16 +1447,33 @@ class SettingsFragment : Fragment() {
                                 }
                                 checkDBUpdateJob = lifecycleScope.launch { checkDBUpdate() }
                             } else {
-                                totalPB.setText(String.format(getString(R.string.set_info_db_updt_icons), index + 1, iconsList.size))
+                                totalPB.setText(
+                                    String.format(
+                                        getString(R.string.set_info_db_updt_icons),
+                                        index + 1,
+                                        iconsList.size
+                                    )
+                                )
                                 totalPB.setValue((index.toFloat() / iconsList.size * 100).toInt())
-                                service.downloadToFile(iconsUrl + iconsList[index] + ".svg", iconsPath + iconsList[index] + ".svg", this)
+                                service.downloadToFile(
+                                    iconsUrl + iconsList[index] + ".svg",
+                                    iconsPath + iconsList[index] + ".svg",
+                                    this
+                                )
                             }
                         }
-                        service.onProgress = {d, t->
-                            val p = if(t.toInt() == -1) 0 else (d.toFloat() / t *100).toInt()
+                        service.onProgress = { d, t ->
+                            val p = if (t.toInt() == -1) 0f else (d.toFloat() / t * 100)
                             itemPB.setText(iconsUrl + iconsList[index] + ".svg")
-                            itemPB.setHint(String.format(getString(R.string.set_info_db_updt_icons_item), p, d.toString(), if(t.toInt() == -1) "?" else t.toString()))
-                            itemPB.setValue(p)
+                            itemPB.setHint(
+                                String.format(
+                                    getString(R.string.set_info_db_updt_icons_item),
+                                    p,
+                                    d.toString(),
+                                    if (t.toInt() == -1) "?" else t.toString()
+                                )
+                            )
+                            itemPB.setValue(p.toInt())
                         }
                         service.onError = { e ->
                             Log.e("[Settings] Update DB", e.toString())
@@ -1401,9 +1484,16 @@ class SettingsFragment : Fragment() {
                             indexView.visibility = GONE
                             filesView.visibility = GONE
                             infoView.visibility = VISIBLE
-                            infoView.text = String.format(getString(R.string.set_info_db_updt_failed), e.toString())
+                            infoView.text = String.format(
+                                getString(R.string.set_info_db_updt_failed),
+                                e.toString()
+                            )
                         }
-                        service.downloadToFile(iconsUrl + iconsList[index] + ".svg", iconsPath + iconsList[index] + ".svg", this)
+                        service.downloadToFile(
+                            iconsUrl + iconsList[index] + ".svg",
+                            iconsPath + iconsList[index] + ".svg",
+                            this
+                        )
                     } catch (e: Exception) {
                         Log.e("[Settings] Update DB", e.toString())
                         lifecycleScope.launch(Dispatchers.Main) {
@@ -1414,7 +1504,10 @@ class SettingsFragment : Fragment() {
                             indexView.visibility = GONE
                             filesView.visibility = GONE
                             infoView.visibility = VISIBLE
-                            infoView.text = String.format(getString(R.string.set_info_db_updt_failed), e.toString())
+                            infoView.text = String.format(
+                                getString(R.string.set_info_db_updt_failed),
+                                e.toString()
+                            )
                         }
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
@@ -1497,7 +1590,8 @@ class SettingsFragment : Fragment() {
             }
             val parsedUrl = Utils.parseUrl(rawUrl, "index.json")
 
-            val json = JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
+            val json =
+                JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {

@@ -99,7 +99,7 @@
     <string name="set_ctrl_asr_model_dl_title2">Downloading Model: %1$s</string>
     <string name="set_ctrl_asr_model_dl_idx">Fetching model index</string>
     <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) Downloading model files</string>
-    <string name="set_ctrl_asr_model_dl_item">%1$d%% %2$s/%3$s</string>
+    <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_ctrl_asr_model_dl_complete">Download complete</string>
     <string name="set_ctrl_asr_model_dl_failed">Download failed: %1$s, please try again</string>
     <string name="set_ctrl_asr_enable">Enable Speech Recognition</string>
@@ -112,8 +112,8 @@
     <string name="set_ctrl_asr_activate">Configure Activation Words</string>
     <string name="set_ctrl_asr_activate_edit">Activation Words</string>
     <string name="set_ctrl_asr_activate_desc">Upon recognizing the specified word, activate the speech recognition function</string>
-    <string name="set_ctrl_asr_words">Configure Recognition Words</string>
-    <string name="set_ctrl_asr_words_desc">Assign recognition words for each stratagem</string>
+    <string name="set_ctrl_asr_keywords">Configure Recognition Keywords</string>
+    <string name="set_ctrl_asr_keywords_desc">Assign recognition words for each stratagem</string>
     <string name="set_ctrl_asr_test">Recognition Test</string>
     <string name="set_info_hdr">Info</string>
     <string name="set_info_db">Database Version</string>
@@ -129,7 +129,7 @@
     <string name="set_info_db_updt_idx">Fetching database index</string>
     <string name="set_info_db_updt_db">Fetching database</string>
     <string name="set_info_db_updt_icons">(%1$d/%2$d) Downloading icons</string>
-    <string name="set_info_db_updt_icons_item">%1$d%% %2$s/%3$s</string>
+    <string name="set_info_db_updt_icons_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_info_db_updt_complete">Update complete</string>
     <string name="set_info_db_updt_failed">Update failed: %1$s, please try again</string>
     <string name="set_info_app">App Version</string>
@@ -148,6 +148,9 @@
     <string name="set_info_import_failed_ver">Import Failed: Backup file version not supported</string>
     <string name="set_info_import_cancel">Import Canceled</string>
     <string name="set_info_about">About</string>
+
+    <!-- Utils -->
+    <string name="utils_parse_url_failed">Fail to parse url: %1$s</string>
 
     <!-- Network -->
     <string name="network_addr_suffix" translatable="false">%1$s ┃ %2$s:%3$d</string>
@@ -227,6 +230,10 @@
     <!-- Edit List Dialog-->
     <string name="dlg_edit_list_title">Edit: %1$s</string>
     <string name="dlg_edit_list_add">Add</string>
+
+    <!-- Stratagem Info Dialog-->
+    <string name="dlg_stratagem_info_keyword_empty">Recognition keyword empty</string>
+    <string name="dlg_stratagem_info_keyword">Recognition keywords:\n%1$s</string>
 
     <!-- ASR -->
     <string name="asr_model_init_failed">Failed to initialize model</string>

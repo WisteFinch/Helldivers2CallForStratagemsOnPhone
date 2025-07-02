@@ -1,6 +1,7 @@
 package indie.wistefinch.callforstratagems.fragments.viewgroup
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -14,6 +15,7 @@ import com.caverock.androidsvg.SVGImageView
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
 import indie.wistefinch.callforstratagems.fragments.stratagemslist.StratagemInfoDialog
 import java.io.File
 
@@ -32,17 +34,19 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
      */
     private lateinit var context: Context
 
+    private lateinit var activity: Activity
+
+    private lateinit var asrKeywordViewModel: AsrKeywordViewModel
+
     private lateinit var dbName: String
 
     private var lang: String = "auto"
-
-    private lateinit var dialog: StratagemInfoDialog
 
     class ListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         context = parent.context
-        dialog = StratagemInfoDialog(context)
+
         return ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_stratagem_item, parent, false))
     }
 
@@ -99,11 +103,10 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
             true
         }
         holder.itemView.setOnClickListener {
-            if (!dialog.isShowing) {
-                dialog.show()
-                dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                dialog.setData(dataList[pos], dbName, lang)
-            }
+            val dialog = StratagemInfoDialog(context, activity , asrKeywordViewModel)
+            dialog.show()
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.setData(dataList[pos], dbName, lang)
         }
     }
 
@@ -117,7 +120,9 @@ class StratagemViewAdapter: RecyclerView.Adapter<StratagemViewAdapter.ListViewHo
      * Because the data won't change, there is no need to compare the difference, ignore the warning.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<StratagemData>, name: String, lang: String) {
+    fun setData(list: List<StratagemData>, name: String, lang: String, asrKeywordViewModel: AsrKeywordViewModel, activity: Activity) {
+        this.asrKeywordViewModel = asrKeywordViewModel
+        this.activity = activity
         this.dataList = list
         dbName = name
         this.lang = lang

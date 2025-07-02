@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 
-class DialogEditList(context: Context, activity: Activity, list: List<String>, title: String) {
+class EditListDialog(context: Context, activity: Activity, list: List<String>, title: String) {
     private var editFinishedListener: (list: List<String>) -> Unit = {}
     private val recyclerView: RecyclerView
 
-    private val adapter: DialogEditListAdapter by lazy { DialogEditListAdapter() }
+    private val adapter: EditListDialogAdapter by lazy { EditListDialogAdapter() }
 
     init {
         val dialog = AlertDialog.Builder(context).create()

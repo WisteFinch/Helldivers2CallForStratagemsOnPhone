@@ -20,6 +20,8 @@ import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
@@ -45,6 +47,15 @@ class ViewGroupFragment : Fragment() {
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
             (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
         )
     }
 
@@ -196,7 +207,9 @@ class ViewGroupFragment : Fragment() {
                 "db_name",
                 Constants.ID_DB_HD2
             )!!,
-            lang
+            lang,
+            asrKeywordViewModel,
+            requireActivity()
         )
     }
 

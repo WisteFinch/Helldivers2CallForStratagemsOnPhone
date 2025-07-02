@@ -10,7 +10,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 
-class DialogEditListAdapter : RecyclerView.Adapter<DialogEditListAdapter.ListViewHolder>() {
+class EditListDialogAdapter : RecyclerView.Adapter<EditListDialogAdapter.ListViewHolder>() {
 
     private var dataList = emptyList<String>().toMutableList()
 

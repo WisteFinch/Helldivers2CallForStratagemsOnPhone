@@ -293,11 +293,11 @@
                 tools:ignore="TooManyViews" />
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/set_ctrl_asr_words"
+                android:id="@+id/set_ctrl_asr_keywords"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:text="@string/set_ctrl_asr_words"
-                app:hint="@string/set_ctrl_asr_words_desc"/>
+                app:text="@string/set_ctrl_asr_keywords"
+                app:hint="@string/set_ctrl_asr_keywords_desc"/>
 
             <Space
                 android:layout_width="match_parent"

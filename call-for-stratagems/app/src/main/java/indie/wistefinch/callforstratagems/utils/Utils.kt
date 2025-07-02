@@ -28,7 +28,7 @@ class Utils {
         }
 
 
-        data class UrlParts(val dir: String, val fileName: String)
+        data class UrlParts(val dir: String = "", val fileName: String = "")
 
         /**
          * For the given URL, retrieve the directory URL.

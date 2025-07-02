@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg">
@@ -8,40 +9,73 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/backgroundPrimary"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_margin="5dp"
+        android:background="@color/backgroundPrimary"
+        android:gravity="center"
+        android:orientation="vertical"
         android:padding="10dp">
-
-        <com.caverock.androidsvg.SVGImageView
-            android:id="@+id/stratagem_info_imageView"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:contentDescription="@string/default_string"
-            android:src="@drawable/ic_question" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
+            <com.caverock.androidsvg.SVGImageView
+                android:id="@+id/stratagem_info_imageView"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="@string/default_string"
+                android:src="@drawable/ic_question" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/stratagem_info_title"
+                    style="@style/AppTextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/default_string"
+                    android:textSize="20sp"
+                    android:visibility="visible" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stratagem_info_steps_recyclerView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/stratagem_info_asr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/stratagem_info_title"
-                style="@style/AppTextTitle"
-                android:layout_width="wrap_content"
+                android:id="@+id/stratagem_info_asr_keywords"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/AppTextHint"
                 android:text="@string/default_string"
-                android:textSize="20sp"
-                android:visibility="visible"
-                android:layout_marginBottom="5dp"/>
+                tools:ignore="TextContrastCheck" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/stratagem_info_steps_recyclerView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
+            <indie.wistefinch.callforstratagems.utils.AppButton
+                android:id="@+id/stratagem_info_asr_edit"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                app:icon="@drawable/ic_edit"
+                android:layout_marginStart="10dp" />
 
         </LinearLayout>
 
