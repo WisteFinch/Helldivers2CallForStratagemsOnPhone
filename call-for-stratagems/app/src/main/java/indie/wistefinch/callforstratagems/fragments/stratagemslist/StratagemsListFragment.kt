@@ -67,7 +67,7 @@ class StratagemsListFragment : Fragment() {
             preference.getString("db_name", Constants.ID_DB_HD2)!!
         var lang = preference.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
-            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+            lang = requireContext().resources.configuration.locales.get(0).toLanguageTag()
         }
 
         val displayName = when (lang) {

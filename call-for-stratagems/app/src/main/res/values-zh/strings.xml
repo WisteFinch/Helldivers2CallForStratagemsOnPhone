@@ -233,11 +233,13 @@
     <string name="dlg_stratagem_info_keyword">识别关键词：\n%1$s</string>
 
     <!-- ASR -->
-    <string name="asr_model_init_failed">Model ini</string>
+    <string name="asr_model_init_failed">模型初始化失败</string>
     <string name="asr_model_file_check_failed">模型文件不完整</string>
     <string name="asr_mic_permission_denied">未授予录音权限</string>
     <string name="asr_model_loading">加载模型中</string>
     <string name="asr_model_ready">模型就绪</string>
+    <string name="asr_model_no_result">无识别结果</string>
+    <string name="asr_model_result_item">%1$s: %2$.3f\n</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>

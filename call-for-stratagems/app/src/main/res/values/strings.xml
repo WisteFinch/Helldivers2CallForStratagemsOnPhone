@@ -241,6 +241,8 @@
     <string name="asr_mic_permission_denied">Microphone access permission denied</string>
     <string name="asr_model_loading">Loading model</string>
     <string name="asr_model_ready">Model ready</string>
+    <string name="asr_model_no_result">No recognition result</string>
+    <string name="asr_model_result_item">%1$s: %2$.3f\n</string>
 
     <!-- Toast -->
     <string name="toast_complete">Complete</string>

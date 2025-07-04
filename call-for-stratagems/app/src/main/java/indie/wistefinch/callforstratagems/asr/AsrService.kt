@@ -254,28 +254,32 @@ object AsrService {
         val buffer = ShortArray(bufferSize)
 
         while (isRecording) {
-            val ret = audioRecord?.read(buffer, 0, buffer.size)
-            if (ret != null && ret > 0) {
-                val samples = FloatArray(ret) { buffer[it] / 32768.0f }
-                model?.acceptSamples(samples)
-                while (model?.isReady()!!) {
-                    model?.decode()
-                }
-                val isEndpoint = model?.isEndpoint()!!
-                val text = model?.text!!
-                activity.runOnUiThread {
-                    onProcess(text)
-                }
-
-                if (isEndpoint) {
-                    model?.reset()
-                    if (text.isNotBlank()) {
-                        Log.i("[ASR Service]", "Result: $text")
+            try {
+                val ret = audioRecord?.read(buffer, 0, buffer.size)
+                if (ret != null && ret > 0) {
+                    val samples = FloatArray(ret) { buffer[it] / 32768.0f }
+                    model?.acceptSamples(samples)
+                    while (model?.isReady()!!) {
+                        model?.decode()
                     }
+                    val isEndpoint = model?.isEndpoint()!!
+                    val text = model?.text!!
                     activity.runOnUiThread {
-                        onEndPoint(text)
+                        onProcess(text)
+                    }
+
+                    if (isEndpoint) {
+                        model?.reset()
+                        if (text.isNotBlank()) {
+                            Log.i("[ASR Service]", "Result: $text")
+                        }
+                        activity.runOnUiThread {
+                            onEndPoint(text)
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                Log.e("[ASR Service]", "Runtime exception: $e")
             }
         }
         activity.runOnUiThread {

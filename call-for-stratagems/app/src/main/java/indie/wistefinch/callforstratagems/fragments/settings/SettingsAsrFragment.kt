@@ -17,13 +17,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.Constants.PATH_ASR_MODELS
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.asr.AsrClient
 import indie.wistefinch.callforstratagems.asr.AsrService
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
+import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsAsrBinding
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.AppProgressBar
@@ -48,6 +55,24 @@ class SettingsAsrFragment : Fragment() {
 
     // Preference.
     private lateinit var preferences: SharedPreferences
+
+    /**
+     * The stratagem view model.
+     */
+    private val stratagemViewModel: StratagemViewModel by activityViewModels {
+        StratagemViewModelFactory(
+            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -418,7 +443,6 @@ class SettingsAsrFragment : Fragment() {
                                 e.toString()
                             )
                         }
-                        preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
                 }
 
@@ -472,32 +496,61 @@ class SettingsAsrFragment : Fragment() {
                 dialog.cancel()
             }
 
+            var lastRes = ""
+            var lang = preferences.getString("ctrl_lang", "auto")!!
+            if (lang == "auto") {
+                lang = requireContext().resources.configuration.locales.get(0).toLanguageTag()
+            }
+            val dbName = preferences.getString("db_name", Constants.ID_DB_HD2)!!
+            val client = AsrClient(asrModelName = preferences.getString("asr_model_name", "")!!,
+                context = requireContext(),
+                activity = requireActivity(),
+                keywordsViewModel = asrKeywordViewModel,
+                activateWords = emptyList(),
+                dbName = dbName,
+                lang = lang,
+                similarityThreshold = preferences.getInt("ctrl_asr_similarity", 50).toFloat() / 100,
+                stratagems = stratagemViewModel.getAllItems(),
+                onError = { e ->
+                    textView.setText(
+                        when (e) {
+                            AsrService.ASRErrType.ASR_MODEL_INIT_FAILED -> R.string.asr_model_init_failed
+                            AsrService.ASRErrType.ASR_MODEL_FILE_CHECK_FAILED -> R.string.asr_model_file_check_failed
+                            AsrService.ASRErrType.ASR_MIC_PERMISSION_DENIED -> R.string.asr_mic_permission_denied
+                        }
+                    )
+                },
+                onProcess = { txt ->
+                    if (txt.isNotBlank()) {
+                        val display = "${txt}\n\n${lastRes}"
+                        textView.text = display
+                    }
+                },
+                onCalculated = { l, txt ->
+                    val list = l.subList(0, l.size.coerceAtMost(10))
+                    if (txt.isNotBlank()) {
+                        lastRes = ""
+                        if (list.isEmpty()) {
+                            lastRes = getString(R.string.asr_model_no_result)
+                        } else {
+                            for (i in list) {
+                                lastRes = String.format(getString(R.string.asr_model_result_item), "${lastRes}${i.second}",  i.third)
+                            }
+                        }
+                        val display = "${txt}\n\n${lastRes}"
+                        textView.text = display
+                    }
+                },
+                onStarted = {
+                    textView.text = null
+                })
+
             dialog.setOnCancelListener {
-                AsrService.destroyModel()
+                client.destroy()
             }
 
             lifecycleScope.launch(Dispatchers.IO) {
-                AsrService.initModel(name = preferences.getString("asr_model_name", "")!!,
-                    context = requireContext(),
-                    activity = requireActivity(),
-                    onError = { e ->
-                        textView.setText(
-                            when (e) {
-                                AsrService.ASRErrType.ASR_MODEL_INIT_FAILED -> R.string.asr_model_init_failed
-                                AsrService.ASRErrType.ASR_MODEL_FILE_CHECK_FAILED -> R.string.asr_model_file_check_failed
-                                AsrService.ASRErrType.ASR_MIC_PERMISSION_DENIED -> R.string.asr_mic_permission_denied
-                            }
-                        )
-                    },
-                    onProcess = { txt ->
-                        if (txt.isNotBlank()) {
-                            textView.text = txt
-                        }
-                    },
-                    onStarted = {
-                        textView.text = null
-                    })
-                AsrService.startRecord(requireContext(), requireActivity())
+                client.startRecord()
             }
         }
     }
