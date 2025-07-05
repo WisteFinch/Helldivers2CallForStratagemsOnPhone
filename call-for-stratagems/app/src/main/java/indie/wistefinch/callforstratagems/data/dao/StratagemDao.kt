@@ -17,7 +17,7 @@ interface StratagemDao {
     /**
      * Get all the entries in the database.
      */
-    @Query("SELECT * FROM stratagem_table ORDER BY id ASC")
+    @Query("SELECT * FROM stratagem_table ORDER BY idx ASC, id ASC")
     fun getItems(): List<StratagemData>
 
     /**

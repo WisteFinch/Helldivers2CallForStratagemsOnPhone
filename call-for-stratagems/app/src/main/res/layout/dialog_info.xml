@@ -9,10 +9,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:background="@color/backgroundPrimary"
-        android:orientation="vertical"
         android:gravity="center"
-        android:layout_margin="5dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
-                android:id="@+id/dialog_info_icon"
+                android:id="@+id/dlg_info_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
@@ -30,12 +30,12 @@
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/dialog_info_title"
+                android:id="@+id/dlg_info_title"
+                style="@style/AppTextTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="@string/default_string"
-                style="@style/AppTextTitle"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -57,22 +57,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fadeScrollbars="false"
+                android:gravity="center"
+                android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+                android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
                 tools:ignore="UselessParent">
 
                 <TextView
-                    android:id="@+id/dialog_info_msg"
-                    android:theme="@style/AppText"
+                    android:id="@+id/dlg_info_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/default_string"/>
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/default_string"
+                    android:theme="@style/AppText" />
 
             </ScrollView>
 
@@ -81,16 +85,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="5dp">
+            android:layout_marginBottom="5dp"
+            android:gravity="start">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/dialog_info_button3"
+                android:id="@+id/dlg_info_button3"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:visibility="gone"
-                app:text="@string/dialog_ignore" />
+                app:text="@string/dlg_comm_ignore" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -98,17 +102,17 @@
                 android:gravity="end">
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button2"
+                    android:id="@+id/dlg_info_button2"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginEnd="5dp"
-                    app:text="@string/dialog_cancel"/>
+                    app:text="@string/dlg_comm_cancel" />
 
                 <indie.wistefinch.callforstratagems.utils.AppButton
-                    android:id="@+id/dialog_info_button1"
+                    android:id="@+id/dlg_info_button1"
                     android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    app:text="@string/dialog_confirm"/>
+                    app:text="@string/dlg_comm_confirm" />
 
             </LinearLayout>
 

@@ -14,7 +14,7 @@ pub async fn load_auth() -> Option<Vec<Auth>> {
     if let Ok(toml_content) = fs::read_to_string(CONF_PATH) {
         match toml::from_str::<AppConfig>(&toml_content) {
             Ok(app_config) => {
-                return Some(app_config.auth_records);
+                return Some(app_config.records);
             },
             Err(e) => {
                 warning(format!("从配置加载认证数据失败: {}", e));
@@ -41,7 +41,7 @@ pub async fn save_auth(auth_data: &[Auth]) {
         match toml::from_str::<AppConfig>(&toml_content) {
             Ok(mut app_config) => {
                 // 更新认证记录
-                app_config.auth_records = auth_data.to_vec();
+                app_config.records = auth_data.to_vec();
                 
                 // 保存回TOML配置文件
                 match toml::to_string_pretty(&app_config) {

@@ -10,7 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import indie.wistefinch.callforstratagems.utils.Util
+import indie.wistefinch.callforstratagems.utils.Utils
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         val sid = preferences.getString("sid", "0")!!
         val editor = preferences.edit()
         if (sid == "0") {
-            editor.putString("sid", Util.getRandomString(16))
+            editor.putString("sid", Utils.getRandomString(16))
             editor.apply()
         }
     }

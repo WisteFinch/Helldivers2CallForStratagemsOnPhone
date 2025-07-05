@@ -16,18 +16,25 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.SharedViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentRootBinding
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RootFragment : Fragment() {
 
@@ -78,22 +85,23 @@ class RootFragment : Fragment() {
             dialog.setView(view)
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).setText(R.string.hint_db_incomplete)
-            view.findViewById<TextView>(R.id.dialog_info_msg)
-                .setText(R.string.hint_db_incomplete_desc)
-            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+            view.findViewById<TextView>(R.id.dlg_info_title)
+                .setText(R.string.dlg_db_incomplete_title)
+            view.findViewById<TextView>(R.id.dlg_info_msg)
+                .setText(R.string.dlg_db_incomplete_desc)
+            view.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
                 dialog.hide()
             }
-            val button2 = view.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.dialog_settings))
+            val button2 = view.findViewById<AppButton>(R.id.dlg_info_button2)
+            button2.setTitle(resources.getString(R.string.dlg_comm_settings))
             button2.setOnClickListener {
                 val bundle = bundleOf(Pair("jump_to_entry", R.id.set_info_db))
                 findNavController().navigate(R.id.settingsFragment, bundle)
                 dialog.hide()
             }
-            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            val button3 = view.findViewById<AppButton>(R.id.dlg_info_button3)
             button3.visibility = VISIBLE
-            button3.setTitle(resources.getString(R.string.dialog_ignore))
+            button3.setTitle(resources.getString(R.string.dlg_comm_ignore))
             button3.setAlert(true)
             button3.setOnClickListener {
                 preferences.edit().putBoolean("hint_db_incomplete", true).apply()
@@ -116,21 +124,21 @@ class RootFragment : Fragment() {
             }
             dialog.show()
 
-            view.findViewById<TextView>(R.id.dialog_info_title).text =
-                String.format(resources.getString(R.string.hint_welcome), ver)
-            view.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.hint_welcome_desc)
-            view.findViewById<AppButton>(R.id.dialog_info_button1).setOnClickListener {
+            view.findViewById<TextView>(R.id.dlg_info_title).text =
+                String.format(resources.getString(R.string.dlg_welcome_title), ver)
+            view.findViewById<TextView>(R.id.dlg_info_msg).setText(R.string.dlg_welcome_desc)
+            view.findViewById<AppButton>(R.id.dlg_info_button1).setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
                 dialog.hide()
             }
             @SuppressLint("CutPasteId")
-            view.findViewById<AppButton>(R.id.dialog_info_button2).visibility = GONE
-            val button3 = view.findViewById<AppButton>(R.id.dialog_info_button3)
+            view.findViewById<AppButton>(R.id.dlg_info_button2).visibility = GONE
+            val button3 = view.findViewById<AppButton>(R.id.dlg_info_button3)
             button3.visibility = VISIBLE
-            button3.setTitle(resources.getString(R.string.hint_welcome_usage))
+            button3.setTitle(resources.getString(R.string.dlg_welcome_usage))
             button3.setOnClickListener {
                 preferences.edit().putBoolean("hint_welcome_$ver", true).apply()
-                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val uri = Uri.parse(Constants.URL_APP_USAGE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
@@ -190,15 +198,41 @@ class RootFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-
         val recyclerView = binding.rootRecyclerView
         recyclerView.adapter = adapter
         recyclerView.recycledViewPool.setMaxRecycledViews(0, 0)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         adapter.setStratagemViewModel(stratagemViewModel)
+        // Init data
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                groupViewModel.initIdx()
+            }
+        }
         groupViewModel.allItems.observe(viewLifecycleOwner) { data ->
             sharedViewModel.checkIfDbIsEmpty(data)
-            adapter.setData(data, preferences.getBoolean("enable_fastboot_mode", false))
+            adapter.setData(
+                data,
+                preferences.getBoolean("ctrl_fastboot", false)
+            )
         }
+        if (!preferences.getBoolean("ctrl_fastboot", false)) {
+            val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
+            val helper = ItemTouchHelper(callback)
+            helper.attachToRecyclerView(recyclerView)
+        }
+    }
+
+    override fun onPause() {
+        if (adapter.isGroupMoved()) {
+            val list = adapter.getData()
+            for (i in list.indices) {
+                if (i != list[i].idx) {
+                    list[i].idx = i
+                    groupViewModel.updateIdx(list[i])
+                }
+            }
+        }
+        super.onPause()
     }
 }

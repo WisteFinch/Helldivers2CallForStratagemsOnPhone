@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.editgroup
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -8,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperAdapter
 import java.io.File
 
 /**
@@ -58,7 +61,7 @@ class StratagemEditAdapter : RecyclerView.Adapter<StratagemEditAdapter.ListViewH
                 Uri.fromFile(
                     File(
                         context.filesDir.path +
-                                context.resources.getString(R.string.icons_path) +
+                                Constants.PATH_DB_ICONS +
                                 "$dbName/" +
                                 dataList[pos].icon + ".svg"
                     )
@@ -129,17 +132,28 @@ class StratagemEditAdapter : RecyclerView.Adapter<StratagemEditAdapter.ListViewH
             dataList.add(toPos, ori)
             notifyItemMoved(fromPos, toPos)
         }
-        onItemClear(source)
     }
 
     override fun onItemSelect(source: RecyclerView.ViewHolder) {
-        source.itemView.scaleX = 1.2f
-        source.itemView.scaleY = 1.2f
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1f, 1.1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1f, 1.1f)
+            .setDuration(200)
+            .start()
     }
 
     override fun onItemClear(source: RecyclerView.ViewHolder) {
-        source.itemView.scaleX = 1.0f
-        source.itemView.scaleY = 1.0f
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1.1f, 1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1.1f, 1f)
+            .setDuration(200)
+            .start()
     }
 
     fun getEnabledStratagems(): List<Int> {

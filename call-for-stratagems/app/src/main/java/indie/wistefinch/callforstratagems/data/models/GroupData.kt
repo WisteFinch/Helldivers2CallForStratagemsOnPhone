@@ -17,5 +17,7 @@ data class GroupData(
     var title: String,
     var list: List<Int>,
     @ColumnInfo(name = "dbName", defaultValue = "0")
-    var dbName: String
+    var dbName: String,
+    @ColumnInfo(name = "idx", defaultValue = Int.MAX_VALUE.toString())
+    var idx: Int = Int.MAX_VALUE
 ): Parcelable

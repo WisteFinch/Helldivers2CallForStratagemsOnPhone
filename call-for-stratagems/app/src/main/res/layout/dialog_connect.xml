@@ -22,7 +22,7 @@
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
-                android:id="@+id/dialog_conn_icon"
+                android:id="@+id/dlg_conn_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
@@ -30,7 +30,7 @@
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/dialog_conn_title"
+                android:id="@+id/dlg_conn_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -63,7 +63,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/dialog_conn_progress"
+                android:id="@+id/dlg_conn_progress"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -77,12 +77,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:text="@string/dialog_progress"/>
+                    android:text="@string/dlg_comm_progressing"/>
 
             </LinearLayout>
 
             <TextView
-                android:id="@+id/dialog_conn_msg"
+                android:id="@+id/dlg_conn_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/default_string"
@@ -99,10 +99,10 @@
             android:layout_marginBottom="5dp">
 
             <indie.wistefinch.callforstratagems.utils.AppButton
-                android:id="@+id/dialog_conn_button"
+                android:id="@+id/dlg_conn_button"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                app:text="@string/dialog_confirm" />
+                app:text="@string/dlg_comm_confirm" />
 
         </LinearLayout>
 

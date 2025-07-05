@@ -33,7 +33,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="10dp"
             android:background="@drawable/round_button"
-            android:contentDescription="@string/back"
+            android:contentDescription="@string/menu_back"
             android:src="@drawable/ic_back"
             tools:ignore="TouchTargetSizeCheck" />
 
@@ -54,7 +54,7 @@
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="5dp"
-            android:contentDescription="@string/editGroup_menu_save_title"
+            android:contentDescription="@string/menu_save"
             app:icon="@drawable/ic_save" />
 
     </LinearLayout>
@@ -69,10 +69,10 @@
             android:id="@+id/editGroup_title"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="5dp"
             android:autofillHints="@string/editGroup_title"
-            android:background="@color/backgroundSecondary"
+            android:background="@drawable/edit_text_view_bg"
             android:gravity="center"
             android:hint="@string/editGroup_title_hint"
             android:inputType="text"

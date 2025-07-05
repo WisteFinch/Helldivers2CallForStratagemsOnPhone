@@ -33,7 +33,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="10dp"
             android:background="@drawable/round_button"
-            android:contentDescription="@string/back"
+            android:contentDescription="@string/menu_back"
             android:src="@drawable/ic_back"
             tools:ignore="TouchTargetSizeCheck" />
 
@@ -63,7 +63,7 @@
             android:layout_margin="5dp"
             android:text="@string/default_string"
             android:textAlignment="center"
-            android:textColor="@color/textColorPrimary"
+            android:textColor="@color/textPrimary"
             android:textSize="24sp"
             android:textStyle="bold" />
 

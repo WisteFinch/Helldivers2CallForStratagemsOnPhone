@@ -1,5 +1,6 @@
 package indie.wistefinch.callforstratagems.fragments.root
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.net.Uri
 import android.util.DisplayMetrics
@@ -15,21 +16,23 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.caverock.androidsvg.SVGImageView
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperAdapter
 import java.io.File
 import kotlin.math.min
 
 /**
  * Adapter for the group recycler view in [RootFragment]
  */
-class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>() {
-
+class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>(),
+    ItemTouchHelperAdapter {
     /**
      * All data in the adapter.
      */
-    private var dataList = emptyList<GroupData>()
+    private var dataList = emptyList<GroupData>().toMutableList()
 
     /**
      * The stratagem view model,.
@@ -45,6 +48,8 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
      * Enable fastboot mode.
      */
     private var fastboot = false
+
+    private var groupMoved = false
 
 
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -72,7 +77,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                     true
                 }
         } else {
-            holder.itemView.findViewById<ConstraintLayout>(R.id.group_cardView).setOnClickListener {
+            holder.itemView.setOnClickListener {
                 holder.itemView.findNavController()
                     .navigate(R.id.action_rootFragment_to_viewGroupFragment, bundle)
             }
@@ -84,7 +89,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
         layout.post {
             val preference = context.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
             val dbName =
-                preference.getString("db_name", context.resources.getString(R.string.db_hd2_name))!!
+                preference.getString("db_name", Constants.ID_DB_HD2)!!
             val maxCount =
                 (holder.itemView.width / (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT) - 50) / 34
             if (dataList.size <= pos) {
@@ -108,7 +113,7 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
                                     Uri.fromFile(
                                         File(
                                             context.filesDir.path +
-                                                    context.resources.getString(R.string.icons_path) +
+                                                    Constants.PATH_DB_ICONS +
                                                     "$dbName/" +
                                                     data.icon + ".svg"
                                         )
@@ -149,11 +154,54 @@ class GroupListAdapter : RecyclerView.Adapter<GroupListAdapter.ListViewHolder>()
      * Set the adapter data.
      */
     fun setData(list: List<GroupData>, fastboot: Boolean) {
+        this.groupMoved = false
         this.fastboot = fastboot
         // Check difference.
         val groupListDiffUtil = GroupListDiffUtil(dataList, list)
         val groupListDiffResult = DiffUtil.calculateDiff(groupListDiffUtil)
-        this.dataList = list
+        this.dataList = list.toMutableList()
         groupListDiffResult.dispatchUpdatesTo(this)
+    }
+
+    override fun onItemMove(source: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) {
+        this.groupMoved = true
+        val fromPos = source.adapterPosition
+        val toPos = target.adapterPosition
+        if (fromPos < dataList.size && toPos < dataList.size) {
+            val ori = dataList[fromPos]
+            dataList.removeAt(fromPos)
+            dataList.add(toPos, ori)
+            notifyItemMoved(fromPos, toPos)
+        }
+    }
+
+    override fun onItemSelect(source: RecyclerView.ViewHolder) {
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1f, 1.1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1f, 1.1f)
+            .setDuration(200)
+            .start()
+    }
+
+    override fun onItemClear(source: RecyclerView.ViewHolder) {
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleX", 1.1f, 1f)
+            .setDuration(200)
+            .start()
+        ObjectAnimator
+            .ofFloat(source.itemView, "scaleY", 1.1f, 1f)
+            .setDuration(200)
+            .start()
+    }
+
+    fun getData(): List<GroupData> {
+        return dataList.toList()
+    }
+
+    fun isGroupMoved(): Boolean {
+        return groupMoved
     }
 }

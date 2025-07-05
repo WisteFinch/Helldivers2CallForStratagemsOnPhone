@@ -13,13 +13,20 @@ android {
         applicationId = "indie.wistefinch.callforstratagems"
         minSdk = 26
         targetSdk = 34
-        versionCode = 14
-        versionName = "0.5.2-patch1"
+        versionCode = 15
+        versionName = "0.6.0"
         // Remove unnecessary language to reduce size.
         resourceConfigurations += listOf("en", "zh", "ru", "fr", "es", "ar")
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
+        }
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters += listOf("arm64-v8a")
+            // Add support for x86_64 devices
+            // abiFilters += listOf("x86_64")
         }
     }
 
@@ -64,6 +71,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidsvg.aar)
     implementation(libs.zxing.lite)
+    implementation(libs.okhttp)
+    implementation(libs.commons.text)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

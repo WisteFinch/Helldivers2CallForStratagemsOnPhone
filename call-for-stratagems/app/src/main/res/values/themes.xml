@@ -7,40 +7,20 @@
         <item name="android:fitsSystemWindows">false</item>
         <item name="android:textColorPrimary">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
-        <item name="alertDialogTheme">@style/AppAlertDialog</item>
-        <item name="cardViewStyle">@style/AppCardView</item>
-        <item name="floatingActionButtonStyle">@style/AppFAB</item>
         <item name="fontFamily">@font/hc_sinclair_medium</item>
         <item name="spinnerDropDownItemStyle">@style/AppSpinnerDropDownItem</item>
     </style>
 
     <style name="Theme.CallForStratagems" parent="Base.Theme.CallForStratagems" />
 
-    <style name="AppAlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:background">@color/colorBackground</item>
-        <item name="textColorAlertDialogListItem">@color/textColorPrimary</item>
-        <item name="android:colorControlNormal">@color/textColorSecondary</item>
-        <item name="android:colorControlActivated">@color/colorPrimary</item>
-    </style>
-
     <style name="AppSpinnerDropDownItem" parent="Widget.AppCompat.TextView.SpinnerItem">
-        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColor">@color/textPrimary</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:background">@color/backgroundPrimary</item>
     </style>
 
-    <style name="AppCardView" parent="CardView">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="cardCornerRadius">16dp</item>
-        <item name="android:foreground">?attr/selectableItemBackground</item>
-        <item name="cardBackgroundColor">@color/colorBackground</item>
-        <item name="cardElevation">0dp</item>
-    </style>
-
     <style name="AppTextTitle">
-        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -49,25 +29,9 @@
     </style>
 
     <style name="AppPlayText">
-        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">48sp</item>
-    </style>
-
-    <style name="AppFAB" parent="Widget.Design.FloatingActionButton">
-        <item name="shapeAppearanceOverlay">@style/FABRoundedStyle</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:backgroundTint">@color/colorAccent</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:elevation">8dp</item>
-        <item name="tint">@color/white</item>
-    </style>
-
-    <style name="FABRoundedStyle" parent="ShapeAppearance.Material3.SmallComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
     </style>
 
     <style name="AppTitle">
@@ -88,6 +52,10 @@
 
     <style name="AppTextHint">
         <item name="android:textColor">@color/textSecondary</item>
+    </style>
+
+    <style name="AppProgressBar" parent="@android:style/Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_bar</item>
     </style>
 
 </resources>

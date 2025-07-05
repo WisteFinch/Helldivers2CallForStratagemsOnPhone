@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.R
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
@@ -21,6 +22,7 @@ import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentEditGroupBinding
+import indie.wistefinch.callforstratagems.utils.ItemTouchHelperCallback
 
 class EditGroupFragment : Fragment() {
 
@@ -66,7 +68,8 @@ class EditGroupFragment : Fragment() {
     private lateinit var preferences: SharedPreferences
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment.
@@ -78,8 +81,7 @@ class EditGroupFragment : Fragment() {
             // Save data to database
             if (isEdit) {
                 updateDataToDb()
-            }
-            else {
+            } else {
                 insertDataToDb()
             }
             findNavController().popBackStack(R.id.rootFragment, false)
@@ -103,7 +105,7 @@ class EditGroupFragment : Fragment() {
                 0,
                 "",
                 listOf(1, 2, 3), // The default stratagems: Reinforce, SOS and Resupply.,
-                preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+                preferences.getString("db_name", Constants.ID_DB_HD2)!!
             )
         }
 
@@ -123,7 +125,8 @@ class EditGroupFragment : Fragment() {
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
-            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+            preferences.getString("db_name", Constants.ID_DB_HD2)!!,
+            currentItem.idx
         )
     }
 
@@ -136,10 +139,11 @@ class EditGroupFragment : Fragment() {
                 "" -> { // User did not name the item, use the default name.
                     binding.editGroupTitle.autofillHints!![0]
                 }
+
                 else -> binding.editGroupTitle.text.toString()
             },
             adapter.getEnabledStratagems(),
-            preferences.getString("db_name", getString(R.string.db_hd2_name))!!
+            preferences.getString("db_name", Constants.ID_DB_HD2)!!
         )
     }
 
@@ -155,7 +159,7 @@ class EditGroupFragment : Fragment() {
         // Init data.
         val list = stratagemViewModel.getAllItems()
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        var lang: String = preference.getString("lang_stratagem", "auto")!!
+        var lang: String = preference.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
@@ -163,14 +167,16 @@ class EditGroupFragment : Fragment() {
         for (i in currentItem.list) {
             if (stratagemViewModel.isIdValid(i)) {
                 orderedList.add(stratagemViewModel.retrieveItem(i))
-            }
-            else {
-                orderedList.add(StratagemData(i,
-                    "Unknown [$i]",
-                    "未知 [$i]",
-                    String(),
-                    emptyList()
-                ))
+            } else {
+                orderedList.add(
+                    StratagemData(
+                        i,
+                        "Unknown [$i]",
+                        "未知 [$i]",
+                        String(),
+                        emptyList()
+                    )
+                )
             }
         }
         for (i in list) {
@@ -178,10 +184,12 @@ class EditGroupFragment : Fragment() {
                 orderedList.add(i)
             }
         }
-        adapter.setData(orderedList,
+        adapter.setData(
+            orderedList,
             currentItem.list.toMutableSet(),
-            preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!,
-            lang)
+            preference.getString("db_name", Constants.ID_DB_HD2)!!,
+            lang
+        )
         val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(adapter)
         val helper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(recyclerView)
@@ -193,7 +201,8 @@ class EditGroupFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }

@@ -59,7 +59,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="85dp"
         android:paddingTop="5dp"
-        android:paddingBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:fadeScrollbars="false"
         android:gravity="center"
         android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
@@ -91,7 +91,7 @@
             android:id="@+id/no_group_imageView"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:contentDescription="@string/root_no_group_img"
+            android:importantForAccessibility="no"
             android:src="@drawable/ic_super_earth"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -99,7 +99,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.35"
-            app:tint="@color/grey"
+            app:tint="@color/textSecondary"
             tools:ignore="ImageContrastCheck" />
 
         <TextView
@@ -107,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/root_no_group"
-            android:textColor="@color/grey"
+            android:textColor="@color/textSecondary"
             android:textSize="16sp"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"

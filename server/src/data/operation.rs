@@ -2,8 +2,8 @@ use std::fmt;
 
 pub enum Operation {
     Status = 0,
-    Combined = 1,
-    Independent = 2,
+    Macro = 1,
+    Input = 2,
     Request = 3,
     Sync = 4,
     Auth = 5,
@@ -12,8 +12,8 @@ pub enum Operation {
 impl Operation {
     pub fn from_u64(v: u64) -> Self {
         match v {
-            1 => Self::Combined,
-            2 => Self::Independent,
+            1 => Self::Macro,
+            2 => Self::Input,
             3 => Self::Request,
             4 => Self::Sync,
             5 => Self::Auth,

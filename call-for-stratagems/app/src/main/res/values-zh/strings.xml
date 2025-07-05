@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">呼叫战略配备</string>
-    <string name="usage_url">https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone/blob/main/usage_zh_CN.md</string>
-    <string name="back">返回</string>
 
-    <!-- Fragment Root -->
+    <!-- Fragment Navigation Menu -->
+    <string name="menu_back">返回</string>
+    <string name="menu_save">保存</string>
+    <string name="menu_edit">编辑</string>
+    <string name="menu_delete">删除</string>
+
+    <!-- Fragment Title -->
     <string name="fragment_root">呼叫战略配备</string>
     <string name="fragment_editGroup">编辑组合</string>
     <string name="fragment_settings">设置</string>
+    <string name="fragment_settings_sync">同步</string>
     <string name="fragment_viewGroup">浏览组合</string>
     <string name="fragment_play">游玩</string>
     <string name="fragment_stratagemsList">战略配备列表</string>
 
-    <!-- Fragment Root -->
-    <string name="root_new_group_FAB">新组合</string>
+    <!-- Root Fragment -->
     <string name="root_no_group">The Galactic War awaits</string>
-    <string name="root_no_group_img">没有组合</string>
 
-    <!-- Fragment Edit Group -->
+    <!-- Edit Group Fragment -->
     <string name="editGroup_title">新的组合</string>
     <string name="editGroup_title_hint">组合名称</string>
 
-    <!-- Fragment View Group -->
-    <string name="viewGroup_play_FAB">开始</string>
-
-    <!-- Fragment Play -->
-    <string name="play_banner_desc">横幅</string>
+    <!-- Play Fragment -->
     <string name="play_exit">退出</string>
     <string name="play_mode">输入模式</string>
     <string name="play_freeInput">自由输入</string>
@@ -34,97 +33,125 @@
     <string name="play_backward">左</string>
     <string name="play_forward">右</string>
     <string name="play_network_status">连接状态</string>
+    <string name="play_asr">语音识别</string>
 
-    <!-- Preference Titles -->
-    <string name="connection_header">连接</string>
-    <string name="sync_header">同步</string>
-    <string name="control_header">控制</string>
-    <string name="info_header">信息</string>
-
-    <!-- Connection Preferences -->
-    <string name="tcp_add_title">服务器地址</string>
-    <string name="tcp_port_title">服务器端口</string>
-    <string name="tcp_retry_title">重试次数</string>
-    <string name="tcp_scan">扫描二维码</string>
-    <string name="tcp_scan_desc">扫描服务器的二维码，快速获取连接配置</string>
+    <!-- Settings Fragment -->
+    <string name="set_conn_hdr">连接</string>
+    <string name="set_conn_server">服务器</string>
+    <string name="set_conn_addr">地址</string>
+    <string name="set_conn_port">端口</string>
+    <string name="set_conn_retry">重试次数</string>
+    <string name="set_conn_test">测试连接</string>
+    <string name="set_conn_scan">扫描二维码</string>
+    <string name="set_conn_scan_desc">扫描服务器的二维码，快速获取连接配置</string>
     <string name="tcp_scan_success">扫描成功</string>
     <string name="tcp_scan_failed">扫描失败</string>
-    <string name="tcp_scan_canceled">扫码取消</string>
-    <string name="tcp_test_title">测试连接</string>
-    <string name="tcp_test_default">测试与服务器的连接</string>
-    <string name="tcp_test_connecting">请民主地等待…</string>
-    <string name="tcp_test_waiting">等待服务器响应…</string>
-    <string name="tcp_test_success">成功</string>
-    <string name="tcp_test_failed">连接失败，请检查网络设置</string>
+    <string name="tcp_scan_cancel">扫码取消</string>
+    <string name="set_sync_hdr">同步</string>
+    <string name="set_sync_port">端口</string>
+    <string name="set_sync_delay">输入延迟</string>
+    <string name="set_sync_input_open">输入：打开战略配备列表</string>
+    <string name="set_sync_advance_hdr">高级选项</string>
+    <string name="set_sync_advance_alert">修改下列设置可能降低服务器稳定性</string>
+    <string name="set_sync_apply">应用配置至服务器</string>
+    <string name="set_sync_apply_finished">请在服务器上接受请求，然后重启服务器来应用配置</string>
+    <string name="set_unit_ms">毫秒</string>
+    <string name="set_unit_day">天</string>
+    <string name="set_unit_percentage">%</string>
+    <string name="set_sync_type_open">类型：打开战略配备列表</string>
+    <string name="set_sync_input_up">输入：上</string>
+    <string name="set_sync_input_down">输入：下</string>
+    <string name="set_sync_input_left">输入：左</string>
+    <string name="set_sync_input_right">输入：右</string>
+    <string name="set_sync_ip">服务器监听地址</string>
+    <string name="set_sync_ip_desc">指定服务器监听地址，建议仅在有多个网卡时设置</string>
+    <string name="set_sync_ip_auto">自动获取</string>
+    <string name="set_sync_auth">启用客户端身份认证</string>
+    <string name="set_sync_auth_desc">为了提高安全性，仅允许通过认证的客户端在服务器执行指令</string>
+    <string name="set_sync_auth_timeout">身份认证有效期</string>
+    <string name="set_sync_auth_timeout_desc">为了提高安全性，客户端认证信息将在指定时间后失效</string>
+    <string name="set_sync_debug">启用调试模式</string>
+    <string name="set_sync_debug_desc">显示详细的服务器日志</string>
+    <string name="set_ctrl_hdr">控制</string>
+    <string name="set_ctrl_simplified_mode">启用精简模式</string>
+    <string name="set_ctrl_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
+    <string name="set_ctrl_simplified_stratagem_size">精简模式战备按钮尺寸</string>
+    <string name="set_ctrl_lang_stratagem">语言：战略配备名称</string>
+    <string name="set_ctrl_gst_swp_distance_threshold">手势距离阈值</string>
+    <string name="set_ctrl_gst_swp_velocity_threshold">手势速度阈值</string>
+    <string name="set_unit_pixel">像素</string>
+    <string name="set_unit_pixel_s">像素/秒</string>
+    <string name="set_ctrl_fastboot_mode">启用快速启动</string>
+    <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览（该模式下将禁止调整组合顺序）</string>
+    <string name="set_ctrl_sfx">启用音效</string>
+    <string name="set_ctrl_sfx_desc">启用按键输入和战备激活的音效</string>
+    <string name="set_ctrl_vibrator">启用震动</string>
+    <string name="set_ctrl_vibrator_desc">启用按键输入和战备激活的震动</string>
+    <string name="set_ctrl_asr_hdr">语音识别</string>
+    <string name="set_ctrl_asr_alert">实验性功能</string>
+    <string name="set_ctrl_asr_alert_desc">启用语音识别将增加发热和耗电量</string>
+    <string name="set_ctrl_asr_models">选择语言模型</string>
+    <string name="set_ctrl_asr_model_null">未选择模型</string>
+    <string name="set_ctrl_asr_model_ready">模型就绪：[%1$s]</string>
+    <string name="set_ctrl_asr_model_incomplete">模型不完整：[%1$s]</string>
+    <string name="set_ctrl_asr_model_dl_title">更新数据库</string>
+    <string name="set_ctrl_asr_model_dl_title2">更新数据库：%1$s</string>
+    <string name="set_ctrl_asr_model_dl_idx">获取数据库索引</string>
+    <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载图标文件</string>
+    <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
+    <string name="set_ctrl_asr_model_dl_complete">更新完成</string>
+    <string name="set_ctrl_asr_model_dl_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
+    <string name="set_ctrl_asr_enable">启用语音识别</string>
+    <string name="set_ctrl_asr_enable_success">模型准备就绪</string>
+    <string name="set_ctrl_asr_enable_failed">禁用：模型未就绪</string>
+    <string name="set_ctrl_asr_similarity">识别相似度阈值</string>
+    <string name="set_ctrl_asr_similarity_desc">当识别文本与目标文本相似度大于阈值时，激活相似度最大的战备</string>
+    <string name="set_ctrl_asr_gpu">启用硬件加速</string>
+    <string name="set_ctrl_asr_gpu_desc">使用GPU运行模型</string>
+    <string name="set_ctrl_asr_activate">配置激活词</string>
+    <string name="set_ctrl_asr_activate_edit">激活词</string>
+    <string name="set_ctrl_asr_activate_desc">识别到特定语句后，激活语音识别功能</string>
+    <string name="set_ctrl_asr_keywords">配置识别关键词</string>
+    <string name="set_ctrl_asr_keywords_desc">为每个战备指定识别语句</string>
+    <string name="set_ctrl_asr_auto_keywords">启用自动生成关键词</string>
+    <string name="set_ctrl_asr_auto_keywords_desc">根据战备名称自动生成关键词</string>
+    <string name="set_ctrl_asr_test">识别测试</string>
+    <string name="set_info_hdr">信息</string>
+    <string name="set_info_db">数据库版本</string>
+    <string name="set_info_db_ver">[%1$s] %2$s</string>
+    <string name="set_info_db_latest">[%1$s] %2$s (最新)</string>
+    <string name="set_info_db_empty">空</string>
+    <string name="set_info_db_incomplete">不完整</string>
+    <string name="set_info_db_chk">数据库版本（正在检查更新）</string>
+    <string name="set_info_db_updatable">数据库版本（可更新）</string>
+    <string name="set_info_db_ver_diff">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
+    <string name="set_info_db_updt_title">更新数据库</string>
+    <string name="set_info_db_updt_title2">更新数据库：%1$s</string>
+    <string name="set_info_db_updt_idx">获取数据库索引</string>
+    <string name="set_info_db_updt_db">获取数据库</string>
+    <string name="set_info_db_updt_icons">(%1$d/%2$d) 下载图标文件</string>
+    <string name="set_info_db_updt_icons_item">%1$.1f%% %2$s/%3$s</string>
+    <string name="set_info_db_updt_complete">更新完成</string>
+    <string name="set_info_db_updt_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
+    <string name="set_info_app">软件版本</string>
+    <string name="set_info_app_chk">软件版本（检查更新）</string>
+    <string name="set_info_app_updatable">软件版本（可更新）</string>
+    <string name="set_info_app_ver">%1$s[API%2$d]</string>
+    <string name="set_info_app_latest">%1$s[API%2$d] (最新)</string>
+    <string name="set_info_app_ver_diff">%1$s[API%2$d] ➡ %3$s</string>
+    <string name="set_info_export">备份用户数据</string>
+    <string name="set_info_export_success">导出成功</string>
+    <string name="set_info_export_failed">导出失败：%1$s</string>
+    <string name="set_info_export_cancel">导出取消</string>
+    <string name="set_info_import">还原用户数据</string>
+    <string name="set_info_import_success">还原成功</string>
+    <string name="set_info_import_failed">还原失败：%1$s</string>
+    <string name="set_info_import_failed_ver">还原失败：备份文件版本不支持</string>
+    <string name="set_info_import_cancel">还原取消</string>
+    <string name="set_info_about">关于</string>
 
-    <!-- Sync Preferences -->
-    <string name="server_port_title">端口</string>
-    <string name="input_delay_title">输入延迟（毫秒）</string>
-    <string name="input_open_title">输入：打开战略配备</string>
-    <string name="input_type_open_title">类型: 打开战略配备</string>
-    <string name="input_up_title">输入：上</string>
-    <string name="input_down_title">输入：下</string>
-    <string name="input_left_title">输入：左</string>
-    <string name="input_right_title">输入：右</string>
-    <string name="sync_config_title">应用配置</string>
-    <string name="sync_config_default">将配置同步到服务器，稍后您需要重启服务器来应用配置</string>
-    <string name="sync_config_finished">请在服务器上接受请求，然后重启服务器来应用配置</string>
-
-    <!-- Control Preferences -->
-    <string name="enable_simplified_mode_title">启用精简模式</string>
-    <string name="enable_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
-    <string name="enable_fastboot_mode_title">启用快速启动</string>
-    <string name="enable_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
-    <string name="swipe_distance_threshold_title">手势距离阈值（像素）</string>
-    <string name="swipe_velocity_threshold_title">手势速度阈值（像素/秒）</string>
-    <string name="lang_stratagem_title">语言：战略配备名称</string>
-
-    <!-- Info Preferences -->
-    <string name="info_db_version">数据库版本</string>
-    <string name="info_db_version_desc">[%1$s] %2$s</string>
-    <string name="info_db_version_latest">[%1$s] %2$s (最新)</string>
-    <string name="info_db_version_empty">空</string>
-    <string name="info_db_version_incomplete">不完整</string>
-    <string name="info_db_version_check">数据库版本（检查更新）</string>
-    <string name="info_db_version_updatable">数据库版本（可更新）</string>
-    <string name="info_db_version_updatable_desc">[%1$s] %2$s ➡\n[%3$s] %4$s</string>
-    <string name="info_db_version_updating">数据库版本（正在更新）</string>
-    <string name="info_db_version_updating_index_desc">下载索引…</string>
-    <string name="info_db_version_updating_db_desc">[%1$s] 下载数据库…</string>
-    <string name="info_db_version_updating_icons_desc">[%1$s] 下载图标… (%2$d/%3$d)</string>
-    <string name="info_db_version_update_complete_desc">[%1$s] 更新完成，请重启程序</string>
-    <string name="info_db_version_update_failed_desc">更新失败，请重试</string>
-    <string name="info_db_version_update_latest">[%1$s] 已是最新版本</string>
-    <string name="info_app_version">软件版本</string>
-    <string name="info_app_version_check">软件版本（检查更新）</string>
-    <string name="info_app_version_updatable">软件版本（可更新）</string>
-    <string name="info_app_version_desc">%1$s</string>
-    <string name="info_app_version_latest">%1$s (最新)</string>
-    <string name="info_app_version_updatable_desc">%1$s ➡ %2$s</string>
-    <string name="info_app_version_log_updatable">新版本：v%1$s</string>
-    <string name="info_app_version_log_latest">当前版本：v%1$s</string>
-    <string name="info_about">关于</string>
-    <string name="info_about_title">呼叫战略配备 v%1$s</string>
-    <string name="info_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314</string>
-    <string name="info_about_usage">用法</string>
-    <string name="info_about_license">许可证</string>
-    <string name="info_about_repo">项目仓库</string>
-
-    <!-- Update Channel Layout -->
-    <string name="info_db_update_title">选择数据库渠道</string>
-    <string name="info_db_update_channel_hd2">绝地潜兵2</string>
-    <string name="info_db_update_channel_hd">绝地潜兵1</string>
-    <string name="info_db_update_channel_custom">自定义</string>
-    <string name="info_db_update_channel_custom_url">自定义数据库索引地址</string>
-    <string name="info_db_update_clear">清除缓存</string>
-    <string name="info_db_update_clear_desc">清除缓存的战备数据库和图标文件</string>
-
-    <!-- Edit Group Menu -->
-    <string name="editGroup_menu_save_title">保存</string>
-
-    <!-- View Group Menu -->
-    <string name="viewGroup_menu_edit_title">编辑</string>
-    <string name="viewGroup_menu_delete_title">删除</string>
+    <!-- Utils -->
+    <string name="utils_parse_url_failed">解析地址失败：%1$s</string>
 
     <!-- Network -->
     <string name="network_connecting">连接中…</string>
@@ -133,78 +160,91 @@
     <string name="network_connected">已连接</string>
     <string name="network_failed">连接失败</string>
     <string name="network_response_error">服务器响应错误，请检查服务器是否正常运行</string>
-    <string name="network_status_error">服务器状态错误[%1$d]，请检查服务器是否正常运行</string>
-    <string name="network_status_1">服务器版本错误，预期%1$s.x，实际%2$s</string>
+    <string name="network_status_error">服务器状态错误，请检查服务器是否正常运行</string>
+    <string name="network_status_1">服务器API版本错误，需要API%1$s</string>
     <string name="network_auth">等待服务器认证，本地sid为%1$s</string>
     <string name="network_auth_failed">认证失败，请重试并在服务器接受认证请求</string>
 
-    <!-- Root Menu -->
-    <string name="root_menu_preferences_title">首选项</string>
-    <string name="root_menu_stratagems_title">战略配备列表</string>
+    <!-- Common Dialog -->
+    <string name="dlg_comm_cancel">取消</string>
+    <string name="dlg_comm_confirm">确认</string>
+    <string name="dlg_comm_download">前往下载</string>
+    <string name="dlg_comm_ignore">忽略</string>
+    <string name="dlg_comm_no_ask">不再询问</string>
+    <string name="dlg_comm_progressing">请民主地等待</string>
+    <string name="dlg_comm_settings">前往设置</string>
 
-    <!-- Dialog -->
-    <string name="dialog_cancel">取消</string>
-    <string name="dialog_confirm">确认</string>
-    <string name="dialog_download">前往下载</string>
-    <string name="dialog_ignore">忽略</string>
-    <string name="dialog_no_ask">不再询问</string>
-    <string name="dialog_progress">请民主地等待</string>
-    <string name="dialog_settings">前往设置</string>
+    <!-- Connection Test Dialog -->
+    <string name="dlg_conn_test_title">测试到服务器的连接</string>
+    <string name="dlg_conn_test_connecting">请民主地等待…</string>
+    <string name="dlg_conn_test_waiting">等待服务器响应…</string>
+    <string name="dlg_conn_test_success">成功</string>
+    <string name="dlg_conn_test_failed">连接失败，请检查网络设置</string>
+
+    <!-- ASR Models Dialog -->
+    <string name="dlg_asr_model_title">选择语言模型</string>
+    <string name="dlg_asr_model_en">英语</string>
+    <string name="dlg_asr_model_zh">中文</string>
+    <string name="dlg_asr_model_custom">自定义</string>
+    <string name="dlg_asr_model_custom_url">自定义模型索引地址</string>
+    <string name="dlg_asr_model_clear">清除缓存</string>
+    <string name="dlg_asr_model_clear_desc">清除缓存的模型文件</string>
+
+    <!-- DB Update Dialog -->
+    <string name="dlg_db_updt_title">选择数据库渠道</string>
+    <string name="dlg_db_updt_channel_hd2">绝地潜兵2</string>
+    <string name="dlg_db_updt_channel_hd">绝地潜兵1</string>
+    <string name="dlg_db_updt_channel_custom">自定义</string>
+    <string name="dlg_db_updt_channel_custom_url">自定义数据库索引地址</string>
+    <string name="dlg_db_updt_clear">清除缓存</string>
+    <string name="dlg_db_updt_clear_desc">清除缓存的战备数据库和图标文件</string>
+
+    <!-- App Version Log Dialog -->
+    <string name="dlg_app_ver_log_updatable">新版本：v%1$s</string>
+    <string name="dlg_app_ver_log_latest">当前版本：v%1$s[API%2$d]</string>
+
+    <!-- Welcome Dialog -->
+    <string name="dlg_welcome_title">欢迎使用 v%1$s</string>
+    <string name="dlg_welcome_usage">用法</string>
+    <string name="dlg_welcome_desc">本次更新后部分设置数据将会丢失，请留意！\n加入了语音识别功能，您可以前往“设置>控制>语音识别”进行配置</string>
+
+    <!-- DB Incomplete Dialog -->
+    <string name="dlg_db_incomplete_title">数据库不完整</string>
+    <string name="dlg_db_incomplete_desc">数据库不完整，请前往“设置>信息>数据库版本”更新数据库</string>
+
+    <!-- Group DB Not Match Dialog -->
+    <string name="dlg_group_db_not_match_title">数据库不相符</string>
+    <string name="dlg_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。请前往“设置>信息>数据库版本”切换数据库</string>
+
+    <!-- Delete Dialog -->
+    <string name="dlg_delete_title">删除</string>
+    <string name="dlg_delete_desc">确认要删除“%1$s”吗？</string>
+
+    <!-- About Dialog -->
+    <string name="dlg_about_title">呼叫战略配备 v%1$s[API%2$d]</string>
+    <string name="dlg_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314\n\tsherpa-ncnn - k2-fsa</string>
+    <string name="dlg_about_usage">用法</string>
+    <string name="dlg_about_license">许可证</string>
+    <string name="dlg_about_repo">项目仓库</string>
+
+    <!-- Edit List Dialog-->
+    <string name="dlg_edit_list_title">编辑：%1$s</string>
+    <string name="dlg_edit_list_add">新增</string>
+
+    <!-- Stratagem Info Dialog-->
+    <string name="dlg_stratagem_info_keyword_empty">未设置识别关键词</string>
+    <string name="dlg_stratagem_info_keyword">识别关键词：\n%1$s</string>
+
+    <!-- ASR -->
+    <string name="asr_model_init_failed">模型初始化失败</string>
+    <string name="asr_model_file_check_failed">模型文件不完整</string>
+    <string name="asr_mic_permission_denied">未授予录音权限</string>
+    <string name="asr_model_loading">加载模型中</string>
+    <string name="asr_model_ready">模型就绪</string>
+    <string name="asr_model_no_result">无识别结果</string>
+    <string name="asr_model_result_item">%1$s: %2$.3f\n</string>
 
     <!-- Toast -->
     <string name="toast_complete">完成</string>
-
-    <!-- Hints -->
-    <string name="hint_db_incomplete">数据库不完整</string>
-    <string name="hint_db_incomplete_desc">数据库不完整，请前往“设置>信息>数据库版本”更新数据库</string>
-    <string name="hint_welcome">欢迎使用 v%1$s</string>
-    <string name="hint_welcome_usage">用法</string>
-    <string name="hint_welcome_desc">本次更新加入了音效和震动功能，您可以前往“设置>控制”开启</string>
-    <string name="hint_group_db_not_match">数据库不相符</string>
-    <string name="hint_group_db_not_match_desc">这个组合是在[%1$s]数据库下创建的，当前为[%2$s]，继续使用可能导致错误。请前往“设置>信息>数据库版本”切换数据库</string>
-    <string name="hint_delete">删除</string>
-    <string name="hint_delete_desc">确认要删除“%1$s”吗？</string>
-
-    <!-- Fragment Settings -->
-    <string name="set_conn_server">服务器</string>
-    <string name="set_conn_retry">重试次数</string>
-    <string name="set_conn_test">测试连接</string>
-    <string name="set_conn_test_title">测试到服务器的连接</string>
-    <string name="set_conn_addr">地址</string>
-    <string name="set_conn_port">端口</string>
-    <string name="set_conn_scan">扫描二维码</string>
-    <string name="set_conn_hdr">连接</string>
-    <string name="set_sync_hdr">同步</string>
-    <string name="set_sync_port">端口</string>
-    <string name="set_sync_delay">输入延迟</string>
-    <string name="set_sync_input_open">输入：打开战略配备列表</string>
-    <string name="set_sync_apply">应用配置至服务器</string>
-    <string name="set_unit_ms">毫秒</string>
-    <string name="set_sync_type_open">类型：打开战略配备列表</string>
-    <string name="set_sync_input_up">输入：上</string>
-    <string name="set_sync_input_down">输入：下</string>
-    <string name="set_sync_input_left">输入：左</string>
-    <string name="set_sync_input_right">输入：右</string>
-    <string name="set_ctrl_hdr">控制</string>
-    <string name="set_ctrl_simplified_mode">启用精简模式</string>
-    <string name="set_ctrl_simplified_mode_desc">只保留一键输入（宏），去除大部分装饰</string>
-    <string name="set_ctrl_lang_stratagem">语言：战略配备名称</string>
-    <string name="set_ctrl_gst_swp_distance_threshold">手势距离阈值</string>
-    <string name="set_ctrl_gst_swp_velocity_threshold">手势速度阈值</string>
-    <string name="set_unit_pixel">像素</string>
-    <string name="set_unit_pixel_s">像素/秒</string>
-    <string name="set_ctrl_fastboot_mode">启用快速启动</string>
-    <string name="set_ctrl_fastboot_mode_desc">点击组合直接启动，长按组合进入浏览</string>
-    <string name="set_ctrl_sfx">启用音效</string>
-    <string name="set_ctrl_sfx_desc">启用按键输入和战备激活的音效</string>
-    <string name="set_ctrl_vibrator">启用震动</string>
-    <string name="set_ctrl_vibrator_desc">启用按键输入和战备激活的震动</string>
-    <string name="set_info_hdr">信息</string>
-    <string name="set_info_db">数据库版本</string>
-    <string name="set_info_chk_updt">检查更新</string>
-    <string name="set_info_latest">已是最新</string>
-    <string name="set_info_updatable">可更新</string>
-    <string name="set_info_app">软件版本</string>
-    <string name="set_info_about">关于</string>
 
 </resources>

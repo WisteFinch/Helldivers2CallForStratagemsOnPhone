@@ -42,25 +42,25 @@ class StepPlayAdapter: RecyclerView.Adapter<StepPlayAdapter.ListViewHolder>() {
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView).setImageResource(R.drawable.ic_arrow_upward)
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView)
                     .drawable
-                    .setTintList(context.resources.getColorStateList(R.color.yellow, context.theme))
+                    .setTintList(context.resources.getColorStateList(R.color.highlight, context.theme))
             }
             6 -> {
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView).setImageResource(R.drawable.ic_arrow_downward)
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView)
                     .drawable
-                    .setTintList(context.resources.getColorStateList(R.color.yellow, context.theme))
+                    .setTintList(context.resources.getColorStateList(R.color.highlight, context.theme))
             }
             7 -> {
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView).setImageResource(R.drawable.ic_arrow_backward)
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView)
                     .drawable
-                    .setTintList(context.resources.getColorStateList(R.color.yellow, context.theme))
+                    .setTintList(context.resources.getColorStateList(R.color.highlight, context.theme))
             }
             8 -> {
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView).setImageResource(R.drawable.ic_arrow_forward)
                 holder.itemView.findViewById<ImageView>(R.id.step_imageView)
                     .drawable
-                    .setTintList(context.resources.getColorStateList(R.color.yellow, context.theme))
+                    .setTintList(context.resources.getColorStateList(R.color.highlight, context.theme))
             }
             else -> holder.itemView.findViewById<ImageView>(R.id.step_imageView).setImageResource(R.drawable.ic_arrow_upward)
         }

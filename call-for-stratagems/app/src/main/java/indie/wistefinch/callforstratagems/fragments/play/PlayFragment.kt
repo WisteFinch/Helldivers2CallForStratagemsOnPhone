@@ -1,11 +1,14 @@
 package indie.wistefinch.callforstratagems.fragments.play
 
 import android.app.Service
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.media.AudioAttributes
 import android.media.AudioAttributes.USAGE_GAME
 import android.media.SoundPool
+import android.net.Uri
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.VibrationEffect.DEFAULT_AMPLITUDE
@@ -14,9 +17,12 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
+import android.widget.LinearLayout.VERTICAL
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
@@ -28,30 +34,29 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.MainActivity
 import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.asr.AsrClient
+import indie.wistefinch.callforstratagems.asr.AsrService
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentPlayBinding
-import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
-import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
-import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
-import indie.wistefinch.callforstratagems.socket.StratagemInputData
-import indie.wistefinch.callforstratagems.socket.StratagemInputPacket
-import indie.wistefinch.callforstratagems.socket.StratagemMacroData
-import indie.wistefinch.callforstratagems.socket.StratagemMacroPacket
+import indie.wistefinch.callforstratagems.network.AppClient
+import indie.wistefinch.callforstratagems.network.AppClientEvent
+import indie.wistefinch.callforstratagems.network.StratagemInputData
+import indie.wistefinch.callforstratagems.network.StratagemMacroData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.Vector
 import kotlin.math.abs
 
@@ -63,6 +68,15 @@ class PlayFragment : Fragment() {
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
             (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
         )
     }
 
@@ -111,6 +125,8 @@ class PlayFragment : Fragment() {
      */
     private lateinit var version: String
 
+    private var stratagems: List<StratagemData> = listOf()
+
     // Recycler view adapters.
     /**
      * The stratagem recycler view's adapter.
@@ -154,31 +170,6 @@ class PlayFragment : Fragment() {
      */
     private var enableVibrator: Boolean = false
 
-    // Runtime variables for socket.
-    /**
-     * The socket client.
-     */
-    private val client = Client()
-
-    /**
-     * Whether the socket is connect.
-     */
-    private var isConnected: Boolean = false
-
-    /**
-     * Reflect whether network communication is currently in progress.
-     *
-     * Lock during any network communication.
-     */
-    private var networkLock = Mutex()
-
-    /**
-     * Reflect whether it is currently attempting to connect to the server.
-     *
-     * Lock during the connect process.
-     */
-    private var connectingLock = Mutex()
-
     /**
      * Server address. Get from the preference.
      */
@@ -198,11 +189,6 @@ class PlayFragment : Fragment() {
      * Device secure id.
      */
     private lateinit var sid: String
-
-    /**
-     * Socket authentication token.
-     */
-    private var token: String = "NULL"
 
     /**
      * Language of stratagem name.
@@ -235,22 +221,34 @@ class PlayFragment : Fragment() {
      */
     private lateinit var sfxPool: SoundPool
 
+    // ASR
+    /**
+     * ASR client.
+     */
+    private var asrClient: AsrClient? = null
+
+    /**
+     * ASR stratagem display job.
+     */
+    @Volatile
+    private var asrStratagemJob: Job? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Get preference.
         val preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
-        distanceThreshold = preferences.getString("swipe_distance_threshold", "100")?.toDouble()!!
-        velocityThreshold = preferences.getString("swipe_velocity_threshold", "50")?.toDouble()!!
-        enableSimplifiedMode = preferences.getBoolean("enable_simplified_mode", false)
-        enableSfx = preferences.getBoolean("enable_sfx", false)
-        enableVibrator = preferences.getBoolean("enable_vibrator", false)
-        address = preferences.getString("tcp_add", "127.0.0.1")!!
-        port = preferences.getString("tcp_port", "23333")?.toInt()!!
-        retryLimit = preferences.getString("tcp_retry", "5")?.toInt()!!
-        sid = preferences.getString("sid", "0")!!
-        lang = preferences.getString("lang_stratagem", "auto")!!
+        distanceThreshold = preferences.getInt("ctrl_sdt", 100).toDouble()
+        velocityThreshold = preferences.getInt("ctrl_svt", 50).toDouble()
+        enableSimplifiedMode = preferences.getBoolean("ctrl_simplified", false)
+        enableSfx = preferences.getBoolean("ctrl_sfx", false)
+        enableVibrator = preferences.getBoolean("ctrl_vibrator", false)
+        address = preferences.getString("conn_addr", "127.0.0.1")!!
+        port = preferences.getInt("conn_port", 23333)
+        retryLimit = preferences.getInt("conn_retry", 5)
+        sid = preferences.getString("sid", "NULL")!!
+        lang = preferences.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
@@ -260,12 +258,13 @@ class PlayFragment : Fragment() {
         @Suppress("DEPRECATION")
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         @Suppress("DEPRECATION")
-        oriSystemUiVisibility = activity?.window?.decorView?.systemUiVisibility!!
+        oriSystemUiVisibility = requireActivity().window.decorView.systemUiVisibility
         @Suppress("DEPRECATION")
-        activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-        activity?.requestedOrientation = if (enableSimplifiedMode) {
+        requireActivity().window.decorView.systemUiVisibility =
+            (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        requireActivity().requestedOrientation = if (enableSimplifiedMode) {
             ActivityInfo.SCREEN_ORIENTATION_SENSOR
         } else {
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -278,6 +277,9 @@ class PlayFragment : Fragment() {
         // Inflate the layout for this fragment.
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
         val view = binding.root
+        if (resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            binding.playInfoBar.orientation = VERTICAL
+        }
 
         // Disable back gesture on some devices.
         if (!enableSimplifiedMode) {
@@ -289,16 +291,19 @@ class PlayFragment : Fragment() {
 
         // Check simplified mode
         if (enableSimplifiedMode) {
-            binding.playBlank.visibility = View.GONE
-            binding.playBanner.visibility = View.GONE
-            binding.playMode.visibility = View.GONE
-            binding.playExit.visibility = View.GONE
-            binding.playStratagemScrollView.visibility = View.GONE
-            binding.playGesture.visibility = View.GONE
-            binding.playBgCross.visibility = View.GONE
-            binding.playBgMask.visibility = View.GONE
-            binding.playSimplifiedScrollView.visibility = View.VISIBLE
-            view.setBackgroundColor(resources.getColor(R.color.colorBackground, context?.theme))
+            binding.playBlank.visibility = GONE
+            binding.playBanner.visibility = INVISIBLE
+            binding.playMode.visibility = GONE
+            binding.playExit.visibility = GONE
+            binding.playFreeInputTitle.visibility = INVISIBLE
+            binding.playFreeInputImage.visibility = INVISIBLE
+            binding.playStratagemScrollView.visibility = GONE
+            binding.playGesture.visibility = GONE
+            binding.playBgCross.visibility = GONE
+            binding.playBgMask.visibility = GONE
+            binding.playSimplifiedScrollView.visibility = VISIBLE
+            binding.playRoot.setBackgroundColor(requireContext().getColor(R.color.playBackgroundPrimary))
+            binding.playModeFAB.visibility = VISIBLE
         }
 
         // Init runtime.
@@ -331,17 +336,243 @@ class PlayFragment : Fragment() {
         setupRecyclerView()
         setupEventListener()
 
-        // Setup client using continue.
+        // Setup client using coroutine.
         lifecycleScope.launch {
             setupClient()
-            this.launch {
-                withContext(Dispatchers.IO) {
-                    clientKeepAlive()
-                }
-            }
+            setupASR(preferences)
+            asrClient?.startRecord()
         }
 
         return view
+    }
+
+    /**
+     * Setup network client.
+     */
+    private fun setupClient() {
+        AppClient.setEventListener { ev, _ ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                when (ev) {
+                    AppClientEvent.CONNECTED -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(getString(R.string.network_connected)),
+                            address,
+                            port
+                        )
+                        binding.playConnectStatus1.visibility = GONE
+                        binding.playConnectStatus2.visibility = VISIBLE
+                        binding.playConnectStatus2.setImageResource(R.drawable.ic_circle)
+                        binding.playConnectStatus2.drawable.setTintList(
+                            context?.resources?.getColorStateList(
+                                R.color.green,
+                                context?.theme
+                            )
+                        )
+                    }
+
+                    AppClientEvent.CONNECTING -> {
+                        if (AppClient.retriedTimes() > 0) {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(
+                                    getString(R.string.network_retry),
+                                    AppClient.retriedTimes(),
+                                    retryLimit
+                                ),
+                                address,
+                                port
+                            )
+                        } else {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(getString(R.string.network_connecting)),
+                                address,
+                                port
+                            )
+                            binding.playConnectStatus1.visibility = VISIBLE
+                            binding.playConnectStatus2.visibility = GONE
+                        }
+                    }
+
+                    AppClientEvent.AUTHING -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(getString(R.string.network_auth), sid),
+                            address,
+                            port
+                        )
+                    }
+
+                    AppClientEvent.RETRYING -> {
+                        binding.playConnectTitle.text = String.format(
+                            getString(R.string.network_addr_suffix),
+                            String.format(
+                                getString(R.string.network_waiting),
+                                AppClient.retriedTimes(),
+                                retryLimit
+                            ),
+                            address,
+                            port
+                        )
+                    }
+
+                    AppClientEvent.FAILED -> {
+                        if (AppClient.retriedTimes() == retryLimit) {
+                            binding.playConnectTitle.text = String.format(
+                                getString(R.string.network_addr_suffix),
+                                String.format(getString(R.string.network_failed)),
+                                address,
+                                port
+                            )
+                            binding.playConnectStatus1.visibility = GONE
+                            binding.playConnectStatus2.visibility = VISIBLE
+                            binding.playConnectStatus2.setImageResource(R.drawable.ic_alert)
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+        AppClient.initClient(address, port, sid, retryLimit)
+    }
+
+    /**
+     * Setup ASR client.
+     */
+    private fun setupASR(preferences: SharedPreferences) {
+        // Setup asr client
+        val name = preferences.getString("asr_model_name", "")!!
+        val check = AsrService.checkAsrModelFiles(requireContext(), name)
+        val dbName = preferences.getString("db_name", Constants.ID_DB_HD2)!!
+        if (preferences.getBoolean("ctrl_asr_enabled", false)) {
+            if (enableSimplifiedMode) {
+                binding.playAsrFAB.visibility = VISIBLE
+                binding.playAsrFABStratagem.visibility = INVISIBLE
+            } else {
+                binding.playAsr.visibility = VISIBLE
+                binding.playAsrStratagem.visibility = INVISIBLE
+            }
+            if (check) {
+                binding.playAsrInfo.setText(R.string.asr_model_loading)
+                if (enableSimplifiedMode) {
+                    binding.playAsrFAB.isClickable = true
+                    binding.playAsrFAB.setImageResource(R.drawable.ic_mic)
+                } else {
+                    binding.playAsr.isClickable = true
+                    binding.playAsr.setImageResource(R.drawable.ic_mic)
+                }
+                asrClient = AsrClient(asrModelName = name,
+                    context = requireContext(),
+                    activity = requireActivity(),
+                    keywordsViewModel = asrKeywordViewModel,
+                    activateWords = emptyList(),
+                    dbName = dbName,
+                    lang = lang,
+                    similarityThreshold = preferences.getInt("ctrl_asr_similarity", 50)
+                        .toFloat() / 100,
+                    useGPU = preferences.getBoolean("ctrl_asr_gpu", true),
+                    useAutoKeywords = preferences.getBoolean("ctrl_asr_auto_keywords", true),
+                    stratagems = stratagems,
+                    onError = { e ->
+                        binding.playAsrInfo.setText(
+                            when (e) {
+                                AsrService.ASRErrType.ASR_MODEL_INIT_FAILED -> R.string.asr_model_init_failed
+                                AsrService.ASRErrType.ASR_MODEL_FILE_CHECK_FAILED -> R.string.asr_model_file_check_failed
+                                AsrService.ASRErrType.ASR_MIC_PERMISSION_DENIED -> R.string.asr_mic_permission_denied
+                            }
+                        )
+                        binding.playAsr.isClickable = false
+                        binding.playAsrFAB.isClickable = false
+                    },
+                    onProcess = { txt ->
+                        if (txt.isNotBlank()) {
+                            binding.playAsrInfo.text = txt
+                        }
+                    },
+                    onCalculated = { l, txt ->
+                        if (txt.isNotBlank()) {
+                            binding.playAsrInfo.text = txt
+                            if (l.isNotEmpty()) {
+                                val s = stratagemViewModel.retrieveItem(l.first().first)
+                                lifecycleScope.launch {
+                                    activateStratagem(s)
+                                }
+                                if (asrStratagemJob != null && asrStratagemJob?.isActive == true) {
+                                    asrStratagemJob?.cancel()
+                                }
+                                asrStratagemJob = lifecycleScope.launch {
+                                    if (enableSimplifiedMode) {
+                                        binding.playAsrFABStratagem.setImageURI(
+                                            Uri.fromFile(
+                                                File(
+                                                    requireContext().filesDir.path +
+                                                            Constants.PATH_DB_ICONS +
+                                                            "$dbName/" +
+                                                            s.icon + ".svg"
+                                                )
+                                            )
+                                        )
+                                        binding.playAsrFABStratagem.visibility = VISIBLE
+                                        delay(1000)
+                                        binding.playAsrFABStratagem.visibility = INVISIBLE
+
+                                    } else {
+                                        binding.playAsrStratagem.setImageURI(
+                                            Uri.fromFile(
+                                                File(
+                                                    requireContext().filesDir.path +
+                                                            Constants.PATH_DB_ICONS +
+                                                            "$dbName/" +
+                                                            s.icon + ".svg"
+                                                )
+                                            )
+                                        )
+                                        binding.playAsrStratagem.visibility = VISIBLE
+                                        delay(1000)
+                                        binding.playAsrStratagem.visibility = INVISIBLE
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    onReady = {
+                        binding.playAsrInfo.setText(R.string.asr_model_ready)
+                    })
+            } else {
+                binding.playAsrInfo.setText(R.string.asr_model_file_check_failed)
+                binding.playAsr.isClickable = false
+                binding.playAsrFAB.isClickable = false
+            }
+        }
+
+        // Setup button
+        if (enableSimplifiedMode) {
+            binding.playAsrFAB.setOnClickListener {
+                if (asrClient?.isRecording == true) {
+                    asrClient?.stopRecord()
+                    binding.playAsrFAB.setImageResource(R.drawable.ic_mic_none)
+                } else {
+                    val flag = asrClient?.startRecord()
+                    if (flag == true) {
+                        binding.playAsrFAB.setImageResource(R.drawable.ic_mic)
+                    }
+                }
+            }
+        } else {
+            binding.playAsr.setOnClickListener {
+                if (asrClient?.isRecording == true) {
+                    asrClient?.stopRecord()
+                    binding.playAsr.setImageResource(R.drawable.ic_mic_none)
+                } else {
+                    val flag = asrClient?.startRecord()
+                    if (flag == true) {
+                        binding.playAsr.setImageResource(R.drawable.ic_mic)
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -349,24 +580,26 @@ class PlayFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        // Retrieve stratagem entry from database and check the validation.
+        val list: Vector<StratagemData> = Vector()
+        for (i in groupData.list) {
+            if (stratagemViewModel.isIdValid(i)) {
+                list.add(stratagemViewModel.retrieveItem(i))
+            }
+        }
+        stratagems = list.toList()
         if (enableSimplifiedMode) {
             // Setup simplified stratagem recycler view.
             val stratagemView = binding.playSimplifiedRecyclerView
             stratagemView.adapter = stratagemSimplifiedAdapter
-            stratagemView.autoFitColumns(100)
-            // Retrieve stratagem entry from database and check the validation.
-            val list: Vector<StratagemData> = Vector()
-            for (i in groupData.list) {
-                if (stratagemViewModel.isIdValid(i)) {
-                    list.add(stratagemViewModel.retrieveItem(i))
-                }
-            }
+            stratagemView.autoFitColumns(preference.getInt("ctrl_stratagem_size", 100))
             stratagemSimplifiedAdapter.setData(
-                list.toList(),
+                stratagems,
                 preference.getString(
                     "db_name",
-                    context?.resources?.getString(R.string.db_hd2_name)
-                )!!
+                    Constants.ID_DB_HD2
+                )!!,
+                preference.getInt("ctrl_stratagem_size", 100)
             )
             // Setup click listener.
             stratagemSimplifiedAdapter.onItemClick = { data ->
@@ -380,18 +613,11 @@ class PlayFragment : Fragment() {
             val stratagemView = binding.playStratagemRecyclerView
             stratagemView.adapter = stratagemAdapter
             stratagemView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-            // Retrieve stratagem entry from database and check the validation.
-            val list: Vector<StratagemData> = Vector()
-            for (i in groupData.list) {
-                if (stratagemViewModel.isIdValid(i)) {
-                    list.add(stratagemViewModel.retrieveItem(i))
-                }
-            }
             stratagemAdapter.setData(
-                list.toList(),
+                stratagems,
                 preference.getString(
                     "db_name",
-                    context?.resources?.getString(R.string.db_hd2_name)
+                    Constants.ID_DB_HD2
                 )!!
             )
             // Setup click listener.
@@ -417,6 +643,9 @@ class PlayFragment : Fragment() {
 
         // Setup free input button.
         binding.playMode.setOnClickListener {
+            setFreeInputMode(!isFreeInput)
+        }
+        binding.playModeFAB.setOnClickListener {
             setFreeInputMode(!isFreeInput)
         }
 
@@ -495,9 +724,9 @@ class PlayFragment : Fragment() {
                 stepAdapter.clear()
                 stepAdapter.setData(data.steps)
                 stepsList = data.steps.toMutableList()
-                binding.playBlank.visibility = View.INVISIBLE
-                binding.playStratagemTitle.visibility = View.VISIBLE
-                binding.playStepsScrollView.visibility = View.VISIBLE
+                binding.playBlank.visibility = INVISIBLE
+                binding.playStratagemTitle.visibility = VISIBLE
+                binding.playStepsScrollView.visibility = VISIBLE
 
                 binding.playStratagemTitle.text = when (lang) {
                     "zh-CN" -> data.nameZh
@@ -512,24 +741,62 @@ class PlayFragment : Fragment() {
      */
     private fun setFreeInputMode(flag: Boolean) {
         if (flag) {
-            binding.playStratagemScrollView.visibility = View.INVISIBLE
-            binding.playBlank.visibility = View.INVISIBLE
-            binding.playStratagemTitle.visibility = View.INVISIBLE
-            binding.playStepsScrollView.visibility = View.INVISIBLE
-            binding.playFreeInput.visibility = View.VISIBLE
-            binding.playFreeInputImage.visibility = View.VISIBLE
+            if (enableSimplifiedMode) {
+                binding.playSimplifiedScrollView.visibility = INVISIBLE
+                binding.playGesture.visibility = VISIBLE
+                binding.playModeFAB.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.highlight,
+                            requireContext().theme
+                        )
+                    )
+            } else {
+                binding.playStratagemScrollView.visibility = INVISIBLE
+                binding.playBlank.visibility = INVISIBLE
+                binding.playStratagemTitle.visibility = INVISIBLE
+                binding.playStepsScrollView.visibility = INVISIBLE
+                binding.playMode.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.highlight,
+                            requireContext().theme
+                        )
+                    )
+            }
+            binding.playFreeInputTitle.visibility = VISIBLE
+            binding.playFreeInputImage.visibility = VISIBLE
             if (!isFreeInput) {
                 lifecycleScope.launch {
                     activateStep(0, 3)
                 }
             }
         } else {
-            binding.playStratagemScrollView.visibility = View.VISIBLE
-            binding.playBlank.visibility = View.VISIBLE
-            binding.playStratagemTitle.visibility = View.INVISIBLE
-            binding.playStepsScrollView.visibility = View.INVISIBLE
-            binding.playFreeInput.visibility = View.INVISIBLE
-            binding.playFreeInputImage.visibility = View.INVISIBLE
+            if (enableSimplifiedMode) {
+                binding.playSimplifiedScrollView.visibility = VISIBLE
+                binding.playGesture.visibility = GONE
+                binding.playModeFAB.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.white,
+                            requireContext().theme
+                        )
+                    )
+            } else {
+                binding.playStratagemScrollView.visibility = VISIBLE
+                binding.playBlank.visibility = VISIBLE
+                binding.playStratagemTitle.visibility = INVISIBLE
+                binding.playStepsScrollView.visibility = INVISIBLE
+                binding.playMode.drawable
+                    .setTintList(
+                        requireContext().resources.getColorStateList(
+                            R.color.white,
+                            requireContext().theme
+                        )
+                    )
+            }
+            binding.playFreeInputTitle.visibility = INVISIBLE
+            binding.playFreeInputImage.visibility = INVISIBLE
             if (isFreeInput) {
                 lifecycleScope.launch {
                     activateStep(0, 4)
@@ -547,6 +814,73 @@ class PlayFragment : Fragment() {
         if (isFreeInput) { // In free input mode, activate step independently.
             lifecycleScope.launch {
                 activateStep(dir, 0)
+                when (dir) {
+                    1 -> binding.playFreeInputUp.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
+                    2 -> binding.playFreeInputDown.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
+                    3 -> binding.playFreeInputLeft.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+
+                    4 -> binding.playFreeInputRight.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.highlight,
+                                requireContext().theme
+                            )
+                        )
+                }
+                delay(200)
+                when (dir) {
+                    1 -> binding.playFreeInputUp.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
+                    2 -> binding.playFreeInputDown.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
+                    3 -> binding.playFreeInputLeft.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+
+                    4 -> binding.playFreeInputRight.drawable
+                        .setTintList(
+                            requireContext().resources.getColorStateList(
+                                R.color.white,
+                                requireContext().theme
+                            )
+                        )
+                }
             }
         } else if (itemSelected) { // In normal mode, record input.
             if (dir == stepsList[currentStepPos]) {
@@ -558,8 +892,11 @@ class PlayFragment : Fragment() {
                     sfxPool.play(sfxStep, 1f, 1f, 0, 0, 1f)
                 }
                 if (enableVibrator) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(100
-                        , DEFAULT_AMPLITUDE))
+                    vibrator.vibrate(
+                        VibrationEffect.createOneShot(
+                            100, DEFAULT_AMPLITUDE
+                        )
+                    )
                 }
             } else {
                 // Play sfx
@@ -596,9 +933,9 @@ class PlayFragment : Fragment() {
         itemSelected = false
         currentStepPos = 0
         stepAdapter.clear()
-        binding.playBlank.visibility = View.VISIBLE
-        binding.playStratagemTitle.visibility = View.INVISIBLE
-        binding.playStepsScrollView.visibility = View.INVISIBLE
+        binding.playBlank.visibility = VISIBLE
+        binding.playStratagemTitle.visibility = INVISIBLE
+        binding.playStepsScrollView.visibility = INVISIBLE
     }
 
     /**
@@ -606,7 +943,10 @@ class PlayFragment : Fragment() {
      */
     private fun swipeToActivate(recyclerView: RecyclerView) {
         val callback =
-            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
+            object : ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
@@ -631,162 +971,6 @@ class PlayFragment : Fragment() {
     }
 
     /**
-     * Setup the tcp client.
-     */
-    private suspend fun setupClient() {
-        connectingLock.lock()
-        var tryTimes = 0
-        withContext(Dispatchers.IO) {
-            // Initial connection.
-            withContext(Dispatchers.Main) {
-                binding.playConnectTitle.text = String.format(
-                    getString(R.string.network_add_suffix),
-                    String.format(getString(R.string.network_connecting)),
-                    address,
-                    port
-                )
-                binding.playConnectStatus1.visibility = View.VISIBLE
-                binding.playConnectStatus2.visibility = View.GONE
-            }
-            networkLock.withLock {
-                isConnected = client.connect(address, port)
-            }
-            isConnected = checkClient()
-
-            // If the connection is not successful, retry.
-            while (!isConnected && tryTimes < 5) {
-                withContext(Dispatchers.Main) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
-                        String.format(
-                            getString(R.string.network_waiting),
-                            tryTimes,
-                            retryLimit
-                        ),
-                        address,
-                        port
-                    )
-                }
-                tryTimes++
-                delay(2000)
-                withContext(Dispatchers.Main) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
-                        String.format(
-                            getString(R.string.network_retry),
-                            tryTimes,
-                            retryLimit
-                        ),
-                        address,
-                        port
-                    )
-                }
-                networkLock.withLock {
-                    isConnected = client.connect(address, port)
-                }
-                isConnected = checkClient()
-            }
-
-            // Set connection status.
-            withContext(Dispatchers.Main) {
-                if (isConnected) {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
-                        String.format(getString(R.string.network_connected)),
-                        address,
-                        port
-                    )
-                    binding.playConnectStatus1.visibility = View.GONE
-                    binding.playConnectStatus2.visibility = View.VISIBLE
-                    binding.playConnectStatus2.setImageResource(R.drawable.ic_circle)
-                    binding.playConnectStatus2.drawable.setTintList(
-                        context?.resources?.getColorStateList(
-                            R.color.green,
-                            context?.theme
-                        )
-                    )
-                } else {
-                    binding.playConnectTitle.text = String.format(
-                        getString(R.string.network_add_suffix),
-                        String.format(getString(R.string.network_failed)),
-                        address,
-                        port
-                    )
-                    binding.playConnectStatus1.visibility = View.GONE
-                    binding.playConnectStatus2.visibility = View.VISIBLE
-                    binding.playConnectStatus2.setImageResource(R.drawable.ic_alert)
-                }
-            }
-        }
-        connectingLock.unlock()
-    }
-
-    /**
-     * Check if the client is valid by sending heartbeat package.
-     */
-    private suspend fun checkClient(): Boolean {
-        if (!isConnected) {
-            return false
-        }
-        var flag: Boolean
-        networkLock.withLock {
-            try {
-                // Send status request.
-                client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                // Receive status.
-                val res: ReceiveStatusData =
-                    Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                // Check the server status.
-                when (res.status) {
-                    0 -> flag = true
-                    1 -> flag = false
-                    2 -> {
-                        // Request authentication.
-                        withContext(Dispatchers.Main) {
-                            binding.playConnectTitle.text = String.format(
-                                getString(R.string.network_add_suffix),
-                                String.format(getString(R.string.network_auth), sid),
-                                address,
-                                port
-                            )
-                        }
-                        client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                        client.toggleTimeout(false)
-                        val auth = Gson().fromJson(client.receive(), ReceiveAuthData::class.java)
-                        client.toggleTimeout(true)
-                        if (auth.auth) {
-                            token = auth.token
-                            flag = true
-                        } else {
-                            flag = false
-                        }
-                    }
-
-                    else -> flag = false
-                }
-            } catch (_: Exception) { // Json convert error & socket timeout.
-                flag = false
-            }
-        }
-        return flag
-    }
-
-    /**
-     * Check if the client is valid every 10s, if not, reconnect.
-     */
-    private suspend fun clientKeepAlive() {
-        while (true) {
-            delay(10000)
-            if (isConnected && !connectingLock.isLocked) {
-                val tmp = checkClient()
-                if (!tmp && !connectingLock.isLocked) {
-                    setupClient()
-                }
-            }
-        }
-    }
-
-    /**
      * Activate stratagem, send stratagem data to the server.
      */
     private suspend fun activateStratagem(stratagemData: StratagemData) {
@@ -797,39 +981,17 @@ class PlayFragment : Fragment() {
         if (enableVibrator) {
             vibrator.vibrate(VibrationEffect.createOneShot(200, DEFAULT_AMPLITUDE))
         }
-        // Check and restart the client
-        if (!isConnected) {
-            if (connectingLock.isLocked) {
-                return
-            }
-            setupClient()
-            if (!isConnected) {
-                return
-            }
-        }
-        // send stratagem data
+        // Send stratagem data
         withContext(Dispatchers.IO) {
-            val packet = StratagemMacroPacket(
+            AppClient.optMacro(
                 StratagemMacroData(
                     when (lang) {
                         "zh-CN" -> stratagemData.nameZh
                         else -> stratagemData.name
                     },
                     stratagemData.steps
-                ),
-                token
+                )
             )
-
-            if (networkLock.tryLock()) {
-                try {
-                    client.send(Gson().toJson(packet).toString())
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                networkLock.unlock()
-            }
         }
     }
 
@@ -844,35 +1006,14 @@ class PlayFragment : Fragment() {
         if (enableVibrator) {
             vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
         }
-        // Check and restart the client
-        if (!isConnected) {
-            if (connectingLock.isLocked) {
-                return
-            }
-            setupClient()
-            if (!isConnected) {
-                return
-            }
-        }
         // Send step data
         withContext(Dispatchers.IO) {
-            val packet = StratagemInputPacket(
+            AppClient.optInput(
                 StratagemInputData(
                     step,
                     type
-                ),
-                token
+                )
             )
-            if (networkLock.tryLock()) {
-                try {
-                    client.send(Gson().toJson(packet).toString())
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                networkLock.unlock()
-            }
         }
     }
 
@@ -887,11 +1028,8 @@ class PlayFragment : Fragment() {
         view?.keepScreenOn = false
 
         // Close client
-        if (connectingLock.isLocked) {
-            client.forceClose()
-        } else {
-            client.disconnect()
-        }
+        AppClient.closeClient()
+        asrClient?.destroy()
 
         super.onDestroy()
     }

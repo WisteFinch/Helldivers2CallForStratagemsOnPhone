@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -21,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,29 +31,51 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.king.camera.scan.CameraScan
-import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.CFSApplication
+import indie.wistefinch.callforstratagems.Constants
+import indie.wistefinch.callforstratagems.Constants.PATH_DB_ICONS
 import indie.wistefinch.callforstratagems.R
-import indie.wistefinch.callforstratagems.utils.Util
+import indie.wistefinch.callforstratagems.data.BackupAsrKeywordData
+import indie.wistefinch.callforstratagems.data.BackupSettingsAsrData
+import indie.wistefinch.callforstratagems.data.BackupSettingsConnData
+import indie.wistefinch.callforstratagems.data.BackupSettingsCtrlData
+import indie.wistefinch.callforstratagems.data.BackupSettingsDBData
+import indie.wistefinch.callforstratagems.data.BackupSettingsData
+import indie.wistefinch.callforstratagems.data.BackupFileData
+import indie.wistefinch.callforstratagems.data.BackupFileDataUtils
+import indie.wistefinch.callforstratagems.data.models.AsrKeywordData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
+import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentSettingsBinding
+import indie.wistefinch.callforstratagems.network.AddressData
+import indie.wistefinch.callforstratagems.network.AppClient
+import indie.wistefinch.callforstratagems.network.AppClientEvent
+import indie.wistefinch.callforstratagems.network.SyncConfigAuthData
+import indie.wistefinch.callforstratagems.network.SyncConfigData
+import indie.wistefinch.callforstratagems.network.SyncConfigInputData
+import indie.wistefinch.callforstratagems.network.SyncConfigServerData
 import indie.wistefinch.callforstratagems.scanner.QRCodeScanActivity
-import indie.wistefinch.callforstratagems.socket.AddressData
-import indie.wistefinch.callforstratagems.socket.Client
-import indie.wistefinch.callforstratagems.socket.ReceiveAuthData
-import indie.wistefinch.callforstratagems.socket.ReceiveStatusData
-import indie.wistefinch.callforstratagems.socket.RequestAuthPacket
-import indie.wistefinch.callforstratagems.socket.RequestStatusPacket
-import indie.wistefinch.callforstratagems.socket.ServerConfigData
-import indie.wistefinch.callforstratagems.socket.SyncConfigPacket
+import indie.wistefinch.callforstratagems.utils.AppButton
+import indie.wistefinch.callforstratagems.utils.AppProgressBar
+import indie.wistefinch.callforstratagems.utils.DownloadService
+import indie.wistefinch.callforstratagems.utils.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+
 
 class SettingsFragment : Fragment() {
     // View binding.
@@ -82,6 +106,12 @@ class SettingsFragment : Fragment() {
     private lateinit var connView: View
 
     /**
+     * Check database update coroutine job
+     */
+    @Volatile
+    private lateinit var checkDBUpdateJob: Job
+
+    /**
      * QR code scanner activity launcher
      */
     private val requestQRScanLauncher =
@@ -94,8 +124,8 @@ class SettingsFragment : Fragment() {
                         binding.setConnAddr.setText(add.add)
                         binding.setConnPort.setText(add.port.toString())
                         with(preferences.edit()) {
-                            putString("tcp_add", add.add)
-                            putString("tcp_port", add.port.toString())
+                            putString("conn_addr", add.add)
+                            putInt("conn_port", add.port)
                             apply()
                         }
                         Toast.makeText(
@@ -103,7 +133,8 @@ class SettingsFragment : Fragment() {
                             getString(R.string.tcp_scan_success),
                             Toast.LENGTH_SHORT
                         ).show()
-                    } catch (_: Exception) {
+                    } catch (e: Exception) {
+                        Log.e("[Settings] QRCode Scanner", e.toString())
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.tcp_scan_failed),
@@ -115,7 +146,7 @@ class SettingsFragment : Fragment() {
                 RESULT_CANCELED -> {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.tcp_scan_canceled),
+                        getString(R.string.tcp_scan_cancel),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -131,16 +162,307 @@ class SettingsFragment : Fragment() {
         }
 
     /**
-     * Socket client
+     * Export activity launcher
      */
-    private val client = Client()
+    private val requestExportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val uri = result.data?.data!!
+                    val sync = SyncConfigData(
+                        server = SyncConfigServerData(
+                            port = preferences.getInt("sync_server_port", 23333),
+                            ip = preferences.getString("sync_server_ip", "")!!,
+                        ),
+                        input = SyncConfigInputData(
+                            delay = preferences.getInt("sync_input_delay", 25),
+                            open = preferences.getString("sync_input_open", "ctrl_left")!!,
+                            keytype = preferences.getString("input_type_open", "hold")!!,
+                            up = preferences.getString("sync_input_up", "w")!!,
+                            down = preferences.getString("sync_input_down", "s")!!,
+                            left = preferences.getString("sync_input_left", "a")!!,
+                            right = preferences.getString("sync_input_right", "d")!!,
+                        ),
+                        auth = SyncConfigAuthData(
+                            enabled = preferences.getBoolean("sync_auth", true),
+                            timeout = preferences.getInt(
+                                "sync_auth_timeout",
+                                3
+                            )
+                        ),
+                        debug = preferences.getBoolean("sync_debug", true),
+                    )
+                    val conn = BackupSettingsConnData(
+                        preferences.getString("conn_addr", "127.0.0.1")!!,
+                        preferences.getInt("conn_port", 23333),
+                        preferences.getInt("conn_retry", 5)
+                    )
+                    val ctrl = BackupSettingsCtrlData(
+                        preferences.getBoolean("ctrl_simplified", false),
+                        preferences.getInt("ctrl_stratagem_size", 100),
+                        preferences.getBoolean("ctrl_fastboot", false),
+                        preferences.getBoolean("ctrl_sfx", false),
+                        preferences.getBoolean("ctrl_vibrator", false),
+                        preferences.getInt(
+                            "ctrl_sdt",
+                            100
+                        ),
+                        preferences.getInt(
+                            "ctrl_svt",
+                            50
+                        ),
+                        preferences.getString(
+                            "ctrl_lang",
+                            "auto"
+                        )!!
+                    )
+                    val asr = BackupSettingsAsrData(
+                        preferences.getInt("ctrl_asr_model", -1),
+                        preferences.getString("ctrl_asr_custom", "")!!,
+                        preferences.getBoolean("ctrl_asr_enabled", false),
+                        preferences.getInt("ctrl_asr_similarity", 50),
+                        preferences.getBoolean("ctrl_asr_gpu", true),
+                        Utils.getPreferenceList(preferences, "ctrl_asr_activate"),
+                        preferences.getBoolean("ctrl_asr_auto_keywords", true)
+                    )
+                    val db = BackupSettingsDBData(
+                        preferences.getInt("db_channel", 0),
+                        preferences.getString("db_custom", "")!!
+                    )
+                    val settings = BackupSettingsData(conn, ctrl, asr, db)
+                    val keywordData = asrKeywordViewModel.getAllItems()
+                    val keywordList: MutableList<BackupAsrKeywordData> = emptyList<BackupAsrKeywordData>().toMutableList()
+                    for (k in keywordData) {
+                        keywordList.add(BackupAsrKeywordData(
+                            k.dbName,
+                            k.stratagem,
+                            Utils.convertJsonListToStringList(k.keywords)
+                        ))
+                    }
+                    try {
+                        val json = Gson().toJson(
+                            BackupFileData(
+                                Constants.BACKUP_FILE_VERSION,
+                                sync,
+                                settings,
+                                groupViewModel.allItemsSync,
+                                keywordList,
+                            )
+                        )
+                        val cr = requireContext().contentResolver
+                        val os: OutputStream = cr.openOutputStream(uri)!!
+                        os.write(json.toByteArray())
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.set_info_export_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: Exception) {
+                        Log.e("[Settings] Export User Data", e.toString())
+                        Toast.makeText(
+                            requireContext(),
+                            String.format(getString(R.string.set_info_export_failed), e.toString()),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.set_info_export_cancel),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        String.format(getString(R.string.set_info_export_failed), "NULL"),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+    private val requestImportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val uri = result.data?.data!!
+                    try {
+                        // Read file
+                        val cr = requireContext().contentResolver
+                        val os: InputStream = cr.openInputStream(uri)!!
+                        val buffer = ByteArray(1024)
+                        var len: Int
+                        val bos = ByteArrayOutputStream()
+                        while ((os.read(buffer).also { len = it }) != -1) {
+                            bos.write(buffer, 0, len)
+                        }
+                        bos.close()
+                        val bytes = bos.toString()
+                        val json = JSONObject(bytes)
+                        val data: BackupFileData = when (json.getInt("ver")) {
+                            1 -> {
+                                BackupFileDataUtils.fromVer1(bytes)
+                            }
+
+                            else -> {
+                                BackupFileData(ver = -1)
+                            }
+                        }
+                        // Restore data
+                        if (data.ver != -1) {
+                            val sync = data.sync
+                            val set = data.settings
+                            val groups = data.groups
+                            val keywords = data.keywords
+                            val server = sync.server
+                            val input = sync.input
+                            val auth = sync.auth
+                            val ctrl = set.ctrl
+                            val conn = set.conn
+                            val asr = set.asr
+                            val db = set.db
+
+                            preferences.edit(commit = true) {
+                                putInt("sync_server_port", server.port)
+                                putString("sync_server_ip", server.ip)
+                                putInt("sync_input_delay", input.delay)
+                                putString("sync_input_open", input.open)
+                                putString("sync_input_up", input.up)
+                                putString("sync_input_down", input.down)
+                                putString("sync_input_left", input.left)
+                                putString("sync_input_right", input.right)
+                                putBoolean("sync_auth", auth.enabled)
+                                putInt("sync_auth_timeout", auth.timeout)
+                                putBoolean("sync_debug", sync.debug)
+                                putString("conn_addr", conn.addr)
+                                putInt("conn_port", conn.port)
+                                putInt("conn_retry", conn.retry)
+                                putBoolean("ctrl_simplified", ctrl.simplified)
+                                putInt("ctrl_stratagem_size", ctrl.stratagemSize)
+                                putBoolean("ctrl_fastboot", ctrl.fastboot)
+                                putBoolean("ctrl_sfx", ctrl.sfx)
+                                putBoolean("ctrl_vibrator", ctrl.vibrator)
+                                putInt("ctrl_sdt", ctrl.sdt)
+                                putInt("ctrl_svt", ctrl.svt)
+                                putString("ctrl_lang", ctrl.lang)
+                                putInt("ctrl_asr_model", asr.model)
+                                putString("ctrl_asr_custom", asr.custom)
+                                putBoolean("ctrl_asr_enabled", asr.enabled)
+                                putInt("ctrl_asr_similarity", asr.similarity)
+                                putBoolean("ctrl_asr_gpu", asr.gpu)
+                                putBoolean("ctrl_asr_auto_keywords", asr.autoKeywords)
+                                putInt("db_channel", db.channel)
+                                putString("db_custom", db.custom)
+                            }
+                            Utils.setPreferenceList(preferences, "ctrl_asr_activate", asr.activate)
+
+                            // Restore group database
+                            for (g in groups) {
+                                groupViewModel.addItem(g.title, g.list, g.dbName)
+                            }
+
+                            // Restore keyword database
+                            for (k in keywords) {
+                                val res = emptySet<String>().toMutableSet()
+                                for (s in k.keywords) {
+                                    res.add(s)
+                                }
+                                if (asrKeywordViewModel.isIdValid(k.stratagem, k.dbName)) {
+                                    val oldData = asrKeywordViewModel.retrieveItem(k.stratagem, dbName)
+                                    val oldList = Utils.convertJsonListToStringList(oldData.keywords)
+                                    for (s in oldList) {
+                                        res.add(s)
+                                    }
+                                    asrKeywordViewModel.updateItem(
+                                        AsrKeywordData(
+                                            id = oldData.id,
+                                            dbName = oldData.dbName,
+                                            stratagem = oldData.stratagem,
+                                            keywords = Gson().toJson(res.toList()).toString()
+                                        )
+                                    )
+                                } else {
+                                    asrKeywordViewModel.insertItem(
+                                        AsrKeywordData(
+                                            dbName = k.dbName,
+                                            stratagem = k.stratagem,
+                                            keywords = Gson().toJson(res.toList()).toString()
+                                        )
+                                    )
+                                }
+                            }
+
+                            // Refresh content
+                            setupContent()
+
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.set_info_import_success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.set_info_import_failed_ver),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("[Settings] Import User Data", e.toString())
+                        Toast.makeText(
+                            requireContext(),
+                            String.format(getString(R.string.set_info_import_failed), e.toString()),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.set_info_import_cancel),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    Toast.makeText(
+                        requireContext(),
+                        String.format(getString(R.string.set_info_import_failed), "NULL"),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
     /**
      * Stratagem view model
      */
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
-            (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+            (requireActivity().application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * Group view model
+     */
+    private val groupViewModel: GroupViewModel by activityViewModels {
+        GroupViewModelFactory(
+            (requireActivity().application as CFSApplication).groupDb.groupDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
         )
     }
 
@@ -157,10 +479,10 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        preferences = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }!!
+        preferences = requireContext().let { PreferenceManager.getDefaultSharedPreferences(it) }
         sid = preferences.getString("sid", "0")!!
         dbVer = preferences.getString("db_version", "0")!!
-        dbName = preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+        dbName = preferences.getString("db_name", Constants.ID_DB_HD2)!!
 
         inputValues = resources.getStringArray(R.array.input_values)
         inputTypeValues = resources.getStringArray(R.array.input_type_values)
@@ -206,16 +528,16 @@ class SettingsFragment : Fragment() {
      */
     private fun setupContent() {
         // Connection
-        binding.setConnAddr.setText(preferences.getString("tcp_add", "127.0.0.1"))
-        binding.setConnPort.setText(preferences.getString("tcp_port", "23333"))
-        binding.setConnRetry.setText(preferences.getString("tcp_retry", "5"))
+        binding.setConnAddr.setText(preferences.getString("conn_addr", "127.0.0.1"))
+        binding.setConnPort.setText(preferences.getInt("conn_port", 23333).toString())
+        binding.setConnRetry.setText(preferences.getInt("conn_retry", 5).toString())
         // Sync
-        binding.setSyncPort.setText(preferences.getString("server_port", "23333"))
-        binding.setSyncDelay.setText(preferences.getString("input_delay", "25"))
+        binding.setSyncPort.setText(preferences.getInt("sync_server_port", 23333).toString())
+        binding.setSyncDelay.setText(preferences.getInt("sync_input_delay", 25).toString())
         binding.setSyncInputOpen.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_open",
+                    "sync_input_open",
                     "ctrl_left"
                 )
             )
@@ -231,7 +553,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputUp.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_up",
+                    "sync_input_up",
                     "w"
                 )
             )
@@ -239,7 +561,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputDown.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_down",
+                    "sync_input_down",
                     "s"
                 )
             )
@@ -247,7 +569,7 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputLeft.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_left",
+                    "sync_input_left",
                     "a"
                 )
             )
@@ -255,60 +577,73 @@ class SettingsFragment : Fragment() {
         binding.setSyncInputRight.setSelection(
             inputValues.indexOf(
                 preferences.getString(
-                    "input_right",
+                    "sync_input_right",
                     "d"
                 )
             )
         )
+        binding.setSyncAdvance.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_settingsSyncFragment)
+        }
         // Control
         binding.setCtrlSimplifiedMode.isChecked =
-            preferences.getBoolean("enable_simplified_mode", false)
+            preferences.getBoolean("ctrl_simplified", false)
+        binding.setCtrlSimplifiedStratagemSize.setText(
+            preferences.getInt(
+                "ctrl_stratagem_size",
+                100
+            ).toString()
+        )
         binding.setCtrlFastbootMode.isChecked =
-            preferences.getBoolean("enable_fastboot_mode", false)
+            preferences.getBoolean("ctrl_fastboot", false)
         binding.setCtrlSfx.isChecked =
-            preferences.getBoolean("enable_sfx", false)
+            preferences.getBoolean("ctrl_sfx", false)
         binding.setCtrlVibrator.isChecked =
-            preferences.getBoolean("enable_vibrator", false)
+            preferences.getBoolean("ctrl_vibrator", false)
         binding.setCtrlGstSwpDistanceThreshold.setText(
-            preferences.getString(
-                "swipe_distance_threshold",
-                "100"
-            )
+            preferences.getInt(
+                "ctrl_sdt",
+                100
+            ).toString()
         )
         binding.setCtrlGstSwpVelocityThreshold.setText(
-            preferences.getString(
-                "swipe_velocity_threshold",
-                "50"
-            )
+            preferences.getInt(
+                "ctrl_svt",
+                50
+            ).toString()
         )
         binding.setCtrlLangStratagem.setSelection(
             langValues.indexOf(
                 preferences.getString(
-                    "lang_stratagem",
+                    "ctrl_lang",
                     "auto"
                 )
             )
         )
+        binding.setCtrlAsr.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_settingsASRFragment)
+        }
         // Info
         // Set database version
         binding.setInfoDb.setHint(
             String.format(
-                resources.getString(R.string.info_db_version_desc),
+                resources.getString(R.string.set_info_db_ver),
                 dbName,
                 when (dbVer) {
-                    "0" -> resources.getString(R.string.info_db_version_empty)
-                    "1" -> resources.getString(R.string.info_db_version_incomplete)
+                    "0" -> resources.getString(R.string.set_info_db_empty)
+                    "1" -> resources.getString(R.string.set_info_db_incomplete)
                     else -> dbVer
                 }
             )
         )
         // Set app version.
-        val pkgName = context?.packageName!!
-        val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+        val pkgName = requireContext().packageName
+        val pkgInfo = requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
         binding.setInfoApp.setHint(
             String.format(
-                getString(R.string.info_app_version_desc),
-                pkgInfo.versionName
+                getString(R.string.set_info_app_ver),
+                pkgInfo.versionName,
+                Constants.API_VERSION
             )
         )
     }
@@ -321,32 +656,56 @@ class SettingsFragment : Fragment() {
         // Connection
         binding.setConnAddr.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_add", text.toString())
+                putString("conn_addr", text.toString().trim())
                 apply()
             }
         }
         binding.setConnPort.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_port", text.toString())
+                putInt(
+                    "conn_port",
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(
+                        0,
+                        65535
+                    )
+                )
                 apply()
             }
         }
         binding.setConnRetry.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("tcp_retry", text.toString())
+                putInt(
+                    "conn_retry",
+                    (if (text.toString().isEmpty()) 5 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
+                )
                 apply()
             }
         }
         // Sync
         binding.setSyncPort.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("server_port", text.toString())
+                putInt(
+                    "sync_server_port",
+                    (if (text.toString().isEmpty()) 23333 else text.toString().toInt()).coerceIn(
+                        0,
+                        65535
+                    )
+                )
                 apply()
             }
         }
         binding.setSyncDelay.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("input_delay", text.toString())
+                putInt(
+                    "sync_input_delay",
+                    (if (text.toString().isEmpty()) 25 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
+                )
                 apply()
             }
         }
@@ -359,7 +718,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_open", inputValues[pos])
+                        putString("sync_input_open", inputValues[pos])
                         apply()
                     }
                 }
@@ -392,7 +751,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_up", inputValues[pos])
+                        putString("sync_input_up", inputValues[pos])
                         apply()
                     }
                 }
@@ -408,7 +767,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_down", inputValues[pos])
+                        putString("sync_input_down", inputValues[pos])
                         apply()
                     }
                 }
@@ -424,7 +783,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_left", inputValues[pos])
+                        putString("sync_input_left", inputValues[pos])
                         apply()
                     }
                 }
@@ -440,7 +799,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("input_right", inputValues[pos])
+                        putString("sync_input_right", inputValues[pos])
                         apply()
                     }
                 }
@@ -450,37 +809,61 @@ class SettingsFragment : Fragment() {
         // Control
         binding.setCtrlSimplifiedMode.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_simplified_mode", isChecked)
+                putBoolean("ctrl_simplified", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlSimplifiedStratagemSize.addTextChangedListener { text ->
+            with(preferences.edit()) {
+                putInt(
+                    "ctrl_stratagem_size",
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(
+                        1,
+                        1000
+                    )
+                )
                 apply()
             }
         }
         binding.setCtrlFastbootMode.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_fastboot_mode", isChecked)
+                putBoolean("ctrl_fastboot", isChecked)
                 apply()
             }
         }
         binding.setCtrlSfx.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_sfx", isChecked)
+                putBoolean("ctrl_sfx", isChecked)
                 apply()
             }
         }
         binding.setCtrlVibrator.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
-                putBoolean("enable_vibrator", isChecked)
+                putBoolean("ctrl_vibrator", isChecked)
                 apply()
             }
         }
         binding.setCtrlGstSwpDistanceThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("swipe_distance_threshold", text.toString())
+                putInt(
+                    "ctrl_sdt",
+                    (if (text.toString().isEmpty()) 100 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
+                )
                 apply()
             }
         }
         binding.setCtrlGstSwpVelocityThreshold.addTextChangedListener { text ->
             with(preferences.edit()) {
-                putString("swipe_velocity_threshold", text.toString())
+                putInt(
+                    "ctrl_svt",
+                    (if (text.toString().isEmpty()) 50 else text.toString().toInt()).coerceIn(
+                        0,
+                        Int.MAX_VALUE
+                    )
+                )
                 apply()
             }
         }
@@ -493,7 +876,7 @@ class SettingsFragment : Fragment() {
                     id: Long
                 ) {
                     with(preferences.edit()) {
-                        putString("lang_stratagem", langValues[pos])
+                        putString("ctrl_lang", langValues[pos])
                         apply()
                     }
                 }
@@ -518,115 +901,84 @@ class SettingsFragment : Fragment() {
                 return@setOnClickListener
             }
             connDialog.show()
-            connView.findViewById<TextView>(R.id.dialog_conn_title).text =
-                resources.getString(R.string.set_conn_test_title)
-            val progress = connView.findViewById<LinearLayout>(R.id.dialog_conn_progress)
-            val msg = connView.findViewById<TextView>(R.id.dialog_conn_msg)
+            connView.findViewById<TextView>(R.id.dlg_conn_title).text =
+                resources.getString(R.string.dlg_conn_test_title)
+            val progress = connView.findViewById<LinearLayout>(R.id.dlg_conn_progress)
+            val msg = connView.findViewById<TextView>(R.id.dlg_conn_msg)
             progress.visibility = VISIBLE
             msg.visibility = GONE
-            val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
-            button.setTitle(resources.getString(R.string.dialog_cancel))
+            val button = connView.findViewById<AppButton>(R.id.dlg_conn_button)
+            button.setTitle(resources.getString(R.string.dlg_comm_cancel))
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
-                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.setTitle(resources.getString(R.string.dlg_comm_confirm))
             }
 
             // Prepare socket and data.
-            val add = binding.setConnAddr.text.toString()
+            val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-            val version = pkgInfo.versionName
+
             // Launch coroutine.
-            val job = lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful, request server status.
-                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                        try {
-                            val res: ReceiveStatusData =
-                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                            // Check the server status.
-                            when (res.status) {
-                                0 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            resources.getText(R.string.tcp_test_success).toString()
-                                        )
-                                    }
-                                }
-
-                                1 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_1),
-                                                version.substring(0, version.lastIndexOf(".")),
-                                                res.ver
-                                            )
-                                        )
-                                    }
-                                }
-
-                                2 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(getString(R.string.network_auth), sid)
-                                        )
-                                    }
-                                    // Request authentication.
-                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                                    client.toggleTimeout(false)
-                                    val auth = Gson().fromJson(
-                                        client.receive(),
-                                        ReceiveAuthData::class.java
-                                    )
-                                    client.toggleTimeout(true)
-                                    withContext(Dispatchers.Main) {
-                                        if (auth.auth) {
-                                            connFinish(
-                                                String.format(getString(R.string.tcp_test_success))
-                                            )
-                                        } else {
-                                            connFinish(
-                                                String.format(getString(R.string.network_auth_failed))
-                                            )
-                                        }
-                                    }
-                                }
-
-                                else -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_error),
-                                                res.status
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppClient.setEventListener { ev, _ ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        when (ev) {
+                            AppClientEvent.CONNECTED -> {
                                 connFinish(
-                                    resources.getText(R.string.network_response_error).toString()
+                                    resources.getText(R.string.dlg_conn_test_success).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.AUTHING -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth), sid)
                                 )
                             }
-                        }
-                    } else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+
+                            AppClientEvent.AUTH_FAILED -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth_failed))
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SERVER_ERR -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_error)
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.FAILED -> {
+                                connFinish(
+                                    resources.getText(R.string.dlg_conn_test_failed).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.API_MISMATCH -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_1),
+                                        Constants.API_VERSION.toString()
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            else -> {}
                         }
                     }
-                    // Disconnect.
-                    client.disconnect()
                 }
+                AppClient.initClient(addr, port, sid, 0)
             }
             button.setOnClickListener {
-                job.cancel()
+                AppClient.closeClient()
                 connDialog.hide()
             }
         }
@@ -637,136 +989,117 @@ class SettingsFragment : Fragment() {
                 return@setOnClickListener
             }
             connDialog.show()
-            connView.findViewById<TextView>(R.id.dialog_conn_title).text =
+            connView.findViewById<TextView>(R.id.dlg_conn_title).text =
                 resources.getString(R.string.set_sync_apply)
-            val progress = connView.findViewById<LinearLayout>(R.id.dialog_conn_progress)
-            val msg = connView.findViewById<TextView>(R.id.dialog_conn_msg)
+            val progress = connView.findViewById<LinearLayout>(R.id.dlg_conn_progress)
+            val msg = connView.findViewById<TextView>(R.id.dlg_conn_msg)
             progress.visibility = VISIBLE
             msg.visibility = GONE
-            val button = connView.findViewById<AppButton>(R.id.dialog_conn_button)
-            button.setTitle(resources.getString(R.string.dialog_cancel))
+            val button = connView.findViewById<AppButton>(R.id.dlg_conn_button)
+            button.setTitle(resources.getString(R.string.dlg_comm_cancel))
             button.requestLayout()
             val connFinish = { str: String ->
                 progress.visibility = GONE
                 msg.visibility = VISIBLE
                 msg.text = str
-                button.setTitle(resources.getString(R.string.dialog_confirm))
+                button.setTitle(resources.getString(R.string.dlg_comm_confirm))
                 button.requestLayout()
             }
 
             // Prepare socket and data.
-            val config = ServerConfigData(
-                port = preferences.getString("server_port", "23333")!!.toInt(),
-                delay = preferences.getString("input_delay", "25")!!.toInt(),
-                open = preferences.getString("input_open", "ctrl_left")!!,
-                openType = preferences.getString("input_type_open", "hold")!!,
-                up = preferences.getString("input_up", "w")!!,
-                down = preferences.getString("input_down", "s")!!,
-                left = preferences.getString("input_left", "a")!!,
-                right = preferences.getString("input_right", "d")!!,
-                ip = "",
+            val config = SyncConfigData(
+                server = SyncConfigServerData(
+                    port = preferences.getInt("sync_server_port", 23333),
+                    ip = preferences.getString("sync_server_ip", "")!!,
+                ),
+                input = SyncConfigInputData(
+                    delay = preferences.getInt("sync_input_delay", 25),
+                    open = preferences.getString("sync_input_open", "ctrl_left")!!,
+                    keytype = preferences.getString("input_type_open", "hold")!!,
+                    up = preferences.getString("sync_input_up", "w")!!,
+                    down = preferences.getString("sync_input_down", "s")!!,
+                    left = preferences.getString("sync_input_left", "a")!!,
+                    right = preferences.getString("sync_input_right", "d")!!,
+                ),
+                auth = SyncConfigAuthData(
+                    enabled = preferences.getBoolean("sync_auth", true),
+                    timeout = preferences.getInt(
+                        "sync_auth_timeout",
+                        3
+                    )
+                ),
+                debug = preferences.getBoolean("sync_debug", true),
             )
-            val add = binding.setConnAddr.text.toString()
+            val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
-            val version = pkgInfo.versionName
             // Launch coroutine.
-            val job = lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    // Connect to the server.
-                    val connected = client.connect(add, port)
-                    if (connected) { // Connection successful, request server status.
-                        client.send(Gson().toJson(RequestStatusPacket(version)).toString())
-                        try {
-                            val res: ReceiveStatusData =
-                                Gson().fromJson(client.receive(), ReceiveStatusData::class.java)
-                            // Check the server status.
-                            when (res.status) {
-                                0 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            resources.getText(R.string.tcp_test_success).toString()
-                                        )
-                                    }
-                                }
-
-                                1 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_1),
-                                                version.substring(0, version.lastIndexOf(".")),
-                                                res.ver
-                                            )
-                                        )
-                                    }
-                                }
-
-                                2 -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(getString(R.string.network_auth), sid)
-                                        )
-                                    }
-                                    // Request authentication.
-                                    client.send(Gson().toJson(RequestAuthPacket(sid)).toString())
-                                    client.toggleTimeout(false)
-                                    val auth = Gson().fromJson(
-                                        client.receive(),
-                                        ReceiveAuthData::class.java
-                                    )
-                                    client.toggleTimeout(true)
-                                    if (auth.auth) {
-                                        client.send(
-                                            Gson().toJson(SyncConfigPacket(config, auth.token))
-                                                .toString()
-                                        )
-                                        withContext(Dispatchers.Main) {
-                                            connFinish(
-                                                resources.getText(R.string.sync_config_finished)
-                                                    .toString()
-                                            )
-                                        }
-                                    } else {
-                                        withContext(Dispatchers.Main) {
-                                            connFinish(
-                                                String.format(getString(R.string.network_auth_failed))
-                                            )
-                                        }
-                                    }
-                                }
-
-                                else -> {
-                                    withContext(Dispatchers.Main) {
-                                        connFinish(
-                                            String.format(
-                                                getString(R.string.network_status_error),
-                                                res.status
-                                            )
-                                        )
-                                    }
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppClient.setEventListener { ev, opt ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        when (ev) {
+                            AppClientEvent.CONNECTED -> {
+                                withContext(Dispatchers.IO) {
+                                    AppClient.optSync(config)
                                 }
                             }
-                        } catch (_: Exception) { // Json convert error & timeout.
-                            withContext(Dispatchers.Main) {
+
+                            AppClientEvent.AUTHING -> {
                                 connFinish(
-                                    resources.getText(R.string.network_response_error).toString()
+                                    String.format(getString(R.string.network_auth), sid)
                                 )
                             }
-                        }
-                    } else { // Connection failed.
-                        withContext(Dispatchers.Main) {
-                            connFinish(resources.getText(R.string.tcp_test_failed).toString())
+
+                            AppClientEvent.AUTH_FAILED -> {
+                                connFinish(
+                                    String.format(getString(R.string.network_auth_failed))
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SERVER_ERR -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_error)
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.FAILED -> {
+                                connFinish(
+                                    resources.getText(R.string.dlg_conn_test_failed).toString()
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            AppClientEvent.SENT -> {
+                                if (opt == 4) {
+                                    connFinish(
+                                        resources.getText(R.string.set_sync_apply_finished)
+                                            .toString()
+                                    )
+                                    AppClient.closeClient()
+                                }
+                            }
+
+                            AppClientEvent.API_MISMATCH -> {
+                                connFinish(
+                                    String.format(
+                                        getString(R.string.network_status_1),
+                                        Constants.API_VERSION.toString()
+                                    )
+                                )
+                                AppClient.closeClient()
+                            }
+
+                            else -> {}
                         }
                     }
-                    // Disconnect.
-                    client.disconnect()
                 }
+                AppClient.initClient(addr, port, sid, 0)
             }
-
             button.setOnClickListener {
-                job.cancel()
+                AppClient.closeClient()
                 connDialog.hide()
             }
         }
@@ -778,40 +1111,42 @@ class SettingsFragment : Fragment() {
             }
             aboutDialog.show()
 
-            val pkgName = context?.packageName!!
-            val pkgInfo = context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+            val pkgName = requireContext().packageName
+            val pkgInfo =
+                requireContext().applicationContext.packageManager.getPackageInfo(pkgName, 0)
             val curVer = pkgInfo.versionName
 
-            aboutView.findViewById<TextView>(R.id.dialog_info_title).text = String.format(
-                resources.getString(R.string.info_about_title),
-                curVer
+            aboutView.findViewById<TextView>(R.id.dlg_info_title).text = String.format(
+                resources.getString(R.string.dlg_about_title),
+                curVer,
+                Constants.API_VERSION
             )
-            aboutView.findViewById<ImageView>(R.id.dialog_info_icon)
+            aboutView.findViewById<ImageView>(R.id.dlg_info_icon)
                 .setImageResource(R.drawable.ic_launcher_foreground)
-            aboutView.findViewById<TextView>(R.id.dialog_info_msg).setText(R.string.info_about_desc)
-            val button1 = aboutView.findViewById<AppButton>(R.id.dialog_info_button1)
-            button1.setTitle(resources.getString(R.string.info_about_usage))
+            aboutView.findViewById<TextView>(R.id.dlg_info_msg).setText(R.string.dlg_about_desc)
+            val button1 = aboutView.findViewById<AppButton>(R.id.dlg_info_button1)
+            button1.setTitle(resources.getString(R.string.dlg_about_usage))
             button1.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.usage_url))
+                val uri = Uri.parse(Constants.URL_APP_USAGE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
                 aboutDialog.hide()
             }
-            val button2 = aboutView.findViewById<AppButton>(R.id.dialog_info_button2)
-            button2.setTitle(resources.getString(R.string.info_about_license))
+            val button2 = aboutView.findViewById<AppButton>(R.id.dlg_info_button2)
+            button2.setTitle(resources.getString(R.string.dlg_about_license))
             button2.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.license_url))
+                val uri = Uri.parse(Constants.URL_APP_LICENSE)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
                 aboutDialog.hide()
             }
-            val button3 = aboutView.findViewById<AppButton>(R.id.dialog_info_button3)
-            button3.setTitle(resources.getString(R.string.info_about_repo))
+            val button3 = aboutView.findViewById<AppButton>(R.id.dlg_info_button3)
+            button3.setTitle(resources.getString(R.string.dlg_about_repo))
             button3.visibility = VISIBLE
             button3.setOnClickListener {
-                val uri = Uri.parse(resources.getString(R.string.repo_url))
+                val uri = Uri.parse(Constants.URL_APP_REPO)
                 val internet = Intent(Intent.ACTION_VIEW, uri)
                 internet.addCategory(Intent.CATEGORY_BROWSABLE)
                 startActivity(internet)
@@ -821,49 +1156,55 @@ class SettingsFragment : Fragment() {
 
         // Check database update.
         // Launch coroutine
-        lifecycleScope.launch {
+        checkDBUpdateJob = lifecycleScope.launch {
             checkDBUpdate()
         }
 
         // Check app update.
         // Launch coroutine
         lifecycleScope.launch {
-            binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_check))
+            binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_chk))
             try {
                 val json =
-                    JSONObject(Util.downloadToStr(resources.getString(R.string.release_api_url)))
+                    JSONObject(DownloadService().downloadAsStr(Constants.URL_APP_RELEASE_API))
                 val newVer = json.getString("tag_name").substring(1)
                 withContext(Dispatchers.Main) {
                     // Set version.
-                    val pkgName = context?.packageName!!
+                    val pkgName = requireContext().packageName
                     val pkgInfo =
-                        context?.applicationContext?.packageManager?.getPackageInfo(pkgName, 0)!!
+                        requireContext().applicationContext.packageManager.getPackageInfo(
+                            pkgName,
+                            0
+                        )
                     val curVer = pkgInfo.versionName
                     val title: String
                     if (curVer != newVer) {
-                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version_updatable))
+                        binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app_updatable))
                         binding.setInfoApp.setHint(
                             String.format(
-                                resources.getString(R.string.info_app_version_updatable_desc),
+                                resources.getString(R.string.set_info_app_ver_diff),
                                 pkgInfo.versionName,
+                                Constants.API_VERSION,
                                 newVer
                             )
                         )
                         title = String.format(
-                            resources.getString(R.string.info_app_version_log_updatable),
+                            resources.getString(R.string.dlg_app_ver_log_updatable),
                             newVer
                         )
                     } else {
-                        binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
+                        binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app))
                         binding.setInfoApp.setHint(
                             String.format(
-                                resources.getString(R.string.info_app_version_latest),
-                                pkgInfo.versionName
+                                resources.getString(R.string.set_info_app_latest),
+                                pkgInfo.versionName,
+                                Constants.API_VERSION
                             )
                         )
                         title = String.format(
-                            resources.getString(R.string.info_app_version_log_latest),
-                            curVer
+                            resources.getString(R.string.dlg_app_ver_log_latest),
+                            curVer,
+                            Constants.API_VERSION
                         )
                     }
                     // Open version log.
@@ -873,29 +1214,30 @@ class SettingsFragment : Fragment() {
                         }
                         appDialog.show()
 
-                        appView.findViewById<TextView>(R.id.dialog_info_title).text = title
-                        appView.findViewById<ImageView>(R.id.dialog_info_icon)
+                        appView.findViewById<TextView>(R.id.dlg_info_title).text = title
+                        appView.findViewById<ImageView>(R.id.dlg_info_icon)
                             .setImageResource(R.drawable.ic_launcher_foreground)
-                        appView.findViewById<TextView>(R.id.dialog_info_msg).text =
+                        appView.findViewById<TextView>(R.id.dlg_info_msg).text =
                             json.getString("body")
-                        val button1 = appView.findViewById<AppButton>(R.id.dialog_info_button1)
-                        button1.setTitle(resources.getString(R.string.dialog_download))
+                        val button1 = appView.findViewById<AppButton>(R.id.dlg_info_button1)
+                        button1.setTitle(resources.getString(R.string.dlg_comm_download))
                         button1.setOnClickListener {
-                            val uri = Uri.parse(resources.getString(R.string.release_url))
+                            val uri = Uri.parse(Constants.URL_APP_RELEASE)
                             val internet = Intent(Intent.ACTION_VIEW, uri)
                             internet.addCategory(Intent.CATEGORY_BROWSABLE)
                             startActivity(internet)
                             appDialog.hide()
                         }
-                        appView.findViewById<AppButton>(R.id.dialog_info_button2)
+                        appView.findViewById<AppButton>(R.id.dlg_info_button2)
                             .setOnClickListener {
                                 appDialog.hide()
                             }
                     }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("[Settings] Check App Ver", e.toString())
                 withContext(Dispatchers.Main) {
-                    binding.setInfoApp.setTitle(resources.getString(R.string.info_app_version))
+                    binding.setInfoApp.setTitle(resources.getString(R.string.set_info_app))
                 }
             }
         }
@@ -911,37 +1253,35 @@ class SettingsFragment : Fragment() {
             val clearView: View = View.inflate(requireContext(), R.layout.dialog_info, null)
             clearDialog.setView(clearView)
 
-            val radioGroup = dbView.findViewById<RadioGroup>(R.id.db_update_group)
-            val confirm = dbView.findViewById<AppButton>(R.id.db_update_confirm)
-            val cancel = dbView.findViewById<AppButton>(R.id.db_update_cancel)
-            val clear = dbView.findViewById<AppButton>(R.id.db_update_clear)
-            val custom = dbView.findViewById<EditText>(R.id.db_update_custom_input)
-            var channel = preferences.getInt("db_update_channel", 0)
+            val radioGroup = dbView.findViewById<RadioGroup>(R.id.dlg_db_update_group)
+            val confirm = dbView.findViewById<AppButton>(R.id.dlg_db_update_confirm)
+            val cancel = dbView.findViewById<AppButton>(R.id.dlg_db_update_cancel)
+            val clear = dbView.findViewById<AppButton>(R.id.dlg_db_update_clear)
+            val custom = dbView.findViewById<EditText>(R.id.dlg_db_update_custom_input)
+            var channel = preferences.getInt("db_channel", 0)
 
             radioGroup.check(
                 when (channel) {
-                    0 -> R.id.db_update_hd2
-                    1 -> R.id.db_update_hd
-                    2 -> R.id.db_update_custom
-                    else -> R.id.db_update_hd2
+                    0 -> R.id.dlg_db_update_hd2
+                    1 -> R.id.dlg_db_update_hd
+                    2 -> R.id.dlg_db_update_custom
+                    else -> R.id.dlg_db_update_hd2
                 }
             )
-            custom.setText(preferences.getString("db_update_channel_custom", ""))
-            custom.isEnabled = channel == 2
+            custom.setText(preferences.getString("db_custom", ""))
 
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 channel = when (checkedId) {
-                    R.id.db_update_hd2 -> 0
-                    R.id.db_update_hd -> 1
-                    R.id.db_update_custom -> 2
+                    R.id.dlg_db_update_hd2 -> 0
+                    R.id.dlg_db_update_hd -> 1
+                    R.id.dlg_db_update_custom -> 2
                     else -> 0
                 }
-                custom.isEnabled = channel == 2
             }
 
             // Set custom url.
             custom.addTextChangedListener {
-                preferences.edit().putString("db_update_channel_custom", custom.text.toString())
+                preferences.edit().putString("db_custom", custom.text.toString().trim())
                     .apply()
             }
 
@@ -951,21 +1291,21 @@ class SettingsFragment : Fragment() {
                 if (!clearDialog.isShowing) {
                     clearDialog.show()
 
-                    val title = clearView.findViewById<TextView>(R.id.dialog_info_title)
-                    title.setText(R.string.info_db_update_clear)
-                    clearView.findViewById<TextView>(R.id.dialog_info_msg)
-                        .setText(R.string.info_db_update_clear_desc)
-                    val button1 = clearView.findViewById<AppButton>(R.id.dialog_info_button1)
+                    val title = clearView.findViewById<TextView>(R.id.dlg_info_title)
+                    title.setText(R.string.dlg_db_updt_clear)
+                    clearView.findViewById<TextView>(R.id.dlg_info_msg)
+                        .setText(R.string.dlg_db_updt_clear_desc)
+                    val button1 = clearView.findViewById<AppButton>(R.id.dlg_info_button1)
                     button1.setAlert(true)
                     button1.setOnClickListener {
-                        val path = context?.filesDir?.path + "/icons"
+                        val path = requireContext().filesDir.path + PATH_DB_ICONS
                         File(path).deleteRecursively()
                         preferences.edit().putString("db_version", "0").apply()
                         preferences.edit().putString("db_name", getString(R.string.default_string))
                             .apply()
-                        preferences.edit().putInt("db_update_channel", 0).apply()
+                        preferences.edit().putInt("db_channel", 0).apply()
                         channel = 0
-                        radioGroup.check(R.id.db_update_hd2)
+                        radioGroup.check(R.id.dlg_db_update_hd2)
                         stratagemViewModel.deleteAll()
 
                         Toast.makeText(
@@ -974,12 +1314,13 @@ class SettingsFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        lifecycleScope.launch {
-                            checkDBUpdate()
+                        if (checkDBUpdateJob.isActive) {
+                            checkDBUpdateJob.cancel()
                         }
+                        checkDBUpdateJob = lifecycleScope.launch { checkDBUpdate() }
                         clearDialog.hide()
                     }
-                    clearView.findViewById<AppButton>(R.id.dialog_info_button2).setOnClickListener {
+                    clearView.findViewById<AppButton>(R.id.dlg_info_button2).setOnClickListener {
                         clearDialog.hide()
                     }
                 }
@@ -991,78 +1332,121 @@ class SettingsFragment : Fragment() {
             }
 
             // Update database.
-            confirm.setOnClickListener {
+            confirm.setOnClickListener confirm@{
+                if (checkDBUpdateJob.isActive) {
+                    checkDBUpdateJob.cancel()
+                }
+
                 dbDialog.hide()
-                preferences.edit().putInt("db_update_channel", channel).apply()
+                preferences.edit().putInt("db_channel", channel).apply()
                 dbVer = preferences.getString("db_version", "0")!!
                 dbName =
-                    preferences.getString("db_name", resources.getString(R.string.db_hd2_name))!!
+                    preferences.getString("db_name", Constants.ID_DB_HD2)!!
 
                 preferences.edit()
                     .putString("db_name", resources.getString(R.string.default_string)).apply()
 
-                var url: String = when (preferences.getInt("db_update_channel", 0)) {
-                    0 -> getString(R.string.db_hd2_url)
-                    1 -> getString(R.string.db_hd_url)
-                    2 -> preferences.getString("db_update_channel_custom", "")!!
-                    else -> getString(R.string.db_hd2_url)
+                // Get index url.
+                var rawUrl: String = when (preferences.getInt("db_channel", 0)) {
+                    0 -> Constants.URL_DB_HD2
+                    1 -> Constants.URL_DB_HD
+                    2 -> preferences.getString("db_custom", "")!!
+                    else -> Constants.URL_DB_HD2
                 }
-                if (url.isEmpty()) {
-                    url = getString(R.string.default_string)
+                if (rawUrl.isEmpty()) {
+                    rawUrl = getString(R.string.default_string)
                 }
-                if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
-                    url = "$url/"
+
+                // Init download dialog.
+                val downloadDialog = AlertDialog.Builder(requireContext()).create()
+                val downloadView: View =
+                    View.inflate(requireContext(), R.layout.dialog_download, null)
+                downloadDialog.setView(downloadView)
+                downloadDialog.setCanceledOnTouchOutside(false)
+                val indexView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_index)
+                val filesView = downloadView.findViewById<LinearLayout>(R.id.dlg_download_files)
+                val titleView = downloadView.findViewById<TextView>(R.id.dlg_download_title)
+                val idxTxtView = downloadView.findViewById<TextView>(R.id.dlg_download_index_text)
+                val totalPB =
+                    downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_total)
+                val itemPB = downloadView.findViewById<AppProgressBar>(R.id.dlg_download_files_item)
+                val infoView = downloadView.findViewById<TextView>(R.id.dlg_download_info)
+                val buttonView = downloadView.findViewById<AppButton>(R.id.dlg_download_button)
+                itemPB.enableHint()
+
+                filesView.visibility = GONE
+                indexView.visibility = VISIBLE
+                titleView.setText(R.string.set_info_db_updt_title)
+                idxTxtView.setText(R.string.set_info_db_updt_idx)
+                downloadDialog.show()
+
+                var isFinished = false
+
+                val parsedUrl: Utils.Companion.UrlParts
+                try {
+                    parsedUrl = Utils.parseUrl(rawUrl, "index.json")
+                } catch (e: Exception) {
+                    Log.e("[Settings] Update DB", e.toString())
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                        buttonView.setOnClickListener {
+                            downloadDialog.hide()
+                        }
+                        indexView.visibility = GONE
+                        filesView.visibility = GONE
+                        infoView.visibility = VISIBLE
+                        infoView.text =
+                            String.format(getString(R.string.utils_parse_url_failed), rawUrl)
+                    }
+                    return@confirm
                 }
 
                 // Download database.
-                lifecycleScope.launch {
-                    binding.setInfoDb.isEnabled = false
-                    withContext(Dispatchers.Main) {
-                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
-                        binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_updating_index_desc))
-                    }
-
+                val downloadJob = lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         preferences.edit().putString("db_version", "1").apply()
+                        withContext(Dispatchers.Main) {
+                            binding.setInfoDb.setHint(
+                                resources.getString(R.string.set_info_db_incomplete)
+                            )
+                        }
 
                         // Download index.
-                        val indexObj = JSONObject(Util.downloadToStr(url + "index.json"))
+                        ensureActive()
+                        val indexObj =
+                            JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
                         val date = indexObj.getString("date")
-                        val dbUrl = url + indexObj.getString("db_path")
-                        val iconsUrl = url + indexObj.getString("icons_path")
+                        val dbUrl = parsedUrl.dir + indexObj.getString("db_path")
+                        val iconsUrl = parsedUrl.dir + indexObj.getString("icons_path")
                         val iconsList: MutableList<String> = emptyList<String>().toMutableList()
                         val name = indexObj.getString("name")
-                        val iconsPath = context?.filesDir?.path + "/icons/$name/"
+                        val nameEn = indexObj.getString("nameEn")
+                        val nameZh = indexObj.getString("nameZh")
+                        val iconsPath = requireContext().filesDir.path + PATH_DB_ICONS + "$name/"
+                        val displayName =
+                            when (requireContext().resources.configuration.locales.get(0)
+                                .toLanguageTag()) {
+                                "zh-CN" -> nameZh
+                                else -> nameEn
+                            }
 
                         // Analyze the index.
                         preferences.edit().putString("db_name", name).apply()
-                        if (date == dbVer && name == dbName) {
-                            // Database is latest, no need to update.
-                            withContext(Dispatchers.Main) {
-                                binding.setInfoDb.setHint(
-                                    String.format(
-                                        resources.getString(R.string.info_db_version_update_latest),
-                                        name
-                                    )
-                                )
-                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
-                            }
-                            preferences.edit().putString("db_version", date).apply()
-                            return@launch
-                        }
+                        preferences.edit().putString("db_name_en", nameEn).apply()
+                        preferences.edit().putString("db_name_zh", nameZh).apply()
 
                         // Download database.
                         withContext(Dispatchers.Main) {
-                            binding.setInfoDb.setHint(
-                                String.format(
-                                    resources.getString(R.string.info_db_version_updating_db_desc),
-                                    name
-                                )
+                            titleView.text = String.format(
+                                getString(R.string.set_info_db_updt_title2),
+                                displayName
                             )
-                            binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
+                            idxTxtView.setText(R.string.set_info_db_updt_db)
                         }
-                        val dbObj = JSONObject(Util.downloadToStr(dbUrl))
+                        ensureActive()
+                        val dbObj = JSONObject(DownloadService().downloadAsStr(dbUrl))
                         // Regenerate database.
+                        ensureActive()
                         stratagemViewModel.deleteAll()
                         val rows = dbObj.getJSONArray("objects")
                             .getJSONObject(0)
@@ -1074,59 +1458,182 @@ class SettingsFragment : Fragment() {
                             for (j in 0 until stepsArray.length()) {
                                 steps.add(stepsArray.getInt(j))
                             }
-                            val item = StratagemData(
-                                row.getInt(0),
-                                row.getString(1),
-                                row.getString(2),
-                                row.getString(3),
-                                steps
-                            )
+                            var item: StratagemData
+                            if (row.length() == 6) {
+                                item = StratagemData(
+                                    row.getInt(0),
+                                    row.getString(1),
+                                    row.getString(2),
+                                    row.getString(3),
+                                    steps,
+                                    row.getInt(5)
+                                )
+                            } else {
+                                item = StratagemData(
+                                    row.getInt(0),
+                                    row.getString(1),
+                                    row.getString(2),
+                                    row.getString(3),
+                                    steps
+                                )
+                            }
                             iconsList.add(row.getString(3))
                             stratagemViewModel.insertItem(item)
                         }
 
                         // Download icons.
-                        for (i in 0 until iconsList.size) {
-                            withContext(Dispatchers.Main) {
-                                binding.setInfoDb.setHint(
+                        ensureActive()
+                        var index = 0
+                        withContext(Dispatchers.Main) {
+                            filesView.visibility = VISIBLE
+                            indexView.visibility = GONE
+                            totalPB.setText(
+                                String.format(
+                                    getString(R.string.set_info_db_updt_icons),
+                                    index + 1,
+                                    iconsList.size
+                                )
+                            )
+                            totalPB.setValue((index.toFloat() / iconsList.size * 100).toInt())
+                            itemPB.setText(iconsUrl + iconsList[index] + ".svg")
+                            itemPB.setHint(
+                                String.format(
+                                    getString(R.string.set_info_db_updt_icons_item),
+                                    0f,
+                                    "0",
+                                    "?"
+                                )
+                            )
+                            itemPB.setValue(0)
+                        }
+                        val service = DownloadService()
+                        service.onComplete = {
+                            ensureActive()
+                            index++
+                            if (index == iconsList.size) {
+                                preferences.edit().putString("db_version", date).apply()
+                                buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                                buttonView.setOnClickListener {
+                                    downloadDialog.hide()
+                                }
+                                filesView.visibility = GONE
+                                infoView.visibility = VISIBLE
+                                infoView.setText(R.string.set_info_db_updt_complete)
+                                isFinished = true
+
+                                if (checkDBUpdateJob.isActive) {
+                                    checkDBUpdateJob.cancel()
+                                }
+                                checkDBUpdateJob = lifecycleScope.launch { checkDBUpdate() }
+                            } else {
+                                totalPB.setText(
                                     String.format(
-                                        resources.getString(R.string.info_db_version_updating_icons_desc),
-                                        name,
-                                        i,
+                                        getString(R.string.set_info_db_updt_icons),
+                                        index + 1,
                                         iconsList.size
                                     )
                                 )
-                                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updating))
+                                totalPB.setValue((index.toFloat() / iconsList.size * 100).toInt())
+                                service.downloadToFile(
+                                    iconsUrl + iconsList[index] + ".svg",
+                                    iconsPath + iconsList[index] + ".svg",
+                                    this
+                                )
                             }
-                            Util.download(
-                                iconsUrl + iconsList[i] + ".svg",
-                                iconsPath + iconsList[i] + ".svg",
-                                false
-                            )
                         }
-
-                        preferences.edit().putString("db_version", date).apply()
-                        withContext(Dispatchers.Main) {
-                            binding.setInfoDb.setHint(
+                        service.onProgress = { d, t ->
+                            val p = if (t.toInt() == -1) 0f else (d.toFloat() / t * 100)
+                            itemPB.setText(iconsUrl + iconsList[index] + ".svg")
+                            itemPB.setHint(
                                 String.format(
-                                    resources.getString(R.string.info_db_version_update_complete_desc),
-                                    name
+                                    getString(R.string.set_info_db_updt_icons_item),
+                                    p,
+                                    d.toString(),
+                                    if (t.toInt() == -1) "?" else t.toString()
                                 )
                             )
+                            itemPB.setValue(p.toInt())
                         }
+                        service.onError = { e ->
+                            Log.e("[Settings] Update DB", e.toString())
+                            buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                            buttonView.setOnClickListener {
+                                downloadDialog.hide()
+                            }
+                            indexView.visibility = GONE
+                            filesView.visibility = GONE
+                            infoView.visibility = VISIBLE
+                            infoView.text = String.format(
+                                getString(R.string.set_info_db_updt_failed),
+                                e.toString()
+                            )
+                        }
+                        service.downloadToFile(
+                            iconsUrl + iconsList[index] + ".svg",
+                            iconsPath + iconsList[index] + ".svg",
+                            this
+                        )
                     } catch (e: Exception) {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                        withContext(Dispatchers.Main) {
-                            binding.setInfoDb.setHint(resources.getString(R.string.info_db_version_update_failed_desc))
-                            binding.setInfoDb.isEnabled = true
+                        Log.e("[Settings] Update DB", e.toString())
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            buttonView.setTitle(getString(R.string.dlg_comm_confirm))
+                            buttonView.setOnClickListener {
+                                downloadDialog.hide()
+                            }
+                            indexView.visibility = GONE
+                            filesView.visibility = GONE
+                            infoView.visibility = VISIBLE
+                            infoView.text = String.format(
+                                getString(R.string.set_info_db_updt_failed),
+                                e.toString()
+                            )
                         }
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
                     }
-                    withContext(Dispatchers.Main) {
-                        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                }
+
+                buttonView.setOnClickListener {
+                    downloadDialog.hide()
+                    downloadJob.cancel()
+                    preferences.edit().putBoolean("hint_db_incomplete", false).apply()
+                    if (checkDBUpdateJob.isActive) {
+                        checkDBUpdateJob.cancel()
+                    }
+                    if (checkDBUpdateJob.isActive) {
+                        checkDBUpdateJob.cancel()
+                    }
+                    checkDBUpdateJob = lifecycleScope.launch { checkDBUpdate() }
+                }
+
+                downloadDialog.setOnCancelListener {
+                    downloadJob.cancel()
+                    if (!isFinished) {
+                        preferences.edit().putBoolean("hint_db_incomplete", false).apply()
+                        if (checkDBUpdateJob.isActive) {
+                            checkDBUpdateJob.cancel()
+                        }
+                        checkDBUpdateJob = lifecycleScope.launch { checkDBUpdate() }
                     }
                 }
             }
+        }
+
+        binding.setInfoExport.setOnClickListener {
+            val fileName = "${Constants.BACKUP_FILE_NAME}.json"
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, fileName)
+            }
+            requestExportLauncher.launch(intent)
+        }
+
+        binding.setInfoImport.setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+            }
+            requestImportLauncher.launch(intent)
         }
     }
 
@@ -1134,58 +1641,70 @@ class SettingsFragment : Fragment() {
      * Check if the database is updatable
      */
     private suspend fun checkDBUpdate() {
-        binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_check))
+        binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_chk))
+        binding.setInfoDb.setHint(
+            String.format(
+                resources.getString(R.string.set_info_db_ver),
+                dbName,
+                when (dbVer) {
+                    "0" -> resources.getString(R.string.set_info_db_empty)
+                    "1" -> resources.getString(R.string.set_info_db_incomplete)
+                    else -> dbVer
+                }
+            )
+        )
         try {
-            var url: String = when (preferences.getInt("db_update_channel", 0)) {
-                0 -> getString(R.string.db_hd2_url)
-                1 -> getString(R.string.db_hd_url)
-                2 -> preferences.getString("db_update_channel_custom", "")!!
-                else -> getString(R.string.db_hd2_url)
+            // Get index url.
+            var rawUrl: String = when (preferences.getInt("db_channel", 0)) {
+                0 -> Constants.URL_DB_HD2
+                1 -> Constants.URL_DB_HD
+                2 -> preferences.getString("db_custom", "")!!
+                else -> Constants.URL_DB_HD2
             }
-            if (url.isEmpty()) {
-                url = getString(R.string.default_string)
-            } 
-            if (url.substring(url.length - 1) != "/" && url.substring(url.length - 1) != "\\") {
-                url = "$url/"
+            if (rawUrl.isEmpty()) {
+                rawUrl = getString(R.string.default_string)
             }
+            val parsedUrl = Utils.parseUrl(rawUrl, "index.json")
 
-            val json = JSONObject(Util.downloadToStr(url + "index.json"))
+            val json =
+                JSONObject(DownloadService().downloadAsStr(parsedUrl.dir + parsedUrl.fileName))
             val newVer = json.getString("date")
             dbVer = preferences.getString("db_version", "0")!!
             withContext(Dispatchers.Main) {
                 if (dbVer != newVer) {
                     binding.setInfoDb.setHint(
                         String.format(
-                            resources.getString(R.string.info_db_version_updatable_desc),
-                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            resources.getString(R.string.set_info_db_ver_diff),
+                            preferences.getString("db_name", Constants.ID_DB_HD2),
                             when (dbVer) {
-                                "0" -> resources.getString(R.string.info_db_version_empty)
-                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                "0" -> resources.getString(R.string.set_info_db_empty)
+                                "1" -> resources.getString(R.string.set_info_db_incomplete)
                                 else -> dbVer
                             },
                             json.getString("name"),
                             newVer
                         )
                     )
-                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version_updatable))
+                    binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db_updatable))
                 } else {
-                    binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                    binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
                     binding.setInfoDb.setHint(
                         String.format(
-                            resources.getString(R.string.info_db_version_latest),
-                            preferences.getString("db_name", getString(R.string.db_hd2_name)),
+                            resources.getString(R.string.set_info_db_latest),
+                            preferences.getString("db_name", Constants.ID_DB_HD2),
                             when (dbVer) {
-                                "0" -> resources.getString(R.string.info_db_version_empty)
-                                "1" -> resources.getString(R.string.info_db_version_incomplete)
+                                "0" -> resources.getString(R.string.set_info_db_empty)
+                                "1" -> resources.getString(R.string.set_info_db_incomplete)
                                 else -> dbVer
                             }
                         )
                     )
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e("[Settings] Check DB Ver", e.toString())
             withContext(Dispatchers.Main) {
-                binding.setInfoDb.setTitle(resources.getString(R.string.info_db_version))
+                binding.setInfoDb.setTitle(resources.getString(R.string.set_info_db))
             }
         }
     }

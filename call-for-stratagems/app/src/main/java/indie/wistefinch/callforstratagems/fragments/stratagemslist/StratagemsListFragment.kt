@@ -11,7 +11,9 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import indie.wistefinch.callforstratagems.CFSApplication
-import indie.wistefinch.callforstratagems.R
+import indie.wistefinch.callforstratagems.Constants
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModelFactory
 import indie.wistefinch.callforstratagems.databinding.FragmentStratagemsListBinding
@@ -25,6 +27,15 @@ class StratagemsListFragment : Fragment() {
     private val stratagemViewModel: StratagemViewModel by activityViewModels {
         StratagemViewModelFactory(
             (activity?.application as CFSApplication).stratagemDb.stratagemDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
         )
     }
 
@@ -52,18 +63,31 @@ class StratagemsListFragment : Fragment() {
 
         // Get database name
         val preference = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val dbName = preference.getString("db_name", context?.resources?.getString(R.string.db_hd2_name))!!
-        var lang = preference.getString("lang_stratagem", "auto")!!
+        val dbName =
+            preference.getString("db_name", Constants.ID_DB_HD2)!!
+        var lang = preference.getString("ctrl_lang", "auto")!!
         if (lang == "auto") {
-            lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
+            lang = requireContext().resources.configuration.locales.get(0).toLanguageTag()
         }
 
-        binding.stratagemsListTitle.text = dbName
+        val displayName = when (lang) {
+            "zh-CN" -> preference.getString("db_name_zh", "")!!
+            else -> preference.getString("db_name_en", "")!!
+        }
+        binding.stratagemsListTitle.text = displayName.ifEmpty {
+            dbName
+        }
 
         val recyclerView = binding.stratagemsListRecyclerView
         recyclerView.adapter = adapter
         recyclerView.autoFitColumns(90)
-        adapter.setData(stratagemViewModel.getAllItems(), dbName, lang)
+        adapter.setData(
+            stratagemViewModel.getAllItems(),
+            dbName,
+            lang,
+            asrKeywordViewModel,
+            requireActivity()
+        )
 
         return view
     }
@@ -74,7 +98,8 @@ class StratagemsListFragment : Fragment() {
          */
         fun RecyclerView.autoFitColumns(columnWidth: Int) {
             val displayMetrics = this.context.resources.displayMetrics
-            val noOfColumns = ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
+            val noOfColumns =
+                ((displayMetrics.widthPixels / displayMetrics.density) / columnWidth).toInt()
             this.layoutManager = GridLayoutManager(this.context, noOfColumns)
         }
     }
