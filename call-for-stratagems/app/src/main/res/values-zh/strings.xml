@@ -206,7 +206,7 @@
     <!-- Welcome Dialog -->
     <string name="dlg_welcome_title">欢迎使用 v%1$s</string>
     <string name="dlg_welcome_usage">用法</string>
-    <string name="dlg_welcome_desc">本次更新加入了音效和震动功能，您可以前往“设置>控制”开启</string>
+    <string name="dlg_welcome_desc">本次更新后部分设置数据将会丢失，请留意！\n加入了语音识别功能，您可以前往“设置>控制>语音识别”进行配置</string>
 
     <!-- DB Incomplete Dialog -->
     <string name="dlg_db_incomplete_title">数据库不完整</string>

@@ -34,7 +34,7 @@ pub async fn run(mut debug: bool, mut disable_auth: bool) -> Result<()> {
         rust_i18n::set_locale("en");
     }
 
-    println(format!("{}{VERSION}{}", t!("title_1"), t!("title_2")));
+    println(format!("{}{VERSION}[API{SERVER_API_VERSION}]{}", t!("title_1"), t!("title_2")));
 
     // 加载配置
     let conf: AppConfig = match load_config().await {

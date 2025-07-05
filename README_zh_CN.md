@@ -11,7 +11,7 @@
 
 </div>
 
-软件用法可以[看这里](./usage_zh_CN.md)
+软件用法请查阅[此处](./usage_zh_CN.md)
 
 ## 特色
 
@@ -19,9 +19,17 @@
 - 根据战略配备的提示输入 ✅
 - 自由输入 ✅
 - 宏 ✅
-- 反转输入
+- 语言识别 ✅
 
-## 构建
+## 需求
+
+- 服务器: 
+  - Windows x64 或 Linux （需手动编译）
+- 客户端: 
+  - Android 8.0 (SDK26)
+  - ABIs: arm64-v8a
+
+## 构建与运行
 
 ### 服务器
 
@@ -46,41 +54,7 @@ cargo run -- --debug --disable-auth  # 同时启用调试模式和禁用SID认�
 cargo run -- --help  # 显示帮助信息
 ```
 
-### 配置文件
-
-配置文件格式在0.6.0版本中已从JSON更改为TOML格式。当您首次运行服务器时，程序将检测旧的配置文件并询问您是否要迁移到新格式。**迁移是必须的**，新版本必须使用新格式配置才能继续运行。确认后，旧的配置和认证记录将自动迁移到新格式，并删除旧文件。
-
-新配置文件示例(config.toml)：
-
-```toml
-[server]
-port = 23333
-ip = ""
-
-[auth]
-enabled = true
-timeout_days = 3
-
-[input]
-delay = 25
-open = "ctrl_left"
-open_type = "hold"
-up = "w"
-down = "s"
-left = "a"
-right = "d"
-
-# 认证记录
-[[auth_records]]
-sid = "client_identification_1"
-time = 1712345678
-
-[[auth_records]]
-sid = "client_identification_2"
-time = 1712345679
-```
-
-服务器API请查阅[此处](./server_api_0_5.md)
+服务器API请查阅[此处](./server_api_6.md)
 
 ### 客户端
 
@@ -95,5 +69,6 @@ time = 1712345679
 
 ### 使用的开源库
 
-- [AndroidSVG](https://github.com/BigBadaboom/androidsvg) 安卓的SVG渲染库
-- [ZXingLite](https://github.com/jenly1314/ZXingLite) 🔥 ZXing的精简极速版，优化扫码和生成二维码/条形码
+- [BigBadaboom/androidsvg](https://github.com/BigBadaboom/androidsvg) 安卓的SVG渲染库
+- [jenly1314/ZXingLite](https://github.com/jenly1314/ZXingLite) 🔥 ZXing的精简极速版，优化扫码和生成二维码/条形码
+- [k2-fsa/sherpa-ncnn](https://github.com/k2-fsa/sherpa-ncnn) 使用下一代Kaldi和ncnn进行实时语音识别和语音活动检测，无需互联网连接

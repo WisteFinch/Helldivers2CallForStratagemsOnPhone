@@ -209,7 +209,7 @@
     <!-- Welcome Dialog -->
     <string name="dlg_welcome_title">Welcome to v%1$s</string>
     <string name="dlg_welcome_usage">Usage</string>
-    <string name="dlg_welcome_desc">This update added sound effects and vibration, you can go to \"Settings>Control\" and enable them</string>
+    <string name="dlg_welcome_desc">Notice: Some settings data will be lost after this update, please reconfigure!\nAdded speech recognition, you can go to \"Settings>Control>Speech recognition\" and configure it</string>
 
     <!-- DB Incomplete Dialog -->
     <string name="dlg_db_incomplete_title">Database Incomplete</string>
