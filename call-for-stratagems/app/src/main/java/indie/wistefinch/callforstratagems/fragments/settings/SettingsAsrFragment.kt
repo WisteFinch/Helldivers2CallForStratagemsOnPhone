@@ -510,6 +510,7 @@ class SettingsAsrFragment : Fragment() {
                 dbName = dbName,
                 lang = lang,
                 similarityThreshold = preferences.getInt("ctrl_asr_similarity", 50).toFloat() / 100,
+                useGPU = preferences.getBoolean("ctrl_asr_gpu", true),
                 stratagems = stratagemViewModel.getAllItems(),
                 onError = { e ->
                     textView.setText(
@@ -534,7 +535,11 @@ class SettingsAsrFragment : Fragment() {
                             lastRes = getString(R.string.asr_model_no_result)
                         } else {
                             for (i in list) {
-                                lastRes = String.format(getString(R.string.asr_model_result_item), "${lastRes}${i.second}",  i.third)
+                                lastRes = String.format(
+                                    getString(R.string.asr_model_result_item),
+                                    "${lastRes}${i.second}",
+                                    i.third
+                                )
                             }
                         }
                         val display = "${txt}\n\n${lastRes}"

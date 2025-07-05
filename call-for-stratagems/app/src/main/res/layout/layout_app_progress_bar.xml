@@ -44,6 +44,7 @@
         android:paddingHorizontal="8dp"
         android:text="@string/default_string"
         android:theme="@style/AppTextHint"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/app_progress_bar_value"
         app:layout_constraintEnd_toEndOf="@id/app_progress_bar_value"
         app:layout_constraintStart_toStartOf="@id/app_progress_bar_value"

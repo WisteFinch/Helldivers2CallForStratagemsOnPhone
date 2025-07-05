@@ -2,12 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/play_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/playBackgroundSecondary"
     android:keepScreenOn="true"
-    tools:context=".fragments.play.PlayFragment"
-    android:id="@+id/play_root">
+    tools:context=".fragments.play.PlayFragment">
 
     <ImageView
         android:id="@+id/play_bg_cross"
@@ -37,39 +37,62 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/play_info_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:id="@+id/play_status">
+        app:layout_constraintStart_toStartOf="parent">
 
-        <indie.wistefinch.callforstratagems.utils.AppLoading
-            android:id="@+id/play_connect_status_1"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
-
-        <ImageView
-            android:id="@+id/play_connect_status_2"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:contentDescription="@string/play_network_status"
-            android:src="@drawable/ic_circle"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/play_connect_title"
+        <LinearLayout
+            android:id="@+id/play_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:orientation="horizontal">
+
+            <indie.wistefinch.callforstratagems.utils.AppLoading
+                android:id="@+id/play_connect_status_1"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <ImageView
+                android:id="@+id/play_connect_status_2"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="@string/play_network_status"
+                android:src="@drawable/ic_circle"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/play_connect_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/default_string"
+                android:textColor="@color/textSecondary"
+                tools:ignore="TextContrastCheck,VisualLintOverlap" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+
+        <TextView
+            android:id="@+id/play_asr_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:ellipsize="start"
+            android:gravity="end"
+            android:maxLines="1"
             android:text="@string/default_string"
-            android:textColor="@color/textSecondary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/play_connect_status"
-            tools:ignore="TextContrastCheck,VisualLintOverlap" />
+            android:textColor="@color/textSecondary" />
 
     </LinearLayout>
 
@@ -97,7 +120,7 @@
         android:gravity="center"
         android:text="@string/play_blank"
         android:textColor="@color/textPrimary"
-        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_banner"
@@ -132,7 +155,7 @@
         android:layout_width="wrap_content"
         android:layout_height="64dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_stratagem_title">
@@ -150,7 +173,7 @@
         android:layout_width="192dp"
         android:layout_height="192dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -225,7 +248,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="16dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -244,7 +267,7 @@
         android:id="@+id/play_stratagem_scrollView"
         android:layout_width="64dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/play_mode">
 
@@ -268,7 +291,36 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_exit"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+    <ImageButton
+        android:id="@+id/play_asr"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/play_asr"
+        android:focusable="true"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_mic_off"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/play_exit" />
+
+    <com.caverock.androidsvg.SVGImageView
+        android:id="@+id/play_asr_stratagem"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:clickable="false"
+        android:contentDescription="@string/default_string"
+        android:src="@drawable/ic_question"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/play_asr"
+        app:layout_constraintEnd_toEndOf="@id/play_asr" />
+
 
     <ImageButton
         android:id="@+id/play_mode"
@@ -294,7 +346,32 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_edit"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/play_status"
+        app:layout_constraintBottom_toTopOf="@id/play_asr_FAB"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/play_asr_FAB"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/play_asr"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_mic_off"
+        android:clickable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/play_info_bar"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.caverock.androidsvg.SVGImageView
+        android:id="@+id/play_asr_FAB_stratagem"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:clickable="false"
+        android:src="@drawable/ic_question"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/play_asr_FAB"
+        app:layout_constraintEnd_toEndOf="@id/play_asr_FAB" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -102,6 +102,7 @@ class SettingsFragment : Fragment() {
     /**
      * Check database update coroutine job
      */
+    @Volatile
     private lateinit var checkDBUpdateJob: Job
 
     /**
@@ -1530,9 +1531,6 @@ class SettingsFragment : Fragment() {
                     downloadJob.cancel()
                     if (!isFinished) {
                         preferences.edit().putBoolean("hint_db_incomplete", false).apply()
-                        if (checkDBUpdateJob.isActive) {
-                            checkDBUpdateJob.cancel()
-                        }
                         if (checkDBUpdateJob.isActive) {
                             checkDBUpdateJob.cancel()
                         }

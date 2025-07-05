@@ -35,6 +35,7 @@
     <string name="play_backward">Backward</string>
     <string name="play_forward">Forward</string>
     <string name="play_network_status">Connect status</string>
+    <string name="play_asr">ASR</string>
 
     <!-- Settings Fragment -->
     <string name="set_conn_hdr">Connection</string>

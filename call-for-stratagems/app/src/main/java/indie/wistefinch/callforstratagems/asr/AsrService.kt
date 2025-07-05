@@ -145,6 +145,7 @@ object AsrService {
             model = SherpaNcnn(
                 config = config
             )
+            Log.i("[ASR Service]", "Model loaded")
         } catch (e: Exception) {
             Log.e("[ASR Service]", "Failed to initialize model: $e")
             activity.runOnUiThread {
@@ -170,6 +171,10 @@ object AsrService {
         onStopped = {}
         onError = {}
         onReady = {}
+        Log.i(
+            "[ASR Service]",
+            "Model destroyed"
+        )
     }
 
     /**
@@ -239,10 +244,10 @@ object AsrService {
      */
     fun stopRecord() {
         isRecording = false
-        audioRecord!!.stop()
-        audioRecord!!.release()
+        audioRecord?.stop()
+        audioRecord?.release()
         audioRecord = null
-        Log.i("[ASR Service]", "Record Stopped")
+        Log.i("[ASR Service]", "Record stopped")
     }
 
     /**

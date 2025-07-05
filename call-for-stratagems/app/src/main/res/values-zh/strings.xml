@@ -33,6 +33,7 @@
     <string name="play_backward">左</string>
     <string name="play_forward">右</string>
     <string name="play_network_status">连接状态</string>
+    <string name="play_asr">语音识别</string>
 
     <!-- Settings Fragment -->
     <string name="set_conn_hdr">连接</string>
