@@ -2,6 +2,7 @@ package indie.wistefinch.callforstratagems
 
 object Constants {
     const val API_VERSION: Int = 6
+    const val BACKUP_FILE_VERSION: Int = 1
 
     const val PATH_DB_ICONS: String = "/icons/"
     const val PATH_ASR_MODELS: String = "/models/"

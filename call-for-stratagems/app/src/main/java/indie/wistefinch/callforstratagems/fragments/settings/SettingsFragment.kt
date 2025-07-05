@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -34,13 +35,18 @@ import indie.wistefinch.callforstratagems.CFSApplication
 import indie.wistefinch.callforstratagems.Constants
 import indie.wistefinch.callforstratagems.Constants.PATH_DB_ICONS
 import indie.wistefinch.callforstratagems.R
-import indie.wistefinch.callforstratagems.data.AppSettingsConnData
-import indie.wistefinch.callforstratagems.data.AppSettingsCtrlData
-import indie.wistefinch.callforstratagems.data.AppSettingsDBData
-import indie.wistefinch.callforstratagems.data.AppSettingsData
+import indie.wistefinch.callforstratagems.data.BackupAsrKeywordData
+import indie.wistefinch.callforstratagems.data.BackupSettingsAsrData
+import indie.wistefinch.callforstratagems.data.BackupSettingsConnData
+import indie.wistefinch.callforstratagems.data.BackupSettingsCtrlData
+import indie.wistefinch.callforstratagems.data.BackupSettingsDBData
+import indie.wistefinch.callforstratagems.data.BackupSettingsData
 import indie.wistefinch.callforstratagems.data.BackupFileData
 import indie.wistefinch.callforstratagems.data.BackupFileDataUtils
+import indie.wistefinch.callforstratagems.data.models.AsrKeywordData
 import indie.wistefinch.callforstratagems.data.models.StratagemData
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
+import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModel
 import indie.wistefinch.callforstratagems.data.viewmodel.GroupViewModelFactory
 import indie.wistefinch.callforstratagems.data.viewmodel.StratagemViewModel
@@ -186,12 +192,12 @@ class SettingsFragment : Fragment() {
                         ),
                         debug = preferences.getBoolean("sync_debug", true),
                     )
-                    val conn = AppSettingsConnData(
+                    val conn = BackupSettingsConnData(
                         preferences.getString("conn_addr", "127.0.0.1")!!,
                         preferences.getInt("conn_port", 23333),
                         preferences.getInt("conn_retry", 5)
                     )
-                    val ctrl = AppSettingsCtrlData(
+                    val ctrl = BackupSettingsCtrlData(
                         preferences.getBoolean("ctrl_simplified", false),
                         preferences.getInt("ctrl_stratagem_size", 100),
                         preferences.getBoolean("ctrl_fastboot", false),
@@ -210,18 +216,37 @@ class SettingsFragment : Fragment() {
                             "auto"
                         )!!
                     )
-                    val db = AppSettingsDBData(
+                    val asr = BackupSettingsAsrData(
+                        preferences.getInt("ctrl_asr_model", -1),
+                        preferences.getString("ctrl_asr_custom", "")!!,
+                        preferences.getBoolean("ctrl_asr_enabled", false),
+                        preferences.getInt("ctrl_asr_similarity", 50),
+                        preferences.getBoolean("ctrl_asr_gpu", true),
+                        Utils.getPreferenceList(preferences, "ctrl_asr_activate"),
+                        preferences.getBoolean("ctrl_asr_auto_keywords", true)
+                    )
+                    val db = BackupSettingsDBData(
                         preferences.getInt("db_channel", 0),
                         preferences.getString("db_custom", "")!!
                     )
-                    val settings = AppSettingsData(conn, ctrl, db)
+                    val settings = BackupSettingsData(conn, ctrl, asr, db)
+                    val keywordData = asrKeywordViewModel.getAllItems()
+                    val keywordList: MutableList<BackupAsrKeywordData> = emptyList<BackupAsrKeywordData>().toMutableList()
+                    for (k in keywordData) {
+                        keywordList.add(BackupAsrKeywordData(
+                            k.dbName,
+                            k.stratagem,
+                            Utils.convertJsonListToStringList(k.keywords)
+                        ))
+                    }
                     try {
                         val json = Gson().toJson(
                             BackupFileData(
-                                Constants.API_VERSION,
+                                Constants.BACKUP_FILE_VERSION,
                                 sync,
                                 settings,
-                                groupViewModel.allItemsSync
+                                groupViewModel.allItemsSync,
+                                keywordList,
                             )
                         )
                         val cr = requireContext().contentResolver
@@ -292,14 +317,16 @@ class SettingsFragment : Fragment() {
                             val sync = data.sync
                             val set = data.settings
                             val groups = data.groups
+                            val keywords = data.keywords
                             val server = sync.server
                             val input = sync.input
                             val auth = sync.auth
                             val ctrl = set.ctrl
                             val conn = set.conn
+                            val asr = set.asr
                             val db = set.db
 
-                            with(preferences.edit()) {
+                            preferences.edit(commit = true) {
                                 putInt("sync_server_port", server.port)
                                 putString("sync_server_ip", server.ip)
                                 putInt("sync_input_delay", input.delay)
@@ -322,14 +349,51 @@ class SettingsFragment : Fragment() {
                                 putInt("ctrl_sdt", ctrl.sdt)
                                 putInt("ctrl_svt", ctrl.svt)
                                 putString("ctrl_lang", ctrl.lang)
+                                putInt("ctrl_asr_model", asr.model)
+                                putString("ctrl_asr_custom", asr.custom)
+                                putBoolean("ctrl_asr_enabled", asr.enabled)
+                                putInt("ctrl_asr_similarity", asr.similarity)
+                                putBoolean("ctrl_asr_gpu", asr.gpu)
+                                putBoolean("ctrl_asr_auto_keywords", asr.autoKeywords)
                                 putInt("db_channel", db.channel)
                                 putString("db_custom", db.custom)
-                                apply()
                             }
+                            Utils.setPreferenceList(preferences, "ctrl_asr_activate", asr.activate)
 
                             // Restore group database
                             for (g in groups) {
                                 groupViewModel.addItem(g.title, g.list, g.dbName)
+                            }
+
+                            // Restore keyword database
+                            for (k in keywords) {
+                                val res = emptySet<String>().toMutableSet()
+                                for (s in k.keywords) {
+                                    res.add(s)
+                                }
+                                if (asrKeywordViewModel.isIdValid(k.stratagem, k.dbName)) {
+                                    val oldData = asrKeywordViewModel.retrieveItem(k.stratagem, dbName)
+                                    val oldList = Utils.convertJsonListToStringList(oldData.keywords)
+                                    for (s in oldList) {
+                                        res.add(s)
+                                    }
+                                    asrKeywordViewModel.updateItem(
+                                        AsrKeywordData(
+                                            id = oldData.id,
+                                            dbName = oldData.dbName,
+                                            stratagem = oldData.stratagem,
+                                            keywords = Gson().toJson(res.toList()).toString()
+                                        )
+                                    )
+                                } else {
+                                    asrKeywordViewModel.insertItem(
+                                        AsrKeywordData(
+                                            dbName = k.dbName,
+                                            stratagem = k.stratagem,
+                                            keywords = Gson().toJson(res.toList()).toString()
+                                        )
+                                    )
+                                }
                             }
 
                             // Refresh content
@@ -337,7 +401,7 @@ class SettingsFragment : Fragment() {
 
                             Toast.makeText(
                                 requireContext(),
-                                getString(R.string.set_info_export_success),
+                                getString(R.string.set_info_import_success),
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -360,7 +424,7 @@ class SettingsFragment : Fragment() {
                 RESULT_CANCELED -> {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.set_info_export_cancel),
+                        getString(R.string.set_info_import_cancel),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -368,7 +432,7 @@ class SettingsFragment : Fragment() {
                 else -> {
                     Toast.makeText(
                         requireContext(),
-                        String.format(getString(R.string.set_info_export_failed), "NULL"),
+                        String.format(getString(R.string.set_info_import_failed), "NULL"),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -390,6 +454,15 @@ class SettingsFragment : Fragment() {
     private val groupViewModel: GroupViewModel by activityViewModels {
         GroupViewModelFactory(
             (requireActivity().application as CFSApplication).groupDb.groupDao()
+        )
+    }
+
+    /**
+     * The Asr keyword view model.
+     */
+    private val asrKeywordViewModel: AsrKeywordViewModel by activityViewModels {
+        AsrKeywordViewModelFactory(
+            (activity?.application as CFSApplication).asrKeywordDb.asrKeywordDao()
         )
     }
 
@@ -569,7 +642,8 @@ class SettingsFragment : Fragment() {
         binding.setInfoApp.setHint(
             String.format(
                 getString(R.string.set_info_app_ver),
-                pkgInfo.versionName
+                pkgInfo.versionName,
+                Constants.API_VERSION
             )
         )
     }
@@ -1044,7 +1118,8 @@ class SettingsFragment : Fragment() {
 
             aboutView.findViewById<TextView>(R.id.dlg_info_title).text = String.format(
                 resources.getString(R.string.dlg_about_title),
-                curVer
+                curVer,
+                Constants.API_VERSION
             )
             aboutView.findViewById<ImageView>(R.id.dlg_info_icon)
                 .setImageResource(R.drawable.ic_launcher_foreground)
@@ -1109,6 +1184,7 @@ class SettingsFragment : Fragment() {
                             String.format(
                                 resources.getString(R.string.set_info_app_ver_diff),
                                 pkgInfo.versionName,
+                                Constants.API_VERSION,
                                 newVer
                             )
                         )
@@ -1121,12 +1197,14 @@ class SettingsFragment : Fragment() {
                         binding.setInfoApp.setHint(
                             String.format(
                                 resources.getString(R.string.set_info_app_latest),
-                                pkgInfo.versionName
+                                pkgInfo.versionName,
+                                Constants.API_VERSION
                             )
                         )
                         title = String.format(
                             resources.getString(R.string.dlg_app_ver_log_latest),
-                            curVer
+                            curVer,
+                            Constants.API_VERSION
                         )
                     }
                     // Open version log.

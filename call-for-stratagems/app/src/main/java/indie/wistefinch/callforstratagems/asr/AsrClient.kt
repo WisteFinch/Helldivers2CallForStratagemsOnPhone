@@ -22,6 +22,7 @@ class AsrClient(
     private val activateWords: List<String>,
     private val similarityThreshold: Float,
     useGPU: Boolean,
+    useAutoKeywords: Boolean,
     private val onProcess: (txt: String) -> Unit = {},
     private val onEndPoint: (txt: String) -> Unit = {},
     private val onStarted: () -> Unit = {},
@@ -73,16 +74,18 @@ class AsrClient(
         // Generate stratagems keywords
         keywords = emptyList<Pair<Int, String>>().toMutableList()
         for (s in stratagems) {
-            keywords.add(
-                Pair(
-                    s.id, strFilter(
-                        when (lang) {
-                            "zh-CN" -> s.nameZh
-                            else -> s.name
-                        }
+            if (useAutoKeywords) {
+                keywords.add(
+                    Pair(
+                        s.id, strFilter(
+                            when (lang) {
+                                "zh-CN" -> s.nameZh
+                                else -> s.name
+                            }
+                        )
                     )
                 )
-            )
+            }
             if (keywordsViewModel.isIdValid(s.id, dbName)) {
                 var l: MutableList<String> = emptyList<String>().toMutableList()
                 l = Gson().fromJson(

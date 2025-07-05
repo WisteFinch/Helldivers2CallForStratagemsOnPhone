@@ -78,8 +78,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_alert"
-                    />
+                    android:src="@drawable/ic_alert" />
 
                 <Space
                     android:layout_width="5dp"
@@ -115,8 +114,8 @@
                 android:id="@+id/set_ctrl_asr_models"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:text="@string/set_ctrl_asr_models"
-                app:hint="@string/default_string"/>
+                app:hint="@string/default_string"
+                app:text="@string/set_ctrl_asr_models" />
 
             <Space
                 android:layout_width="match_parent"
@@ -278,26 +277,78 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="5dp"
+                android:visibility="gone"
                 tools:ignore="TooManyViews" />
 
             <indie.wistefinch.callforstratagems.utils.AppButton
                 android:id="@+id/set_ctrl_asr_activate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:text="@string/set_ctrl_asr_activate"
-                app:hint="@string/set_ctrl_asr_activate_desc"/>
+                android:visibility="gone"
+                app:hint="@string/set_ctrl_asr_activate_desc"
+                app:text="@string/set_ctrl_asr_activate" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="5dp"
+                android:visibility="gone"
                 tools:ignore="TooManyViews" />
 
             <indie.wistefinch.callforstratagems.utils.AppButton
                 android:id="@+id/set_ctrl_asr_keywords"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:text="@string/set_ctrl_asr_keywords"
-                app:hint="@string/set_ctrl_asr_keywords_desc"/>
+                android:visibility="gone"
+                app:hint="@string/set_ctrl_asr_keywords_desc"
+                app:text="@string/set_ctrl_asr_keywords" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                tools:ignore="TooManyViews" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/backgroundPrimary"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_ctrl_asr_auto_keywords"
+                        android:theme="@style/AppText" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_ctrl_asr_auto_keywords_desc"
+                        android:theme="@style/AppTextHint" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    tools:ignore="TooManyViews" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/set_ctrl_asr_auto_keywords"
+                    android:layout_width="75dp"
+                    android:layout_height="35dp"
+                    app:trackTint="@color/switch_color"
+                    tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
+
+            </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"
@@ -308,8 +359,8 @@
                 android:id="@+id/set_ctrl_asr_test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:text="@string/set_ctrl_asr_test"
-                app:hint="@string/default_string"/>
+                app:hint="@string/default_string"
+                app:text="@string/set_ctrl_asr_test" />
 
         </LinearLayout>
 

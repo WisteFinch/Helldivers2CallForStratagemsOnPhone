@@ -473,6 +473,7 @@ class PlayFragment : Fragment() {
                     similarityThreshold = preferences.getInt("ctrl_asr_similarity", 50)
                         .toFloat() / 100,
                     useGPU = preferences.getBoolean("ctrl_asr_gpu", true),
+                    useAutoKeywords = preferences.getBoolean("ctrl_asr_auto_keywords", true),
                     stratagems = stratagems,
                     onError = { e ->
                         binding.playAsrInfo.setText(

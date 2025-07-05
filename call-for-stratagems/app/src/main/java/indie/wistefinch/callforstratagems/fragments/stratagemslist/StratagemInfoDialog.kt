@@ -17,6 +17,7 @@ import indie.wistefinch.callforstratagems.data.models.StratagemData
 import indie.wistefinch.callforstratagems.data.viewmodel.AsrKeywordViewModel
 import indie.wistefinch.callforstratagems.utils.AppButton
 import indie.wistefinch.callforstratagems.utils.EditListDialog
+import indie.wistefinch.callforstratagems.utils.Utils
 import java.io.File
 
 class StratagemInfoDialog(
@@ -76,16 +77,16 @@ class StratagemInfoDialog(
             val valid = asrKeywordViewModel.isIdValid(data.id, dbName)
             if (valid) {
                 val str = asrKeywordViewModel.retrieveItem(data.id, dbName).keywords
-                list = Gson().fromJson(str, list.javaClass)
+                list = Utils.convertJsonListToStringList(str).toMutableList()
             }
             val dialog = EditListDialog(
                 context,
                 activity,
-                list,
+                Utils.stringListDuplication(list),
                 displayName
             )
             dialog.onEditFinished { d ->
-                val res: MutableList<String> = emptyList<String>().toMutableList()
+                val res: MutableSet<String> = emptySet<String>().toMutableSet()
                 for (i in d) {
                     if (i.isNotBlank()) {
                         res.add(i)
@@ -93,14 +94,14 @@ class StratagemInfoDialog(
                 }
                 if (valid) {
                     val newData = asrKeywordViewModel.retrieveItem(data.id, dbName)
-                    newData.keywords = Gson().toJson(res).toString()
+                    newData.keywords = Gson().toJson(res.toList()).toString()
                     asrKeywordViewModel.updateItem(newData)
                 } else {
                     asrKeywordViewModel.insertItem(
                         AsrKeywordData(
                             dbName = dbName,
                             stratagem = data.id,
-                            keywords = Gson().toJson(res).toString()
+                            keywords = Gson().toJson(res.toList()).toString()
                         )
                     )
                 }

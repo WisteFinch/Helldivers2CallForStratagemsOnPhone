@@ -114,6 +114,7 @@ class SettingsAsrFragment : Fragment() {
             ).toString()
         )
         binding.setCtrlAsrGpu.isChecked = preferences.getBoolean("ctrl_asr_gpu", true)
+        binding.setCtrlAsrAutoKeywords.isChecked = preferences.getBoolean("ctrl_asr_auto_keywords", true)
     }
 
 
@@ -149,6 +150,12 @@ class SettingsAsrFragment : Fragment() {
         binding.setCtrlAsrGpu.setOnCheckedChangeListener { _, isChecked ->
             with(preferences.edit()) {
                 putBoolean("ctrl_asr_gpu", isChecked)
+                apply()
+            }
+        }
+        binding.setCtrlAsrAutoKeywords.setOnCheckedChangeListener { _, isChecked ->
+            with(preferences.edit()) {
+                putBoolean("ctrl_asr_auto_keywords", isChecked)
                 apply()
             }
         }
@@ -511,6 +518,7 @@ class SettingsAsrFragment : Fragment() {
                 lang = lang,
                 similarityThreshold = preferences.getInt("ctrl_asr_similarity", 50).toFloat() / 100,
                 useGPU = preferences.getBoolean("ctrl_asr_gpu", true),
+                useAutoKeywords = preferences.getBoolean("ctrl_asr_auto_keywords", true),
                 stratagems = stratagemViewModel.getAllItems(),
                 onError = { e ->
                     textView.setText(

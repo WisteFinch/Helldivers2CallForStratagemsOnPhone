@@ -115,6 +115,8 @@
     <string name="set_ctrl_asr_activate_desc">Upon recognizing the specified word, activate the speech recognition function</string>
     <string name="set_ctrl_asr_keywords">Configure Recognition Keywords</string>
     <string name="set_ctrl_asr_keywords_desc">Assign recognition words for each stratagem</string>
+    <string name="set_ctrl_asr_auto_keywords">Enable Automatic Keywords Generation</string>
+    <string name="set_ctrl_asr_auto_keywords_desc">Automatically generate keywords based on stratagems\' names</string>
     <string name="set_ctrl_asr_test">Recognition Test</string>
     <string name="set_info_hdr">Info</string>
     <string name="set_info_db">Database Version</string>
@@ -136,9 +138,9 @@
     <string name="set_info_app">App Version</string>
     <string name="set_info_app_chk">App Version (Checking)</string>
     <string name="set_info_app_updatable">App Version (Updatable)</string>
-    <string name="set_info_app_ver">%1$s</string>
-    <string name="set_info_app_latest">%1$s (latest)</string>
-    <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
+    <string name="set_info_app_ver">%1$s[API%2$d]</string>
+    <string name="set_info_app_latest">%1$s[API%2$d] (latest)</string>
+    <string name="set_info_app_ver_diff">%1$s[API%2$d] ➡ %3$s</string>
     <string name="set_info_export">Backup User Data</string>
     <string name="set_info_export_success">Export Successful</string>
     <string name="set_info_export_failed">Export Failed: %1$s</string>
@@ -202,7 +204,7 @@
 
     <!-- App Version Log Dialog -->
     <string name="dlg_app_ver_log_updatable">New Version: v%1$s</string>
-    <string name="dlg_app_ver_log_latest">Current Version: v%1$s</string>
+    <string name="dlg_app_ver_log_latest">Current Version: v%1$s[API%2$d]</string>
 
     <!-- Welcome Dialog -->
     <string name="dlg_welcome_title">Welcome to v%1$s</string>
@@ -222,7 +224,7 @@
     <string name="dlg_delete_desc">Confirm to delete \"%1$s\"?</string>
 
     <!-- About Dialog -->
-    <string name="dlg_about_title">CallForStratagems v%1$s</string>
+    <string name="dlg_about_title">CallForStratagems v%1$s[API%2$d]</string>
     <string name="dlg_about_desc">Tie your phone to your arm so that you can call for stratagems like a real helldiver!\n\nProduced by:\n\tFloatingLight233\n\tWisteFinch\n\nLicensed under MIT\n\nLibs used:\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314\n\tsherpa-ncnn - k2-fsa</string>
     <string name="dlg_about_usage">Usage</string>
     <string name="dlg_about_license">License</string>

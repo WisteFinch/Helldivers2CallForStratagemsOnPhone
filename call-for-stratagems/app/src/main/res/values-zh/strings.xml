@@ -113,6 +113,8 @@
     <string name="set_ctrl_asr_activate_desc">识别到特定语句后，激活语音识别功能</string>
     <string name="set_ctrl_asr_keywords">配置识别关键词</string>
     <string name="set_ctrl_asr_keywords_desc">为每个战备指定识别语句</string>
+    <string name="set_ctrl_asr_auto_keywords">启用自动生成关键词</string>
+    <string name="set_ctrl_asr_auto_keywords_desc">根据战备名称自动生成关键词</string>
     <string name="set_ctrl_asr_test">识别测试</string>
     <string name="set_info_hdr">信息</string>
     <string name="set_info_db">数据库版本</string>
@@ -134,9 +136,9 @@
     <string name="set_info_app">软件版本</string>
     <string name="set_info_app_chk">软件版本（检查更新）</string>
     <string name="set_info_app_updatable">软件版本（可更新）</string>
-    <string name="set_info_app_ver">%1$s</string>
-    <string name="set_info_app_latest">%1$s (最新)</string>
-    <string name="set_info_app_ver_diff">%1$s ➡ %2$s</string>
+    <string name="set_info_app_ver">%1$s[API%2$d]</string>
+    <string name="set_info_app_latest">%1$s[API%2$d] (最新)</string>
+    <string name="set_info_app_ver_diff">%1$s[API%2$d] ➡ %3$s</string>
     <string name="set_info_export">备份用户数据</string>
     <string name="set_info_export_success">导出成功</string>
     <string name="set_info_export_failed">导出失败：%1$s</string>
@@ -199,7 +201,7 @@
 
     <!-- App Version Log Dialog -->
     <string name="dlg_app_ver_log_updatable">新版本：v%1$s</string>
-    <string name="dlg_app_ver_log_latest">当前版本：v%1$s</string>
+    <string name="dlg_app_ver_log_latest">当前版本：v%1$s[API%2$d]</string>
 
     <!-- Welcome Dialog -->
     <string name="dlg_welcome_title">欢迎使用 v%1$s</string>
@@ -219,7 +221,7 @@
     <string name="dlg_delete_desc">确认要删除“%1$s”吗？</string>
 
     <!-- About Dialog -->
-    <string name="dlg_about_title">呼叫战略配备 v%1$s</string>
+    <string name="dlg_about_title">呼叫战略配备 v%1$s[API%2$d]</string>
     <string name="dlg_about_desc">把手机绑在手臂上，通过手机呼叫战略配备，做真正的绝地潜兵！\n\n作者：\n\tFloatingLight233\n\tWisteFinch\n\n在MIT许可证下发布\n\n使用的库：\n\tAndroidSVG - BigBadaboom\n\tZXing-Lite - jenly1314\n\tsherpa-ncnn - k2-fsa</string>
     <string name="dlg_about_usage">用法</string>
     <string name="dlg_about_license">许可证</string>

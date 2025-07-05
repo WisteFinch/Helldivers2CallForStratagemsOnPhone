@@ -3,6 +3,7 @@ package indie.wistefinch.callforstratagems.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.google.gson.Gson
 import java.net.URL
 import java.util.Random
 
@@ -82,12 +83,29 @@ class Utils {
          */
         @JvmStatic
         fun setPreferenceList(p: SharedPreferences, key: String, list: List<String>) {
-            p.edit {
+            p.edit(commit = true) {
                 putInt("${key}_count", list.count())
                 for (i in 1..list.count()) {
                     putString("${key}_${i}", list[i - 1])
                 }
             }
+        }
+
+        /**
+         * Convert json list to string list
+         */
+        @JvmStatic
+        fun convertJsonListToStringList(str: String): List<String> {
+            val list: MutableList<String> = emptyList<String>().toMutableList()
+            return Gson().fromJson(str, list.javaClass)
+        }
+
+        /**
+         * String list duplication
+         */
+        @JvmStatic
+        fun stringListDuplication(list: List<String>): List<String> {
+            return list.toSet().toList()
         }
     }
 }
