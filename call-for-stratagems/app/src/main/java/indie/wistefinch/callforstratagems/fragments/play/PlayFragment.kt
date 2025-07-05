@@ -485,6 +485,8 @@ class PlayFragment : Fragment() {
                         )
                         binding.playAsr.isClickable = false
                         binding.playAsrFAB.isClickable = false
+                        binding.playAsr.setImageResource(R.drawable.ic_mic_off)
+                        binding.playAsrFAB.setImageResource(R.drawable.ic_mic_off)
                     },
                     onProcess = { txt ->
                         if (txt.isNotBlank()) {

@@ -49,10 +49,6 @@ class SettingsAsrFragment : Fragment() {
     private var _binding: FragmentSettingsAsrBinding? = null
     private val binding get() = _binding!!
 
-    // Dialogs
-    private lateinit var modelDialog: AlertDialog
-    private lateinit var modelView: View
-
     // Preference.
     private lateinit var preferences: SharedPreferences
 
@@ -88,11 +84,6 @@ class SettingsAsrFragment : Fragment() {
         }
 
         preferences = requireContext().let { PreferenceManager.getDefaultSharedPreferences(it) }
-
-        // Setup dialogs
-        modelDialog = AlertDialog.Builder(requireContext()).create()
-        modelView = View.inflate(requireContext(), R.layout.dialog_asr_models, null)
-        modelDialog.setView(modelView)
 
         setupContent()
         setupEventListener()
@@ -162,9 +153,9 @@ class SettingsAsrFragment : Fragment() {
 
         // Show select model dialog.
         binding.setCtrlAsrModels.setOnClickListener {
-            if (modelDialog.isShowing) {
-                return@setOnClickListener
-            }
+            val modelDialog = AlertDialog.Builder(requireContext()).create()
+            val modelView = View.inflate(requireContext(), R.layout.dialog_asr_models, null)
+            modelDialog.setView(modelView)
             modelDialog.show()
 
             val clearDialog = AlertDialog.Builder(requireContext()).create()
@@ -226,22 +217,22 @@ class SettingsAsrFragment : Fragment() {
                         ).show()
 
                         checkAsrModelStatus()
-                        clearDialog.hide()
+                        clearDialog.dismiss()
                     }
                     clearView.findViewById<AppButton>(R.id.dlg_info_button2).setOnClickListener {
-                        clearDialog.hide()
+                        clearDialog.dismiss()
                     }
                 }
             }
 
             // Cancel.
             cancel.setOnClickListener {
-                modelDialog.hide()
+                modelDialog.dismiss()
             }
 
             // Select model
             confirm.setOnClickListener Confirm@{
-                modelDialog.hide()
+                modelDialog.dismiss()
 
                 // Get index url.
                 var rawUrl = when (model) {
@@ -285,7 +276,7 @@ class SettingsAsrFragment : Fragment() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         buttonView.setTitle(getString(R.string.dlg_comm_confirm))
                         buttonView.setOnClickListener {
-                            downloadDialog.hide()
+                            downloadDialog.dismiss()
                         }
                         indexView.visibility = GONE
                         filesView.visibility = GONE
@@ -381,7 +372,7 @@ class SettingsAsrFragment : Fragment() {
                                 preferences.edit().putString("asr_model_name_zh", nameZh).apply()
                                 buttonView.setTitle(getString(R.string.dlg_comm_confirm))
                                 buttonView.setOnClickListener {
-                                    downloadDialog.hide()
+                                    downloadDialog.dismiss()
                                 }
                                 filesView.visibility = GONE
                                 infoView.visibility = VISIBLE
@@ -420,7 +411,7 @@ class SettingsAsrFragment : Fragment() {
                             Log.e("[Settings ASR] Download Model", e.toString())
                             buttonView.setTitle(getString(R.string.dlg_comm_confirm))
                             buttonView.setOnClickListener {
-                                downloadDialog.hide()
+                                downloadDialog.dismiss()
                             }
                             indexView.visibility = GONE
                             filesView.visibility = GONE
@@ -440,7 +431,7 @@ class SettingsAsrFragment : Fragment() {
                         lifecycleScope.launch(Dispatchers.Main) {
                             buttonView.setTitle(getString(R.string.dlg_comm_confirm))
                             buttonView.setOnClickListener {
-                                downloadDialog.hide()
+                                downloadDialog.dismiss()
                             }
                             indexView.visibility = GONE
                             filesView.visibility = GONE
@@ -454,8 +445,8 @@ class SettingsAsrFragment : Fragment() {
                 }
 
                 buttonView.setOnClickListener {
-                    downloadDialog.hide()
                     downloadJob.cancel()
+                    downloadDialog.dismiss()
                 }
 
                 downloadDialog.setOnCancelListener {
