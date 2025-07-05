@@ -2,7 +2,7 @@
 name = "server"
 version = "0.6.0"
 edition = "2021"
-authors = ["WisteFinch", "FloatingLight233", "djkcyl"]
+authors = ["WisteFinch", "FloatingLight233", "Zxilly", "eigeen", "djkcyl"]
 license = "MIT"
 repository = "https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone"
 

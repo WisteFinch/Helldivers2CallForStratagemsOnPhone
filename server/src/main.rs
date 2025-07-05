@@ -1,15 +1,15 @@
 use server::modules::net::run;
 use clap::Parser;
 
-/// 地狱潜者2 - 战略配备呼叫服务器
+/// Call for stratagem server
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// 启用调试模式
+    /// Enable debug mode
     #[arg(long)]
     debug: bool,
     
-    /// 禁用SID验证
+    /// Disable authentication
     #[arg(long = "disable-auth")]
     disable_auth: bool,
 }
