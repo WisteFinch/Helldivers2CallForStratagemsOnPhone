@@ -2,14 +2,16 @@ package com.k2fsa.sherpa.ncnn
 
 import android.content.Context
 import android.content.res.AssetManager
+import androidx.annotation.Keep
 import indie.wistefinch.callforstratagems.Constants
 
+@Keep
 data class FeatureExtractorConfig(
     var sampleRate: Float,
     var featureDim: Int,
 )
 
-
+@Keep
 data class ModelConfig(
     var encoderParam: String,
     var encoderBin: String,
@@ -22,11 +24,13 @@ data class ModelConfig(
     var useGPU: Boolean = true, // If there is a GPU and useGPU true, we will use GPU
 )
 
+@Keep
 data class DecoderConfig(
     var method: String = "modified_beam_search", // valid values: greedy_search, modified_beam_search
     var numActivePaths: Int = 4, // used only by modified_beam_search
 )
 
+@Keep
 data class RecognizerConfig(
     var featConfig: FeatureExtractorConfig,
     var modelConfig: ModelConfig,
@@ -39,6 +43,7 @@ data class RecognizerConfig(
     var hotwordsScore: Float = 1.5f,
 )
 
+@Keep
 class SherpaNcnn(
     var config: RecognizerConfig,
     assetManager: AssetManager? = null,
@@ -96,6 +101,7 @@ class SherpaNcnn(
     }
 }
 
+@Keep
 fun getFeatureExtractorConfig(
     sampleRate: Float,
     featureDim: Int
@@ -106,10 +112,12 @@ fun getFeatureExtractorConfig(
     )
 }
 
+@Keep
 fun getDecoderConfig(method: String, numActivePaths: Int): DecoderConfig {
     return DecoderConfig(method = method, numActivePaths = numActivePaths)
 }
 
+@Keep
 fun getModelConfig(model: String, useGPU: Boolean, context: Context? = null): ModelConfig {
     return if (context == null) {
         val modelDir = "models/$model"

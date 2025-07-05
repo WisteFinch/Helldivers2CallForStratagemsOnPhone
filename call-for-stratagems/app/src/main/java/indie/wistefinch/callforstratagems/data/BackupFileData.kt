@@ -1,11 +1,7 @@
 package indie.wistefinch.callforstratagems.data
 
-import android.os.Parcelable
 import androidx.annotation.Keep
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import indie.wistefinch.callforstratagems.data.models.AsrKeywordData
 import indie.wistefinch.callforstratagems.data.models.GroupData
 import indie.wistefinch.callforstratagems.network.SyncConfigData
 
