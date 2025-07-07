@@ -26,7 +26,7 @@
 - 服务器: 
   - Windows x64 或 Linux （需手动编译）
 - 客户端: 
-  - Android 8.0 (SDK26)
+  - Android: ≥8.0 (SDK26)
   - ABIs: arm64-v8a
 
 ## 构建与运行
@@ -48,7 +48,7 @@ cargo run
 - `-V`, `--version`：显示版本信息
 
 ``` shell
-cargo run -- --disable-auth  # 无需SID认证运行
+cargo run -- --disable-auth  # 关闭认证
 cargo run -- --debug  # 使用调试模式运行
 cargo run -- --debug --disable-auth  # 同时启用调试模式和禁用SID认证
 cargo run -- --help  # 显示帮助信息

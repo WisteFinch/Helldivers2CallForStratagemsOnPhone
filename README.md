@@ -26,7 +26,7 @@ You can check the usage [here](./usage.md)
 - Server: 
   - Windows x64 or Linux (manual compilation required)
 - Client: 
-  - Android 8.0 (SDK26)
+  - Android: ≥8.0 (SDK26)
   - ABIs: arm64-v8a
 
 ## Build & Run
