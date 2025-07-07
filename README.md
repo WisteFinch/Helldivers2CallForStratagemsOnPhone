@@ -67,7 +67,7 @@ You can check the server API [here](./server_api_6.md)
 - Helldivers2 Stratagem Database [HD2CFS-Database](https://github.com/WisteFinch/HD2CFS-Database)
 - Helldivers Stratagem Database [HD2CFS-Database_HD](https://github.com/WisteFinch/HD2CFS-Database_HD)
 
-### Libs used
+## Libs used
 
 - [BigBadaboom/androidsvg](https://github.com/BigBadaboom/androidsvg) SVG rendering library for Android
 - [jenly1314/ZXingLite](https://github.com/jenly1314/ZXingLite) 🔥 Streamlined and fast version of ZXing, optimizes scanning and generating QR codes/barcodes

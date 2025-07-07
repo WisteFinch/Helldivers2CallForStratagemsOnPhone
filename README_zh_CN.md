@@ -67,7 +67,7 @@ cargo run -- --help  # 显示帮助信息
 - 绝地潜兵2战备数据库 [HD2CFS-Database](https://github.com/WisteFinch/Helldivers2CallForStratagemsOnPhone)
 - 绝地潜兵战备数据库 [HD2CFS-Database_HD](https://github.com/WisteFinch/HD2CFS-Database_HD)
 
-### 使用的开源库
+## 使用的开源库
 
 - [BigBadaboom/androidsvg](https://github.com/BigBadaboom/androidsvg) 安卓的SVG渲染库
 - [jenly1314/ZXingLite](https://github.com/jenly1314/ZXingLite) 🔥 ZXing的精简极速版，优化扫码和生成二维码/条形码
