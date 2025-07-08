@@ -78,9 +78,11 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/play_info_bar_space"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:visibility="gone" />
 
 
         <TextView
@@ -92,7 +94,8 @@
             android:gravity="end"
             android:maxLines="1"
             android:text="@string/default_string"
-            android:textColor="@color/textSecondary" />
+            android:textColor="@color/textSecondary"
+            android:visibility="gone" />
 
     </LinearLayout>
 
