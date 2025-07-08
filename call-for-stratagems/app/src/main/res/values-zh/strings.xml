@@ -97,7 +97,7 @@
     <string name="set_ctrl_asr_model_dl_title">更新数据库</string>
     <string name="set_ctrl_asr_model_dl_title2">更新数据库：%1$s</string>
     <string name="set_ctrl_asr_model_dl_idx">获取数据库索引</string>
-    <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载图标文件</string>
+    <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载模型文件</string>
     <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_ctrl_asr_model_dl_complete">更新完成</string>
     <string name="set_ctrl_asr_model_dl_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
