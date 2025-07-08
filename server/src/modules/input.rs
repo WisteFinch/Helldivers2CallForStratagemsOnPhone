@@ -112,7 +112,9 @@ pub async fn execute(step: Step, t: InputType, conf: &AppConfig) -> Result<()> {
     match t {
         InputType::Click => {
             simulate_key_event(step.clone(), 0, conf);
-            print(step.clone());
+            if step != Step::Open {
+                print(step.clone());
+            }
             let _ = io::stdout().flush();
             sleep(Duration::from_millis(conf.input.delay)).await;
             simulate_key_event(step, 1, conf);

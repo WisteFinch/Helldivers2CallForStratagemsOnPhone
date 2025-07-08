@@ -41,6 +41,7 @@ object AppClient {
     /**
      * Client coroutine job.
      */
+    @Volatile
     private lateinit var clientJob: Job
 
     /**
@@ -71,6 +72,7 @@ object AppClient {
     /**
      * Whether the client is connected.
      */
+    @Volatile
     private var connected: Boolean = false
 
     /**
@@ -88,6 +90,7 @@ object AppClient {
      *
      * Lock during any network communication.
      */
+    @Volatile
     private var networkLock = Mutex()
 
     /**
@@ -95,6 +98,7 @@ object AppClient {
      *
      * Lock during the connect process.
      */
+    @Volatile
     private var connectingLock = Mutex()
 
     /**

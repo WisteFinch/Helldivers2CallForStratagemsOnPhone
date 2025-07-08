@@ -454,6 +454,8 @@ class PlayFragment : Fragment() {
                 binding.playAsr.visibility = VISIBLE
                 binding.playAsrStratagem.visibility = INVISIBLE
             }
+            binding.playInfoBarSpace.visibility = VISIBLE
+            binding.playAsrInfo.visibility = VISIBLE
             if (check) {
                 binding.playAsrInfo.setText(R.string.asr_model_loading)
                 if (enableSimplifiedMode) {

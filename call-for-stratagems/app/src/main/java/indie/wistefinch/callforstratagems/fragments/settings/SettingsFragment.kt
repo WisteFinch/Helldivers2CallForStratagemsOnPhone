@@ -190,7 +190,7 @@ class SettingsFragment : Fragment() {
                                 3
                             )
                         ),
-                        debug = preferences.getBoolean("sync_debug", true),
+                        debug = preferences.getBoolean("sync_debug", false),
                     )
                     val conn = BackupSettingsConnData(
                         preferences.getString("conn_addr", "127.0.0.1")!!,
@@ -331,6 +331,7 @@ class SettingsFragment : Fragment() {
                                 putString("sync_server_ip", server.ip)
                                 putInt("sync_input_delay", input.delay)
                                 putString("sync_input_open", input.open)
+                                putString("input_type_open", input.keytype)
                                 putString("sync_input_up", input.up)
                                 putString("sync_input_down", input.down)
                                 putString("sync_input_left", input.left)
@@ -1028,7 +1029,7 @@ class SettingsFragment : Fragment() {
                         3
                     )
                 ),
-                debug = preferences.getBoolean("sync_debug", true),
+                debug = preferences.getBoolean("sync_debug", false),
             )
             val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()

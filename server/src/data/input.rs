@@ -34,7 +34,7 @@ pub struct InputData {
     pub mouse_button: Button,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Step {
     Open = 0,
     Up = 1,
