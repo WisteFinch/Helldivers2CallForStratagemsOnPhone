@@ -1028,7 +1028,7 @@ class SettingsFragment : Fragment() {
                         3
                     )
                 ),
-                debug = preferences.getBoolean("sync_debug", true),
+                debug = preferences.getBoolean("sync_debug", false),
             )
             val addr = binding.setConnAddr.text.toString()
             val port: Int = binding.setConnPort.text.toString().toInt()
