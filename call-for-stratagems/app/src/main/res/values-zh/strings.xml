@@ -99,7 +99,7 @@
     <string name="set_ctrl_asr_model_incomplete">模型不完整：[%1$s]</string>
     <string name="set_ctrl_asr_model_dl_title">更新模型</string>
     <string name="set_ctrl_asr_model_dl_title2">更新模型：%1$s</string>
-    <string name="set_ctrl_asr_model_dl_idx">获取数据库索引</string>
+    <string name="set_ctrl_asr_model_dl_idx">获取模型索引</string>
     <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载模型文件</string>
     <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
     <string name="set_ctrl_asr_model_dl_complete">更新完成</string>
