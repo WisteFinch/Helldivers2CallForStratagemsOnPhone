@@ -1117,10 +1117,12 @@
                     app:text="@string/set_info_app" />
 
                 <Space
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:gravity="center"
