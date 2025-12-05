@@ -82,6 +82,8 @@
     <string name="set_ctrl_lang_stratagem">Language: Stratagem Name</string>
     <string name="set_ctrl_gst_swp_distance_threshold">Gesture Swipe Distance Threshold</string>
     <string name="set_ctrl_gst_swp_velocity_threshold">Gesture Swipe Velocity Threshold</string>
+    <string name="set_ctrl_orientation">Screen Orientation</string>
+    <string name="set_ctrl_simplified_orientation">Screen Orientation (Simplified Mode)</string>
     <string name="set_unit_pixel">pixel</string>
     <string name="set_unit_pixel_s">pixel/s</string>
     <string name="set_ctrl_fastboot_mode">Enable Fastboot Mode</string>

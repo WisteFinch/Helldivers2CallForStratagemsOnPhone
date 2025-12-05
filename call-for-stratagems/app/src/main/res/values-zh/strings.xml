@@ -80,6 +80,8 @@
     <string name="set_ctrl_lang_stratagem">语言：战略配备名称</string>
     <string name="set_ctrl_gst_swp_distance_threshold">手势距离阈值</string>
     <string name="set_ctrl_gst_swp_velocity_threshold">手势速度阈值</string>
+    <string name="set_ctrl_orientation">屏幕旋转方向</string>
+    <string name="set_ctrl_simplified_orientation">屏幕旋转方向（精简模式）</string>
     <string name="set_unit_pixel">像素</string>
     <string name="set_unit_pixel_s">像素/秒</string>
     <string name="set_ctrl_fastboot_mode">启用快速启动</string>

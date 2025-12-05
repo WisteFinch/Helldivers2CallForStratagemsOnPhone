@@ -94,6 +94,8 @@ class SettingsFragment : Fragment() {
     private lateinit var inputValues: Array<String>
     private lateinit var inputTypeValues: Array<String>
     private lateinit var langValues: Array<String>
+    private lateinit var orientationValues: Array<String>
+    private lateinit var simplifiedOrientationValues: Array<String>
 
     // Dialogs
     private lateinit var dbDialog: AlertDialog
@@ -488,6 +490,8 @@ class SettingsFragment : Fragment() {
         inputValues = resources.getStringArray(R.array.input_values)
         inputTypeValues = resources.getStringArray(R.array.input_type_values)
         langValues = resources.getStringArray(R.array.lang_values)
+        orientationValues = resources.getStringArray(R.array.orientation_values)
+        simplifiedOrientationValues = resources.getStringArray(R.array.simplified_orientation_values)
 
         // Setup dialogs
         dbDialog = AlertDialog.Builder(requireContext()).create()
@@ -617,6 +621,22 @@ class SettingsFragment : Fragment() {
             langValues.indexOf(
                 preferences.getString(
                     "ctrl_lang",
+                    "auto"
+                )
+            )
+        )
+        binding.setCtrlOrientation.setSelection(
+            orientationValues.indexOf(
+                preferences.getString(
+                    "ctrl_orientation",
+                    "landscape"
+                )
+            )
+        )
+        binding.setCtrlSimplifiedOrientation.setSelection(
+            simplifiedOrientationValues.indexOf(
+                preferences.getString(
+                    "ctrl_simplified_orientation",
                     "auto"
                 )
             )
@@ -878,6 +898,38 @@ class SettingsFragment : Fragment() {
                 ) {
                     with(preferences.edit()) {
                         putString("ctrl_lang", langValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setCtrlOrientation.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("ctrl_orientation", orientationValues[pos])
+                        apply()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        binding.setCtrlSimplifiedOrientation.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    pos: Int,
+                    id: Long
+                ) {
+                    with(preferences.edit()) {
+                        putString("ctrl_simplified_orientation", simplifiedOrientationValues[pos])
                         apply()
                     }
                 }
