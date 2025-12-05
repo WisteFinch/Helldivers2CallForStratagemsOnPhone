@@ -248,4 +248,34 @@
         <item>zh-CN</item>
     </string-array>
 
+    <string-array name="orientation_entries">
+        <item>Landscape(Default)</item>
+        <item>Portrait</item>
+        <item>Reverse Landscape</item>
+        <item>Reverse Portrait</item>
+    </string-array>
+
+    <string-array name="orientation_values">
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>reverse_landscape</item>
+        <item>reverse_portrait</item>
+    </string-array>
+
+    <string-array name="simplified_orientation_entries">
+        <item>Auto Rotate(Default)</item>
+        <item>Landscape</item>
+        <item>Portrait</item>
+        <item>Reverse Landscape</item>
+        <item>Reverse Portrait</item>
+    </string-array>
+
+    <string-array name="simplified_orientation_values">
+        <item>auto</item>
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>reverse_landscape</item>
+        <item>reverse_portrait</item>
+    </string-array>
+
 </resources>

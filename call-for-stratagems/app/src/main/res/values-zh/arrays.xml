@@ -248,4 +248,34 @@
         <item>en</item>
     </string-array>
 
+    <string-array name="orientation_entries">
+        <item>横向（默认）</item>
+        <item>竖向</item>
+        <item>反向横向</item>
+        <item>反向竖向</item>
+    </string-array>
+
+    <string-array name="orientation_values">
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>reverse_landscape</item>
+        <item>reverse_portrait</item>
+    </string-array>
+
+    <string-array name="simplified_orientation_entries">
+        <item>自动旋转（默认）</item>
+        <item>横向</item>
+        <item>竖向</item>
+        <item>反向横向</item>
+        <item>反向竖向</item>
+    </string-array>
+
+    <string-array name="simplified_orientation_values">
+        <item>auto</item>
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>reverse_landscape</item>
+        <item>reverse_portrait</item>
+    </string-array>
+
 </resources>

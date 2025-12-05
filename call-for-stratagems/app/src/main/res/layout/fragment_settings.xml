@@ -978,6 +978,76 @@
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/backgroundPrimary"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/set_ctrl_orientation"
+                        android:theme="@style/AppText" />
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent" />
+
+                    <Spinner
+                        android:id="@+id/set_ctrl_orientation"
+                        android:layout_width="125dp"
+                        android:layout_height="35dp"
+                        android:background="@color/backgroundSecondary"
+                        android:entries="@array/orientation_entries"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="TouchTargetSizeCheck" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/backgroundPrimary"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/set_ctrl_simplified_orientation"
+                        android:theme="@style/AppText" />
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent" />
+
+                    <Spinner
+                        android:id="@+id/set_ctrl_simplified_orientation"
+                        android:layout_width="125dp"
+                        android:layout_height="35dp"
+                        android:background="@color/backgroundSecondary"
+                        android:entries="@array/simplified_orientation_entries"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="TouchTargetSizeCheck" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
                 <indie.wistefinch.callforstratagems.utils.AppButton
                     android:id="@+id/set_ctrl_asr"
                     android:layout_width="match_parent"
@@ -1047,10 +1117,12 @@
                     app:text="@string/set_info_app" />
 
                 <Space
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="5dp" />
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:gravity="center"

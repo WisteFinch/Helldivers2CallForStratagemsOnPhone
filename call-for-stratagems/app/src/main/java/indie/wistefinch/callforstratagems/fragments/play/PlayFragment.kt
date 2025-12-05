@@ -195,6 +195,16 @@ class PlayFragment : Fragment() {
      */
     private var lang: String = "auto"
 
+    /**
+     * Screen orientation.
+     */
+    private var orientation: String = "landscape"
+
+    /**
+     * Screen orientation (simplified mode).
+     */
+    private var simplifiedOrientation: String = "auto"
+
     // Sound effects and vibrator.
     /**
      * Step input sfx id.
@@ -249,6 +259,8 @@ class PlayFragment : Fragment() {
         retryLimit = preferences.getInt("conn_retry", 5)
         sid = preferences.getString("sid", "NULL")!!
         lang = preferences.getString("ctrl_lang", "auto")!!
+        orientation = preferences.getString("ctrl_orientation", "landscape")!!
+        simplifiedOrientation = preferences.getString("ctrl_simplified_orientation", "auto")!!
         if (lang == "auto") {
             lang = context?.resources?.configuration?.locales?.get(0)?.toLanguageTag()!!
         }
@@ -265,9 +277,22 @@ class PlayFragment : Fragment() {
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         requireActivity().requestedOrientation = if (enableSimplifiedMode) {
-            ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            when(simplifiedOrientation) {
+                "auto" -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                "landscape" -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                "portrait" -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                "reverse_landscape" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                "reverse_portrait" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            }
         } else {
-            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            when(orientation) {
+                "landscape" -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                "portrait" -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                "reverse_landscape" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                "reverse_portrait" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                else -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
         }
         view?.keepScreenOn = true
 

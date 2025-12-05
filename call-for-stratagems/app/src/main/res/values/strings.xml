@@ -7,7 +7,8 @@
     <string name="fragment_root">CallForStratagems</string>
     <string name="fragment_editGroup">Edit Group</string>
     <string name="fragment_settings">Settings</string>
-    <string name="fragment_settings_sync">Sync</string>
+    <string name="fragment_settings_sync">Advanced Options</string>
+    <string name="fragment_settings_asr">Speech Recognition</string>
     <string name="fragment_viewGroup">Browse Group</string>
     <string name="fragment_play">Play</string>
     <string name="fragment_stratagemsList">Stratagems List</string>
@@ -81,6 +82,8 @@
     <string name="set_ctrl_lang_stratagem">Language: Stratagem Name</string>
     <string name="set_ctrl_gst_swp_distance_threshold">Gesture Swipe Distance Threshold</string>
     <string name="set_ctrl_gst_swp_velocity_threshold">Gesture Swipe Velocity Threshold</string>
+    <string name="set_ctrl_orientation">Screen Orientation</string>
+    <string name="set_ctrl_simplified_orientation">Screen Orientation (Simplified Mode)</string>
     <string name="set_unit_pixel">pixel</string>
     <string name="set_unit_pixel_s">pixel/s</string>
     <string name="set_ctrl_fastboot_mode">Enable Fastboot Mode</string>

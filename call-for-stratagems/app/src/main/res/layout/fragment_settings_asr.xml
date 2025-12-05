@@ -43,7 +43,7 @@
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/set_ctrl_asr_hdr"
+            android:text="@string/fragment_settings_asr"
             android:textSize="24sp"
             android:theme="@style/AppTextTitle" />
 
