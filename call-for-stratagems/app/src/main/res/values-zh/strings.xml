@@ -12,7 +12,8 @@
     <string name="fragment_root">呼叫战略配备</string>
     <string name="fragment_editGroup">编辑组合</string>
     <string name="fragment_settings">设置</string>
-    <string name="fragment_settings_sync">同步</string>
+    <string name="fragment_settings_sync">高级选项</string>
+    <string name="fragment_settings_asr">语音识别</string>
     <string name="fragment_viewGroup">浏览组合</string>
     <string name="fragment_play">游玩</string>
     <string name="fragment_stratagemsList">战略配备列表</string>
@@ -94,8 +95,8 @@
     <string name="set_ctrl_asr_model_null">未选择模型</string>
     <string name="set_ctrl_asr_model_ready">模型就绪：[%1$s]</string>
     <string name="set_ctrl_asr_model_incomplete">模型不完整：[%1$s]</string>
-    <string name="set_ctrl_asr_model_dl_title">更新数据库</string>
-    <string name="set_ctrl_asr_model_dl_title2">更新数据库：%1$s</string>
+    <string name="set_ctrl_asr_model_dl_title">更新模型</string>
+    <string name="set_ctrl_asr_model_dl_title2">更新模型：%1$s</string>
     <string name="set_ctrl_asr_model_dl_idx">获取数据库索引</string>
     <string name="set_ctrl_asr_model_dl_files">(%1$d/%2$d) 下载模型文件</string>
     <string name="set_ctrl_asr_model_dl_item">%1$.1f%% %2$s/%3$s</string>
@@ -134,7 +135,7 @@
     <string name="set_info_db_updt_complete">更新完成</string>
     <string name="set_info_db_updt_failed">更新失败：%1$s\n，请开启网络代理（VPN）后重试</string>
     <string name="set_info_app">软件版本</string>
-    <string name="set_info_app_chk">软件版本（检查更新）</string>
+    <string name="set_info_app_chk">软件版本（正在检查更新）</string>
     <string name="set_info_app_updatable">软件版本（可更新）</string>
     <string name="set_info_app_ver">%1$s[API%2$d]</string>
     <string name="set_info_app_latest">%1$s[API%2$d] (最新)</string>
@@ -146,7 +147,7 @@
     <string name="set_info_import">还原用户数据</string>
     <string name="set_info_import_success">还原成功</string>
     <string name="set_info_import_failed">还原失败：%1$s</string>
-    <string name="set_info_import_failed_ver">还原失败：备份文件版本不支持</string>
+    <string name="set_info_import_failed_ver">还原失败：不支持的文件版本</string>
     <string name="set_info_import_cancel">还原取消</string>
     <string name="set_info_about">关于</string>
 
