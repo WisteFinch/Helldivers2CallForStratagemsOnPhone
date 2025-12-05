@@ -29,7 +29,13 @@ You can check the usage [here](./usage.md)
   - Android: ≥8.0 (SDK26)
   - ABIs: arm64-v8a
 
-## Build & Run
+## TODO
+
+* [ ] Server singleton pattern
+* [ ] Custom stratagem
+* [ ] ASR hotword
+
+## Build
 
 ### Server
 
