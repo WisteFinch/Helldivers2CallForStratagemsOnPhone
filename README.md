@@ -72,6 +72,7 @@ You can check the server API [here](./server_api_6.md)
 
 - Helldivers2 Stratagem Database [HD2CFS-Database](https://github.com/WisteFinch/HD2CFS-Database)
 - Helldivers Stratagem Database [HD2CFS-Database_HD](https://github.com/WisteFinch/HD2CFS-Database_HD)
+- [Helldivers 2 Guides](https://hd2guides.com/) — Helldivers 2 stratagem tier lists, warbond guides, mission strategies, and loadout builds.
 
 ## Libs used
 
